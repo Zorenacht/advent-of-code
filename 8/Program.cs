@@ -1,3 +1,3 @@
-﻿using ReaderUtilities;
+﻿using Tools;
 
 Console.WriteLine(Reader.ReadAsText("Input.txt"));
