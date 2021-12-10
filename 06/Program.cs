@@ -1,12 +1,9 @@
-﻿
-[Test]
-part2();
+﻿part2();
 
 void part2()
 {
     const int total_generations = 256;
     long[] population = new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Reader.ReadAsText("Input.txt");
     const int normal_internal_timer = 7;
     const int new_internal_timer = normal_internal_timer+2;
 
