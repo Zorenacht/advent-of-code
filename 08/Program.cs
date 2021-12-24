@@ -2,15 +2,7 @@
 
 
 part1();
-
-DateTime startTime, endTime;
-startTime = DateTime.Now;
-
-part2();
-
-endTime = DateTime.Now;
-Double elapsedMillisecs = ((TimeSpan)(endTime - startTime)).TotalMilliseconds;
-Console.WriteLine("Ms: " + elapsedMillisecs);
+Stopwatch.Time(part2);
 
 void part2()
 {

@@ -1,92 +1,63 @@
-﻿using System.Text;
-const int part2maxCount = 21;
+﻿using Tools;
 
-//part1();
-part2();
+Stopwatch.Time(part2);
 
-void part2()
+void part1()
 {
-    long[,,,] dynamicArray = new long[10, 10, part2maxCount + 1, part2maxCount + 1]; //p1,p2,total count
-    dynamicArray[4 - 1, 8 - 1, 0, 0] = 1;
-    for (int count = 0; count < dynamicArray.GetLength(2); count++)
-    {
-        print(dynamicArray, count);
-        for (int p1 = 0; p1 < dynamicArray.GetLength(0); p1++)
-        {
-            for (int p2 = 0; p2 < dynamicArray.GetLength(1); p2++)
-            {
-                diceRolls(count, p1, p2, dynamicArray);
-            }
-        }
-    }
-    print(dynamicArray, part2maxCount);
-
-    int p1count = 0;
-    int p2count = 0;
-    for (int p1 = 0; p1 < dynamicArray.GetLength(0); p1++)
-    {
-        for (int p2 = 0; p2 < dynamicArray.GetLength(1); p2++)
-        {
-            
-        }
-    }
-}
-
-void diceRolls(int count, int p1, int p2, long[,,,] dynamicArray)
-{
-    for(int i=1; i <= 3; i++)
-    {
-        for (int j = 1; j <= 3; j++)
-        {
-            for (int k = 1; k <= 3; k++)
-            {
-                int roll = i + j + k;
-
-                int newP1pos = newPos(p1, roll);
-                int newP1count = Math.Min(count + newP1pos, part2maxCount);
-                dynamicArray[newP1pos - 1, p2, newP1count] += dynamicArray[p1, p2, count];
-
-                int newP2pos = newPos(p2, roll);
-                int newP2count = Math.Min(count + newP2pos, part2maxCount);
-                dynamicArray[p1, newP2pos - 1, newP2count] += dynamicArray[p1, p2, count];
-            }
-        }
-    }
-}
-
-int newPos(int player, int roll)
-{
-    return (player + roll - 1) % 10 + 1;
-}
-
-void print(long[,,] dynamicArray, int count)
-{
-    StringBuilder sb = new();
-    for (int p1 = 0; p1 < dynamicArray.GetLength(0); p1++)
-    {
-        for (int p2 = 0; p2 < dynamicArray.GetLength(1); p2++)
-        {
-            string val = dynamicArray[p1, p2, count].ToString();
-            sb.Append(dynamicArray[p1, p2, count] + new string(' ', 20-val.Length) + ",");
-        }
-        sb.Append('\n');
-    }
-    Console.WriteLine(sb.ToString());
-}
-
-void part1(){
     int[] playerPos = new int[2] { 4, 3 };
     int[] playerCount = new int[2] { 0, 0 };
 
     int detDie = 1;
     int turn = 0;
-    while(playerCount.Max() < 1000)
+    while (playerCount.Max() < 1000)
     {
-        playerPos[turn] = (playerPos[turn]-1 + 3 * detDie + 3) % 10 + 1;
+        playerPos[turn] = (playerPos[turn] - 1 + 3 * detDie + 3) % 10 + 1;
         playerCount[turn] += playerPos[turn];
         detDie += 3;
         turn = (turn + 1) % 2;
     }
-    Console.WriteLine(detDie-1 + " " + string.Join(' ', playerCount));
-    Console.WriteLine((detDie-1) * playerCount.Min());
+    Console.WriteLine(detDie - 1 + " " + string.Join(' ', playerCount));
+    Console.WriteLine((detDie - 1) * playerCount.Min());
+}
+void part2()
+{
+    Game game = new Game();
+    List<(int, int)> state = new List<(int, int)>() { (4,0), (3,0) };
+    game.Run(1, state, 0);
+
+    Console.WriteLine("Numer of dimensions: " + string.Join(",", game.count));
+
+}
+
+public class Game
+{
+    public Dictionary<int, int> distribution = new Dictionary<int, int>() { { 3, 1 }, { 4, 3 }, { 5, 6 }, { 6, 7 }, { 7, 6 }, { 8, 3 }, { 9, 1 } };
+    public long[] count = new long[2];
+
+    public void Run(long branchCount, List<(int, int)> state, int player)
+    {
+        foreach (KeyValuePair<int, int> dist in distribution)
+        {
+            var newPlayerState = NewPlayerState(player, dist.Key, state);
+            var newState = new List<(int, int)>() 
+            { 
+                player == 0 ? newPlayerState : state[0], 
+                player == 1 ? newPlayerState : state[1]
+            };
+            if( newState[player].Item2 >= 21)
+            {
+                count[player] += dist.Value * branchCount;
+            }
+            else
+            {
+                Run(dist.Value * branchCount, newState , (player+1) % 2);
+            }
+        }
+    }
+
+    private (int,int) NewPlayerState(int player, int roll, List<(int,int)> currentState)
+        => (NewPos(currentState[player].Item1, roll), currentState[player].Item2 + NewPos(currentState[player].Item1, roll));
+    
+    private int NewPos(int pos, int roll) 
+        => (pos + roll - 1) % 10 + 1;
 }
