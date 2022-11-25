@@ -35,7 +35,7 @@ int[,] FoldHorizontal(int x, int[,] paper)
 
 int[,] FoldVertical(int y, int[,] paper)
 {
-    int[,] paper = new int[1500, 1500];
+    //int[,] paper = new int[1500, 1500];
 
     string[] lines = Reader.ReadLines("Input.txt");
     foreach (string line in lines)
