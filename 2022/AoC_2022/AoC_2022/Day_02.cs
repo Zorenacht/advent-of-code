@@ -1,6 +1,6 @@
 namespace AoC_2022;
 
-public class Day_1
+public class Day_02
 {
     [TestCase(2, ExpectedResult = 1)]
     public int Part_1(int i)
