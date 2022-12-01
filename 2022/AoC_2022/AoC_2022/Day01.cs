@@ -12,9 +12,9 @@ public class Day01
         int current = 0;
         foreach (string line in InputPart_1)
         {
-            if(line == string.Empty)
+            if (line == string.Empty)
             {
-                if(current > result)
+                if (current > result)
                 {
                     result = current;
                 }
@@ -32,19 +32,18 @@ public class Day01
     public void Part2()
     {
         int current = 0;
-        var top3 = new PriorityQueue<int, int>();
-        List<int> input = new List<int>();
+        var top3 = new PriorityQueue<int, int>(3);
         foreach (string line in InputPart_2)
         {
             if (line == string.Empty)
             {
-                bool notEmpty = top3.TryPeek(out int _, out int prio);
-                if ( !notEmpty || notEmpty && prio < current)
+                if (top3.Count < 3)
                 {
-                    if(top3.Count == 3)
-                    { 
-                        top3.Dequeue();
-                    }
+                    top3.Enqueue(current, current);
+                }
+                else if (top3.Peek() < current)
+                {
+                    top3.Dequeue();
                     top3.Enqueue(current, current);
                 }
                 current = 0;
