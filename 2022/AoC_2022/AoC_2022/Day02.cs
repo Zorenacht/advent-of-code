@@ -1,16 +1,38 @@
 namespace AoC_2022;
 
-public class Day02
+public class Day02 : Day
 {
-    [TestCase(2, ExpectedResult = 1)]
-    public int Part1(int i)
+    [Test]
+    public void Example()
     {
-        return i;
+        int result = 0;
+        foreach (string line in InputExample)
+        {
+            var split = line.Split(',', '.', ':');
+        }
+        result.Should().Be(68923);
+        Assert.Pass();
     }
 
-    [TestCase(3, ExpectedResult = 2)]
-    public int Part2(int i)
+    [Test]
+    public void Part1()
     {
-        return i;
+        int result = 0;
+        foreach (string line in InputPart1)
+        {
+        }
+        result.Should().Be(68923);
+        Assert.Pass();
+    }
+
+    [Test]
+    public void Part2()
+    {
+        int result = 0;
+        foreach (string line in InputPart2)
+        {
+        }
+        result.Should().Be(68923);
+        Assert.Pass();
     }
 }

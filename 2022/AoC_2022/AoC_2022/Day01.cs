@@ -1,16 +1,13 @@
 namespace AoC_2022;
 
-public class Day01
+public sealed class Day01 : Day
 {
-    readonly string[] InputPart_1 = Reader.ReadLines(@"InputFiles\Day01-1.txt").ToArray();
-    readonly string[] InputPart_2 = Reader.ReadLines(@"InputFiles\Day01-2.txt").ToArray();
-
     [Test]
     public void Part1()
     {
         int result = 0;
         int current = 0;
-        foreach (string line in InputPart_1)
+        foreach (string line in InputPart1)
         {
             if (line == string.Empty)
             {
@@ -33,7 +30,7 @@ public class Day01
     {
         int current = 0;
         var top3 = new PriorityQueue<int, int>(3);
-        foreach (string line in InputPart_2)
+        foreach (string line in InputPart2)
         {
             if (line == string.Empty)
             {
