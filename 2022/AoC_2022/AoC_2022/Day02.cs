@@ -6,14 +6,14 @@ public class Day02 : Day
     public void Example()
     {
         int score = 0;
-        foreach (string line in InputPart1)
+        foreach (string line in InputExample)
         {
             var split = line.Split(' ');
             int opponent = split[0][0] - 'A';
             int you = split[1][0] - 'X';
             score += (you + 1) + 3 * Modulo(you - opponent + 1, 3);
         }
-        score.Should().Be(9241);
+        score.Should().Be(15);
     }
 
     [Test]
