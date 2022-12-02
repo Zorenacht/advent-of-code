@@ -6,22 +6,14 @@ public class Day02 : Day
     public void Example()
     {
         int score = 0;
-        foreach (string line in InputExample)
+        foreach (string line in InputPart1)
         {
             var split = line.Split(' ');
-            char opponent = split[0][0];
-            char you = (char)(split[1][0] - ('X' - 'A'));
-            score += you - 'A' + 1;
-            if (opponent == you)
-            {
-                score += 3;
-            }
-            else if (opponent == 'A' && you == 'B' || opponent == 'B' && you == 'C' || opponent == 'C' && you == 'A')
-            {
-                score += 6;
-            }
+            int opponent = split[0][0] - 'A';
+            int you = split[1][0] - 'X';
+            score += (you + 1) + 3 * Modulo(you - opponent + 1, 3);
         }
-        score.Should().Be(15);
+        score.Should().Be(9241);
     }
 
     [Test]
@@ -31,17 +23,9 @@ public class Day02 : Day
         foreach (string line in InputPart1)
         {
             var split = line.Split(' ');
-            char opponent = split[0][0];
-            char you = (char)(split[1][0] - ('X' - 'A'));
-            score += you - 'A' + 1;
-            if (opponent == you)
-            {
-                score += 3;
-            }
-            else if (opponent == 'A' && you == 'B' || opponent == 'B' && you == 'C' || opponent == 'C' && you == 'A')
-            {
-                score += 6;
-            }
+            int opponent = split[0][0] - 'A';
+            int you = split[1][0] - 'X';
+            score += (you + 1) + 3 * Modulo(you - opponent + 1, 3);
         }
         score.Should().Be(9241);
     }
@@ -53,11 +37,11 @@ public class Day02 : Day
         foreach (string line in InputPart2)
         {
             var split = line.Split(' ');
-            char opponent = split[0][0];
-            char you = split[1][0];
-            var offset = (you - 'Y') % 3; //+0 for draw, +1 for win, +2 for loss
-            score += Modulo(opponent - 'A' + offset,3) + 1;
-            score += 3 * (you - 'X');
+            int opponent = split[0][0] - 'A';
+            int goal = split[1][0] - 'X'; //0 loss, 1 draw, 2 win
+            int offset = goal - 1; //-1 loss, 0 draw, 1 win 
+            score += Modulo(opponent + offset, 3) + 1;
+            score += 3 * goal;
         }
         score.Should().Be(14610);
     }
@@ -75,6 +59,7 @@ public class Day02 : Day
         Modulo(3, 3).Should().Be(0);
     }
 
+    //Modulo such that -1 % n = n-1 for positive n
     private int Modulo(int a, int b)
     {
         int remainder = a % b;
