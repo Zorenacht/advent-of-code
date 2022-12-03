@@ -9,62 +9,51 @@ public class Day03 : Day
     public void Example()
     {
         int score = 0;
-        var seen = new HashSet<char>(52);
+        var seen = new bool[52];
         foreach (string line in InputExample)
         {
-            for(int i=0; i < line.Length/2; i++)
+            for (int i = 0; i < line.Length / 2; i++)
             {
-                seen.Add(line[i]);
+                seen[CharToIndex(line[i])] = true;
             }
             for (int i = line.Length / 2; i < line.Length; i++)
             {
-                if (seen.Contains(line[i]))
+                if (seen[CharToIndex(line[i])])
                 {
-                    if (line[i] >= 'a' && line[i] <= 'z')
-                    {
-                        score += line[i] - 'a' + 1;
-                        break;
-                    }
-                    else
-                    {
-                        score += line[i] - 'A' + 1 + 26;
-                        break;
-                    }
+                    score += CharToIndex(line[i]) + 1;
+                    break;
                 };
             }
-            seen.Clear();
+            seen = new bool[52];
         }
         score.Should().Be(157);
     }
+
+    public int CharToIndex(char ch) =>
+        ch >= 'a' && ch <= 'z'
+        ? ch - 'a'
+        : ch - 'A' + 26;
 
     [Test]
     public void Part1()
     {
         int score = 0;
-        var seen = new HashSet<char>(52);
+        var seen = new bool[52];
         foreach (string line in InputPart1)
         {
             for (int i = 0; i < line.Length / 2; i++)
             {
-                seen.Add(line[i]);
+                seen[CharToIndex(line[i])] = true;
             }
             for (int i = line.Length / 2; i < line.Length; i++)
             {
-                if (seen.Contains(line[i]))
+                if (seen[CharToIndex(line[i])])
                 {
-                    if (line[i] >= 'a' && line[i] <= 'z')
-                    {
-                        score += line[i] - 'a' + 1;
-                        break;
-                    }
-                    else
-                    {
-                        score += line[i] - 'A' + 1 + 26;
-                        break;
-                    }
+                    score += CharToIndex(line[i]) + 1;
+                    break;
                 };
             }
-            seen.Clear();
+            seen = new bool[52];
         }
         score.Should().Be(7903);
     }
@@ -77,23 +66,14 @@ public class Day03 : Day
         int groupCounter = 0;
         foreach (string line in InputPart2)
         {
-            if(groupCounter == 3)
+            if (groupCounter == 3)
             {
                 seen = new int[52];
                 groupCounter = 0;
             }
             foreach (var uniqueChar in line.Distinct())
             {
-                int index;
-                if (uniqueChar >= 'a' && uniqueChar <= 'z')
-                {
-                    index = uniqueChar - 'a';
-                }
-                else
-                {
-                    index = uniqueChar - 'A' + 26;
-                }
-
+                int index = CharToIndex(uniqueChar);
                 if (seen[index] == 2)
                 {
                     score += index + 1;
@@ -106,6 +86,6 @@ public class Day03 : Day
             }
             groupCounter++;
         }
-        score.Should().Be(7903);
+        score.Should().Be(2548);
     }
 }
