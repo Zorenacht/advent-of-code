@@ -1,6 +1,3 @@
-using MathNet.Numerics.Providers.LinearAlgebra;
-using System.Runtime.Serialization;
-
 namespace AoC_2022;
 
 public class Day03 : Day
