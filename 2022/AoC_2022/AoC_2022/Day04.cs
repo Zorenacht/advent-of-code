@@ -6,13 +6,13 @@ namespace AoC_2022;
 public class Day04 : Day
 {
     [Test]
-    public void Example() => InputExample.Select(Parse).Count(OneContained);
+    public void Example() => InputExample.Select(Parse).Count(OneContained).Should().Be(2);
 
     [Test]
-    public void Part1() => InputPart1.Select(Parse).Count(OneContained);
+    public void Part1() => InputPart1.Select(Parse).Count(OneContained).Should().Be(538);
 
     [Test]
-    public void Part2() => InputPart2.Select(Parse).Count(AnyOverlap);
+    public void Part2() => InputPart2.Select(Parse).Count(AnyOverlap).Should().Be(792);
 
     public Interval[] Parse(string line)
     {
@@ -41,7 +41,7 @@ public class Day04 : Day
     public bool OneContained(Interval[] intervals)
     {
         var intersection = intervals[0].Intersection(intervals[1]);
-        return intersection == intervals[0] || intersection == intervals[0];
+        return intersection == intervals[0] || intersection == intervals[1];
     }
 
     public bool AnyOverlap(Interval[] intervals) => intervals[0].Intersection(intervals[1]).IsValid;
