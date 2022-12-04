@@ -1,67 +1,48 @@
+
+using System.Reflection.Metadata.Ecma335;
+
 namespace AoC_2022;
 
 public class Day04 : Day
 {
     [Test]
-    public void Example()
-    {
-        int score = 0;
-        foreach (string line in InputExample)
-        {
-            var split = line.Split('-', ',');
-            int x1 = int.Parse(split[0]);
-            int y1 = int.Parse(split[1]);
-            int x2 = int.Parse(split[2]);
-            int y2 = int.Parse(split[3]);
-            var ix = Math.Max(x1, x2);
-            var iy = Math.Min(y1, y2);
-            if( ix == x1 && iy == y1 || ix == x2 && iy == y2)
-            {
-                score++;
-            }
-        }
-        score.Should().Be(2);
-    }
+    public void Example() => InputExample.Select(Parse).Count(OneContained);
 
     [Test]
-    public void Part1()
-    {
-        int score = 0;
-        foreach (string line in InputPart1)
-        {
-            var split = line.Split('-', ',');
-            int x1 = int.Parse(split[0]);
-            int y1 = int.Parse(split[1]);
-            int x2 = int.Parse(split[2]);
-            int y2 = int.Parse(split[3]);
-            var ix = Math.Max(x1, x2);
-            var iy = Math.Min(y1, y2);
-            if (ix == x1 && iy == y1 || ix == x2 && iy == y2)
-            {
-                score++;
-            }
-        }
-        score.Should().Be(538);
-    }
+    public void Part1() => InputPart1.Select(Parse).Count(OneContained);
 
     [Test]
-    public void Part2()
+    public void Part2() => InputPart2.Select(Parse).Count(AnyOverlap);
+
+    public Interval[] Parse(string line)
     {
-        int score = 0;
-        foreach (string line in InputPart2)
+        var split = line.Split('-', ',');
+        int a1 = int.Parse(split[0]);
+        int b1 = int.Parse(split[1]);
+        int a2 = int.Parse(split[2]);
+        int b2 = int.Parse(split[3]);
+        return new[]
         {
-            var split = line.Split('-', ',');
-            int x1 = int.Parse(split[0]);
-            int y1 = int.Parse(split[1]);
-            int x2 = int.Parse(split[2]);
-            int y2 = int.Parse(split[3]);
-            var ix = Math.Max(x1, x2);
-            var iy = Math.Min(y1, y2);
-            if (iy - ix >= 0)
-            {
-                score++;
-            }
-        }
-        score.Should().Be(792);
+            new Interval(a1, b1),
+            new Interval(a2, b2)
+        };
     }
+
+    public record Interval(int Min, int Max)
+    {
+        public bool IsValid = Max - Min >= 0;
+
+        public Interval Intersection(Interval other) =>
+            new Interval(
+                Math.Max(Min, other.Min),
+                Math.Min(Max, other.Max));
+    };
+
+    public bool OneContained(Interval[] intervals)
+    {
+        var intersection = intervals[0].Intersection(intervals[1]);
+        return intersection == intervals[0] || intersection == intervals[0];
+    }
+
+    public bool AnyOverlap(Interval[] intervals) => intervals[0].Intersection(intervals[1]).IsValid;
 }
