@@ -27,12 +27,12 @@ public sealed partial class Day06 : Day
     }
 
 
-    private int StartOfMessage(string line, int unique)
+    private int StartOfMessage(string message, int unique)
     {
         int result = 0;
         var uniques = new HashSet<char>(unique);
         var queue = new Queue<char>(unique);
-        foreach (char c in line)
+        foreach (char c in message)
         {
             if (uniques.Count == unique) break;
             while (uniques.Contains(c))
