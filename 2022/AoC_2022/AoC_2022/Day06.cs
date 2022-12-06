@@ -1,6 +1,3 @@
-
-using System.Xml;
-
 namespace AoC_2022;
 
 public sealed partial class Day06 : Day
