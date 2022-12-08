@@ -1,5 +1,3 @@
-using System.Diagnostics.Metrics;
-using System.Reflection;
 using Tools.Geometry;
 
 namespace AoC_2022;
@@ -216,6 +214,8 @@ public sealed partial class Day08 : Day
         down.Print();
     }
 
+
+    //nlog(n) (n=total input digits)
     private void TreeView2(Grid grid, out Grid left, out Grid right, out Grid up, out Grid down)
     {
         left = new Grid(grid.RowLength, grid.ColumnLength);
