@@ -9,10 +9,10 @@ public sealed partial class Day07 : Day
     public void Example()
     {
         var result = 0;
-        foreach (string line in InputExample)
-        {
-        }
-        result.Should().Be(68923);
+        var root = ParseInput(InputExample);
+        SetFolderSizes(root);
+        FindSizesGreaterThan100000(root, ref result);
+        result.Should().Be(95437);
     }
 
     [Test]
@@ -22,19 +22,19 @@ public sealed partial class Day07 : Day
         var root = ParseInput(InputPart1);
         SetFolderSizes(root);
         FindSizesGreaterThan100000(root, ref result);
-        result.Should().Be(1778099);
+        result.Should().Be(1_778_099);
     }
 
     [Test]
     public void Part2()
     {
-        var maxSize = 40000000;
+        var maxSize = 4_0000_000;
         var root = ParseInput(InputPart2);
         SetFolderSizes(root);
         int sizeToBeDeleted = root.Size - maxSize;
         var minSize = root.Size;
         FindSmallestToBeDeleted(root, sizeToBeDeleted, ref minSize);
-        minSize.Should().Be(1623571);
+        minSize.Should().Be(1_623_571);
     }
 
     File ParseInput(string[] input)
