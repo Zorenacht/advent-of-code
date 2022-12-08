@@ -10,11 +10,13 @@ public sealed partial class Day09 : Day
     [Test]
     public void Part1()
     {
+
     }
 
     [Test]
     public void Part2()
     {
+
     }
 
 }
