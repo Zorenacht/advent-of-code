@@ -1,5 +1,3 @@
-using MathNet.Numerics;
-using System.Runtime.InteropServices;
 using Tools.Geometry;
 
 namespace AoC_2022;

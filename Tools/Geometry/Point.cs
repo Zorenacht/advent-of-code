@@ -4,23 +4,23 @@ namespace Tools.Geometry;
 
 public readonly struct Point : IEquatable<Point>
 {
-    public static Point O = new(0,0);
+    public static readonly Point O = new(0, 0);
 
     public int X { get; }
     public int Y { get; }
 
     public Point(int x, int y)
     {
-        X = x; 
-        Y = y; 
+        X = x;
+        Y = y;
     }
 
 
-    public Point Neighbor(Direction direction) 
+    public Point Neighbor(Direction direction)
     {
         int x = Convert.ToInt32(Math.Round(Math.Cos(Convert.ToDouble(direction) * Math.PI / 4)));
         int y = Convert.ToInt32(Math.Round(Math.Sin(Convert.ToDouble(direction) * Math.PI / 4)));
-        return new Point(X+x, Y+y);
+        return new Point(X + x, Y + y);
     }
 
     public Point Difference(Point other)
@@ -30,7 +30,7 @@ public readonly struct Point : IEquatable<Point>
 
     public int Norm => X * X + Y * Y;
 
-    public Direction GeneralDirection 
+    public Direction GeneralDirection
     {
         get
         {
@@ -56,4 +56,13 @@ public readonly struct Point : IEquatable<Point>
     public bool Equals(Point other) => other.X == X && other.Y == Y;
     public override int GetHashCode() => X ^ (Y << 16);
 
+    public static bool operator ==(Point left, Point right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Point left, Point right)
+    {
+        return !(left == right);
+    }
 }
