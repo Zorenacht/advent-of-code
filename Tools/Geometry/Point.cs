@@ -1,15 +1,20 @@
-﻿namespace Tools.Geometry;
+﻿using System.Diagnostics.CodeAnalysis;
 
-public struct Point
+namespace Tools.Geometry;
+
+public readonly struct Point : IEquatable<Point>
 {
-    public int X { get; init; }
-    public int Y { get; init; }
+    public static Point O = new(0,0);
+
+    public int X { get; }
+    public int Y { get; }
 
     public Point(int x, int y)
     {
         X = x; 
         Y = y; 
     }
+
 
     public Point Neighbor(Direction direction) 
     {
@@ -46,4 +51,9 @@ public struct Point
     {
         return $"({X},{Y})";
     }
+
+    public override bool Equals([NotNullWhen(true)] object? obj) => obj is Point other && Equals(other);
+    public bool Equals(Point other) => other.X == X && other.Y == Y;
+    public override int GetHashCode() => X ^ (Y << 16);
+
 }

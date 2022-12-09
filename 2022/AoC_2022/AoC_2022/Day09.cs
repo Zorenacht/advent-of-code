@@ -7,85 +7,43 @@ namespace AoC_2022;
 public sealed partial class Day09 : Day
 {
     [Test]
-    public void Example()
-    {
-        var rope = Enumerable.Repeat(new Point(0, 0), 2).ToArray();
-        var visited = new HashSet<Point>() { rope[^1] };
-        foreach (string line in InputExample)
-        {
-            var split = line.Split(' ');
-            var dir = StringToDirection(split[0]);
-            var amount = int.Parse(split[1]);
-            for (int i = 0; i < amount; i++)
-            {
-                rope[0] = rope[0].Neighbor(dir);
-                UpdateTail(rope);
-                if (!visited.Contains(rope[^1]))
-                {
-                    visited.Add(rope[^1]);
-                }
-            }
-        }
-        visited.Count().Should().Be(13);
-    }
+    public void Example() => Simulate(InputExample, 2).Should().Be(13);
 
     [Test]
-    public void Part1()
-    {
-        var rope = Enumerable.Repeat(new Point(0, 0), 2).ToArray();
-        var visited = new HashSet<Point>() { rope[^1] };
-        foreach (string line in InputPart1)
-        {
-            var split = line.Split(' ');
-            var dir = StringToDirection(split[0]);
-            var amount = int.Parse(split[1]);
-            for (int i = 0; i < amount; i++)
-            {
-                rope[0] = rope[0].Neighbor(dir);
-                UpdateTail(rope);
-                if (!visited.Contains(rope[^1]))
-                {
-                    visited.Add(rope[^1]);
-                }
-            }
-        }
-        visited.Count().Should().Be(6044);
-    }
+    public void Part1() => Simulate(InputPart1, 2).Should().Be(6044);
 
     [Test]
-    public void Part2()
-    {
+    public void Part2() => Simulate(InputPart1, 10).Should().Be(2384);
 
-        var rope = Enumerable.Repeat(new Point(0, 0), 10).ToArray();
-        var visited = new HashSet<Point>() { rope[^1] };
-        foreach (string line in InputPart1)
+
+    private static int Simulate(string[] input, int size)
+    {
+        var rope = Enumerable.Repeat(Point.O, size).ToArray();
+        var visited = new HashSet<Point>();
+        foreach (string line in input)
         {
-            var split = line.Split(' ');
-            var dir = StringToDirection(split[0]);
-            var amount = int.Parse(split[1]);
+            var dir = StringToDirection(line[0]);
+            var amount = int.Parse(line[2..]);
             for (int i = 0; i < amount; i++)
             {
                 rope[0] = rope[0].Neighbor(dir);
                 UpdateTail(rope);
-                if (!visited.Contains(rope[^1]))
-                {
-                    visited.Add(rope[^1]);
-                }
+                visited.Add(rope[^1]);
             }
         }
-        visited.Count().Should().Be(2384);
+        return visited.Count;
     }
 
-    private Direction StringToDirection(string s) => s switch
+    private static Direction StringToDirection(char s) => s switch
     {
-        "R" => Direction.E,
-        "L" => Direction.W,
-        "U" => Direction.N,
-        "D" => Direction.S,
+        'R' => Direction.E,
+        'L' => Direction.W,
+        'U' => Direction.N,
+        'D' => Direction.S,
         _ => throw new IndexOutOfRangeException(),
     };
 
-    private void UpdateTail(Point[] rope)
+    private static void UpdateTail(Point[] rope)
     {
         for (int i = 1; i < rope.Length; i++)
         {
