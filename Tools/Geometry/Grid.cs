@@ -72,6 +72,10 @@ public class Grid : IEnumerable
     {
         if (IsValid(row, col))
             Lattice[row][col] = value;
+        else
+        {
+            throw new IndexOutOfRangeException();
+        }
         return IsValid(row, col);
     }
     public bool UpdateAt(Point point, int value)

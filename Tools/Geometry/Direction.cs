@@ -10,4 +10,6 @@ public enum Direction
     SW = 5,
     S = 6,
     SE = 7,
+
+    None = 100,
 }
