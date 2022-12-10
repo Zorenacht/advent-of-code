@@ -13,7 +13,7 @@ public sealed partial class Day10 : Day
     [Test]
     public void Part2() => CRT.Parse(InputPart1).Display().Should().Be(EFLUGLPAP);
 
-    static string ExampleAnswer => 
+    static string ExampleAnswer =>
 @"##..##..##..##..##..##..##..##..##..##..
 ###...###...###...###...###...###...###.
 ####....####....####....####....####....
@@ -31,23 +31,23 @@ public sealed partial class Day10 : Day
 
 
     private class CRT
-    { 
-        private Queue<Cmd> Cmds { get; set; }
-        private CRT(Queue<Cmd> cmds) => Cmds = cmds;
+    {
+        private List<Cmd> Cmds { get; set; }
+        private CRT(List<Cmd> cmds) => Cmds = cmds;
 
         public static CRT Parse(string[] input)
         {
-            var cmds = new Queue<Cmd>();
+            var cmds = new List<Cmd>();
             foreach (var line in input)
             {
                 if (line[..4] == "noop")
                 {
-                    cmds.Enqueue(new Cmd(0));
+                    cmds.Add(new Cmd(0));
                 }
                 else
                 {
-                    cmds.Enqueue(new Cmd(0));
-                    cmds.Enqueue(new Cmd(int.Parse(line[5..])));
+                    cmds.Add(new Cmd(0));
+                    cmds.Add(new Cmd(int.Parse(line[5..])));
                 }
             }
             return new CRT(cmds);
@@ -58,14 +58,13 @@ public sealed partial class Day10 : Day
             int result = 0;
             int value = 1;
             int cycle = 1;
-            while (Cmds.Any())
+            foreach (var cmd in Cmds)
             {
                 if ((cycle + 20) % 40 == 0)
                 {
                     result += value * cycle;
                 }
-
-                value += Cmds.Dequeue().Value;
+                value += cmd.Value;
                 cycle++;
             }
             return result;
@@ -77,26 +76,23 @@ public sealed partial class Day10 : Day
             char[][] image = new char[6].Select(_ => new char[40]).ToArray();
             int value = 1;
             int cycle = 1;
-            while (Cmds.Any())
+            foreach (var cmd in Cmds)
             {
-                int cycleRow = (cycle - 1)/40;
+                int cycleRow = (cycle - 1) / 40;
                 int cycleCol = Modulo(cycle - 1, 40);
                 int spriteCol = value % 40;
-                if (SpriteOverlap(cycleCol, spriteCol))
-                {
-                    image[cycleRow][cycleCol] = '#';
-                }
-                else image[cycleRow][cycleCol] = '.';
 
-                value += Cmds.Dequeue().Value;
+                image[cycleRow][cycleCol] = SpriteOverlap(cycleCol, spriteCol) ? '#' : '.';
+                value += cmd.Value;
                 cycle++;
             }
             var result = string.Join("\r\n", image.Select(x => new string(x)));
             return result;
         }
 
-        private static bool SpriteOverlap(int pixel, int sprite) =>
-            pixel >= sprite - 1 && pixel <= sprite + 1;
+        private static bool SpriteOverlap(int pixel, int sprite)
+            => pixel >= sprite - 1
+            && pixel <= sprite + 1;
 
         public record Cmd(int Value);
 
