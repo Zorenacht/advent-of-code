@@ -1,128 +1,109 @@
-using System.Runtime.CompilerServices;
-using System.Text;
-using static AoC_2022.Day10;
-
 namespace AoC_2022;
 
 public sealed partial class Day10 : Day
 {
     [Test]
-    public void Example() => P1(Simulate(InputExample)).Should().Be(13140);
+    public void Example() => CRT.Parse(InputExample).SignalStrength().Should().Be(13140);
 
     [Test]
-    public void Part1() => P1(Simulate(InputPart1)).Should().Be(15020);
+    public void Part1() => CRT.Parse(InputPart1).SignalStrength().Should().Be(15020);
 
     [Test]
-    public void ExampleP2() => P2(Simulate(InputExample)).Should().Be(ExampleAnswer);
+    public void ExampleP2() => CRT.Parse(InputExample).Display().Should().Be(ExampleAnswer);
     [Test]
-    public void Part2() => P2(Simulate(InputPart1)).Should().Be(EFLUGLPAP);
+    public void Part2() => CRT.Parse(InputPart1).Display().Should().Be(EFLUGLPAP);
 
-    static string ExampleAnswer => @"
-        ##..##..##..##..##..##..##..##..##..##..
-        ###...###...###...###...###...###...###.
-        ####....####....####....####....####....
-        #####.....#####.....#####.....#####.....
-        ######......######......######......####
-        #######.......#######.......#######.....";
+    static string ExampleAnswer => 
+@"##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....";
 
     static string EFLUGLPAP =>
-        @"####.####.#..#..##..#....###...##..###.#
-          .....#....#..#.#..#.#....#..#.#..#.#..#.
-          ###..###..#..#.#....#....#..#.#..#.#..#.
-          #....#....#..#.#.##.#....###..####.###..
-          .....#....#..#.#..#.#....#....#..#.#....
-          ####.#.....##...###.####.#....#..#.#....";
+@"####.####.#..#..##..#....###...##..###.#
+.....#....#..#.#..#.#....#..#.#..#.#..#.
+###..###..#..#.#....#....#..#.#..#.#..#.
+#....#....#..#.#.##.#....###..####.###..
+.....#....#..#.#..#.#....#....#..#.#....
+####.#.....##...###.####.#....#..#.#....";
 
-    private static Queue<Cmd> Simulate(string[] input)
-    {
-        var cmds = new Queue<Cmd>();
-        foreach (string line in input)
+
+    private class CRT
+    { 
+        private Queue<Cmd> Cmds { get; set; }
+        private CRT(Queue<Cmd> cmds) => Cmds = cmds;
+
+        public static CRT Parse(string[] input)
         {
-            var cmd = line[..4];
-            int arg = 0;
-            int turns = 1;
-            if (cmd == "addx") {
-                arg = int.Parse(line[5..]);
-                turns = 2;
-            }
-            cmds.Enqueue(new Cmd() { Turns = turns, Value = arg });
-        }
-        return cmds;
-    }
-
-    private static int P1(Queue<Cmd> cmds)
-    {
-        int result = 0;
-        int value = 1;
-        int cycle = 1;
-        while (cmds.Any())
-        {
-            if ((cycle + 20) % 40 == 0) result += value * cycle;
-
-            var current = cmds.Peek();
-            if (current.Turns == 1)
+            var cmds = new Queue<Cmd>();
+            foreach (var line in input)
             {
-                cmds.Dequeue();
-                value += current.Value;
+                if (line[..4] == "noop")
+                {
+                    cmds.Enqueue(new Cmd(0));
+                }
+                else
+                {
+                    cmds.Enqueue(new Cmd(0));
+                    cmds.Enqueue(new Cmd(int.Parse(line[5..])));
+                }
             }
-            else current.Turns--;
-
-
-
-            cycle++;
+            return new CRT(cmds);
         }
-        return result;
-    }
 
-    private static string P2(Queue<Cmd> cmds)
-    {
-        char[] image = new char[240];
-        int value = 1;
-        int cycle = 1;
-        while (cmds.Any())
+        public int SignalStrength()
         {
-            int cycleRowIndex = Modulo(cycle - 1, 40);
-            int spriteRowIndex = Modulo(value, 40);
-            if (SpriteOverlap(cycleRowIndex, spriteRowIndex))
+            int result = 0;
+            int value = 1;
+            int cycle = 1;
+            while (Cmds.Any())
             {
-                image[cycle - 1] = '#';
+                if ((cycle + 20) % 40 == 0)
+                {
+                    result += value * cycle;
+                }
+
+                value += Cmds.Dequeue().Value;
+                cycle++;
             }
-            else image[cycle - 1] = '.';
-
-
-
-            var current = cmds.Peek();
-            if (current.Turns == 1)
-            {
-                cmds.Dequeue();
-                value += current.Value;
-            }
-            else current.Turns--;
-            cycle++;
+            return result;
         }
-        return new string(image);
-    }
 
-    /*private static string CharArrayToString(char[] chars, int lb)
-    {
-        var sb = new StringBuilder();
-        *//*for(int i=0; i<chars.Length; i += lb) 
+
+        public string Display()
         {
-            sb.Append(chars[i..i)])
-        }*//*
-    }*/
+            char[][] image = new char[6].Select(_ => new char[40]).ToArray();
+            int value = 1;
+            int cycle = 1;
+            while (Cmds.Any())
+            {
+                int cycleRow = (cycle - 1)/40;
+                int cycleCol = Modulo(cycle - 1, 40);
+                int spriteCol = Modulo(value, 40);
+                if (SpriteOverlap(cycleCol, spriteCol))
+                {
+                    image[cycleRow][cycleCol] = '#';
+                }
+                else image[cycleRow][cycleCol] = '.';
 
-    private static bool SpriteOverlap(int pixel, int sprite) =>
-        pixel >= sprite - 1 && pixel <= sprite + 1;
+                value += Cmds.Dequeue().Value;
+                cycle++;
+            }
+            var result = string.Join("\r\n", image.Select(x => new string(x)));
+            return result;
+        }
 
-    public class Cmd {
-        public int Turns { get; set; }
-        public int Value { get; set; }
-    }; 
-    
-    public static int Modulo(int a, int b)
-    {
-        int remainder = a % b;
-        return remainder >= 0 ? remainder : remainder + b;
+        private static bool SpriteOverlap(int pixel, int sprite) =>
+            pixel >= sprite - 1 && pixel <= sprite + 1;
+
+        public record Cmd(int Value);
+
+        public static int Modulo(int a, int b)
+        {
+            int remainder = a % b;
+            return remainder >= 0 ? remainder : remainder + b;
+        }
     }
 }
