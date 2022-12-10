@@ -60,7 +60,7 @@ public class Day02 : Day
     }
 
     //Modulo such that -1 % n = n-1 for positive n
-    private int Modulo(int a, int b)
+    public int Modulo(int a, int b)
     {
         int remainder = a % b;
         return remainder >= 0 ? remainder : remainder + b;
