@@ -106,115 +106,6 @@ public sealed partial class Day08 : Day
         }
     }
 
-    private void TreeView(Grid grid,
-        out Grid left, out Grid right, out Grid up, out Grid down)
-    {
-        left = new Grid(grid.RowLength, grid.ColumnLength);
-        right = new Grid(grid.RowLength, grid.ColumnLength);
-        up = new Grid(grid.RowLength, grid.ColumnLength);
-        down = new Grid(grid.RowLength, grid.ColumnLength);
-        var leftRecent = Enumerable.Repeat(-1, grid.RowLength).ToArray();
-        var rightRecent = Enumerable.Repeat(-1, grid.RowLength).ToArray();
-        var upRecent = Enumerable.Repeat(-1, grid.ColumnLength).ToArray();
-        var downRecent = Enumerable.Repeat(-1, grid.ColumnLength).ToArray();
-        for (int i = 0; i < grid.RowLength; i++)
-        {
-            for (int j = 0; j < grid.ColumnLength; j++)
-            {
-                if (j == 2 && i == 1)
-                {
-                    var a = 1;
-                }
-                int iReverse = grid.RowLength - i - 1;
-                int jReverse = grid.ColumnLength - j - 1;
-
-                if (leftRecent[i] == -1 || left.Lattice[i][leftRecent[i]] < left.Lattice[i][j])
-                {
-                    left.Lattice[i][j] = j;
-                    leftRecent[i] = j;
-                }
-                else
-                {
-                    int sightCounter = 1;
-                    for (int k = j - 1; k >= leftRecent[i]; k--)
-                    {
-                        if (grid.Lattice[i][j] <= grid.Lattice[i][k])
-                        {
-                            break;
-                        }
-                        sightCounter++;
-                    }
-                    left.Lattice[i][j] = sightCounter;
-                }
-
-                if (rightRecent[i] == -1 || right.Lattice[i][rightRecent[i]] < right.Lattice[i][jReverse])
-                {
-                    right.Lattice[i][jReverse] = j;
-                    rightRecent[i] = jReverse;
-                }
-                else
-                {
-                    int sightCounter = 1;
-                    for (int k = jReverse + 1; k <= rightRecent[i]; k++)
-                    {
-                        if (grid.Lattice[i][jReverse] <= grid.Lattice[i][k])
-                        {
-                            break;
-                        }
-                        sightCounter++;
-                    }
-                    right.Lattice[i][jReverse] = sightCounter;
-                }
-
-
-                if (upRecent[j] == -1 || up.Lattice[upRecent[j]][j] < up.Lattice[i][j])
-                {
-                    up.Lattice[i][j] = i;
-                    upRecent[j] = i;
-                }
-                else
-                {
-                    int sightCounter = 1;
-                    for (int k = i - 1; k >= upRecent[j]; k--)
-                    {
-                        if (grid.Lattice[i][j] <= grid.Lattice[k][j])
-                        {
-                            break;
-                        }
-                        sightCounter++;
-                    }
-                    up.Lattice[i][j] = sightCounter;
-                }
-
-
-                if (downRecent[j] == -1 || up.Lattice[downRecent[j]][j] < up.Lattice[iReverse][j])
-                {
-                    down.Lattice[iReverse][j] = i;
-                    downRecent[j] = iReverse;
-                }
-                else
-                {
-                    int sightCounter = 1;
-                    for (int k = iReverse + 1; k <= downRecent[j]; k++)
-                    {
-                        if (grid.Lattice[iReverse][j] <= grid.Lattice[k][j])
-                        {
-                            break;
-                        }
-                        sightCounter++;
-                    }
-                    down.Lattice[iReverse][j] = sightCounter;
-                }
-            }
-        }
-        grid.Print();
-        left.Print();
-        right.Print();
-        up.Print();
-        down.Print();
-    }
-
-
     //nlog(n) (n=total input digits)
     private void TreeView2(Grid grid, out Grid left, out Grid right, out Grid up, out Grid down)
     {
@@ -222,16 +113,10 @@ public sealed partial class Day08 : Day
         right = new Grid(grid.RowLength, grid.ColumnLength);
         up = new Grid(grid.RowLength, grid.ColumnLength);
         down = new Grid(grid.RowLength, grid.ColumnLength);
-        var view = new Grid(grid.RowLength, grid.ColumnLength);
-        int max = 0;
         for (int i = 0; i < grid.RowLength; i++)
         {
             for (int j = 0; j < grid.ColumnLength; j++)
             {
-                if (i == 0 && j == 2)
-                {
-                    var a = 1;
-                }
                 var counter = new int[4];
                 for (int k = i - 1; k >= 0; k--)
                 {

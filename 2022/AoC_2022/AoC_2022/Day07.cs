@@ -40,7 +40,7 @@ public sealed partial class Day07 : Day
     File ParseInput(string[] input)
     {
         var root = new File() { Parent = null };
-        File current = null;
+        File current = new File();
         var cmd = "";
         var cmdArg = "";
         foreach (string line in input)
@@ -69,7 +69,7 @@ public sealed partial class Day07 : Day
                 }
                 else if (cmdArg == "..")
                 {
-                    current = current.Parent;
+                    current = current.Parent!;
                 }
                 else
                 {
@@ -136,8 +136,8 @@ public sealed partial class Day07 : Day
 
     public class File
     {
-        public string Type { get; set; }
-        public string Name { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public int Size { get; set; }
         public List<File> Children { get; set; } = new List<File>();
         public File? Parent { get; set; }

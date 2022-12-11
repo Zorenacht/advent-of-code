@@ -13,6 +13,8 @@ public sealed partial class Day11 : Day
 
     private static int Prod = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23;
 
+    List<long> a => new List<long>() { 79, 60, 97 };
+
     private long Simulate(List<Monkey> monkeys, int turns, int divisor)
     {
         for (int i = 0; i < turns; i++)
@@ -42,10 +44,17 @@ public sealed partial class Day11 : Day
         public int Operations { get; set; }
         public int Prod { get; set; }
 
+        public Monkey(List<long> items, Func<long, long> operation, Func<long, int> throwFunc)
+        {
+            Items = items;
+            Operation = operation;
+            Throw = throwFunc;
+        }
+
         public long CauseWorry(long item, int prod, int divisor)
         {
             Operations++;
-            if(Operation(item) < 0)
+            if (Operation(item) < 0)
             {
                 throw new Exception();
             }
