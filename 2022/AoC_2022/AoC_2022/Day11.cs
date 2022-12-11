@@ -9,7 +9,7 @@ public sealed partial class Day11 : Day
     [Test]
     public void ExampleP2() => Simulate2(1).Should().Be(0);
     [Test]
-    public void Part2() => Simulate2(10000).Should().Be(0);
+    public void Part2() => Simulate2(10000).Should().Be(19457438264);
 
     public int Simulate(int turns)
     {
