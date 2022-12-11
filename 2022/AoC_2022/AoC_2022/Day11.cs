@@ -13,8 +13,6 @@ public sealed partial class Day11 : Day
 
     private static int Prod = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23;
 
-    List<long> a => new List<long>() { 79, 60, 97 };
-
     private long Simulate(List<Monkey> monkeys, int turns, int divisor)
     {
         for (int i = 0; i < turns; i++)
