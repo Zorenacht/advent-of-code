@@ -7,11 +7,11 @@ public sealed partial class Day11 : Day
     [Test]
     public void Part1() => Simulate(20).Should().Be(110220);
     [Test]
-    public void ExampleP2() => Simulate2(1).Should().Be(0);
+    public void ExampleP2() => Simulate(1).Should().Be(0);
     [Test]
     public void Part2() => Simulate2(10000).Should().Be(19457438264);
 
-    public int Simulate(int turns)
+    public long Simulate(int turns)
     {
         var monkeys = InputPart1();
         for (int i = 0; i < turns; i++)
@@ -29,7 +29,7 @@ public sealed partial class Day11 : Day
             }
         }
         var topMonkeys = monkeys.OrderByDescending(monkey => monkey.Operations).Take(2).ToArray();
-        return topMonkeys[0].Operations * topMonkeys[1].Operations;
+        return (long)topMonkeys[0].Operations * topMonkeys[1].Operations;
     }
 
     public long Simulate2(int turns)
@@ -50,8 +50,10 @@ public sealed partial class Day11 : Day
             }
         }
         var topMonkeys = monkeys.OrderByDescending(monkey => monkey.Operations).Take(2).ToArray();
-        return (long)topMonkeys[0].Operations * (long)topMonkeys[1].Operations;
+        return (long)topMonkeys[0].Operations * topMonkeys[1].Operations;
     }
+
+    private static int Prod = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23;
 
     private List<Monkey> InputPart1()
     {
@@ -60,49 +62,57 @@ public sealed partial class Day11 : Day
             {
                 Items = new List<int>() { 53, 89, 62, 57, 74, 51, 83, 97 },
                 Operation = (old) => old * 3,
-                Test = Monkey.CreateTest(13,1,5)
+                Test = Monkey.CreateTest(13,1,5),
+                Prod = Prod,
             },
             new Monkey
             {
                 Items = new List<int>() { 85, 94, 97, 92, 56 },
                 Operation = (old) => old + 2,
-                Test = Monkey.CreateTest(19,5,2)
+                Test = Monkey.CreateTest(19,5,2),
+                Prod = Prod,
             },
             new Monkey
             {
                 Items = new List<int>() { 86, 82, 82},
                 Operation = (old) => old + 1,
-                Test = Monkey.CreateTest(11,3,4)
+                Test = Monkey.CreateTest(11,3,4),
+                Prod = Prod,
             },
             new Monkey
             {
                 Items = new List<int>() { 94, 68},
                 Operation = (old) => old + 5,
-                Test = Monkey.CreateTest(17,7,6)
+                Test = Monkey.CreateTest(17,7,6),
+                Prod = Prod,
             },
             new Monkey
             {
                 Items = new List<int>() { 83, 62, 74, 58, 96, 68, 85 },
                 Operation = (old) => old + 4,
-                Test = Monkey.CreateTest(3,3,6)
+                Test = Monkey.CreateTest(3,3,6),
+                Prod = Prod,
             },
             new Monkey
             {
                 Items = new List<int>() { 50, 68, 95, 82 },
                 Operation = (old) => old + 8,
-                Test = Monkey.CreateTest(7,2,4)
+                Test = Monkey.CreateTest(7,2,4),
+                Prod = Prod,
             },
             new Monkey
             {
                 Items = new List<int>() { 75},
                 Operation = (old) => old * 7,
-                Test = Monkey.CreateTest(5,7,0)
+                Test = Monkey.CreateTest(5,7,0),
+                Prod = Prod,
             },
             new Monkey
             {
                 Items = new List<int>() { 92, 52, 85, 89, 68, 82 },
                 Operation = (old) => old * old,
-                Test = Monkey.CreateTest(2,0,1)
+                Test = Monkey.CreateTest(2,0,1),
+                Prod = Prod,
             },
         };
     }
@@ -114,49 +124,57 @@ public sealed partial class Day11 : Day
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 53, 89, 62, 57, 74, 51, 83, 97 }),
                 Operation = old => old * 3,
-                Test = MonkeyV2.CreateTest(13,1,5)
+                Test = MonkeyV2.CreateTest(13,1,5),
+                Prod = Prod,
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 85, 94, 97, 92, 56 }),
                 Operation = old => old + 2,
-                Test = MonkeyV2.CreateTest(19,5,2)
+                Test = MonkeyV2.CreateTest(19,5,2),
+                Prod = Prod,
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 86, 82, 82 }),
                 Operation = old => old + 1,
-                Test = MonkeyV2.CreateTest(11,3,4)
+                Test = MonkeyV2.CreateTest(11,3,4),
+                Prod = Prod,
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 94, 68 }),
                 Operation = old => old + 5,
-                Test = MonkeyV2.CreateTest(17,7,6)
+                Test = MonkeyV2.CreateTest(17,7,6),
+                Prod = Prod,
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 83, 62, 74, 58, 96, 68, 85 }),
                 Operation = old => old + 4,
-                Test = MonkeyV2.CreateTest(3,3,6)
+                Test = MonkeyV2.CreateTest(3,3,6),
+                Prod = Prod,
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 50, 68, 95, 82 }),
                 Operation = old => old + 8,
-                Test = MonkeyV2.CreateTest(7,2,4)
+                Test = MonkeyV2.CreateTest(7,2,4),
+                Prod = Prod,
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 75 }),
                 Operation = old => old * 7,
-                Test = MonkeyV2.CreateTest(5,7,0)
+                Test = MonkeyV2.CreateTest(5,7,0),
+                Prod = Prod,
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList( new List<int>() { 92, 52, 85, 89, 68, 82 }),
                 Operation = old => old * old,
-                Test = MonkeyV2.CreateTest(2,0,1)
+                Test = MonkeyV2.CreateTest(2,0,1),
+                Prod = Prod,
             },
         };
     }
@@ -164,22 +182,16 @@ public sealed partial class Day11 : Day
     private class Monkey
     {
         public List<int> Items { get; set; }
-
-        private Func<int, int> _operation;
-        public Func<int, int> Operation
-        {
-            get { return _operation; }
-            set { _operation = val => value(val) / 3; }
-        }
+        public Func<int, int> Operation { get; set; }
         public Func<int, int> Test { get; set; }
         public int Operations { get; set; }
+        public int Prod { get; set; }
 
         public int OperateOn(int item)
         {
             Operations++;
-            return Operation(item);
+            return Operation(item) / 3 % Prod;
         }
-
 
         public static Func<int, int> CreateTest(int divisor, int onTrue, int onFalse) =>
             (val) => val % divisor == 0 ? onTrue : onFalse;
@@ -197,6 +209,7 @@ public sealed partial class Day11 : Day
         }
         public Func<ModuloInt, int> Test { get; set; }
         public int Operations { get; set; }
+        public int Prod { get; set; }
 
         public ModuloInt OperateOn(ModuloInt item)
         {
