@@ -113,49 +113,49 @@ public sealed partial class Day11 : Day
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 53, 89, 62, 57, 74, 51, 83, 97 }),
-                Operation = (old) => old * 3,
+                Operation = old => old * 3,
                 Test = MonkeyV2.CreateTest(13,1,5)
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 85, 94, 97, 92, 56 }),
-                Operation = (old) => old + 2,
+                Operation = old => old + 2,
                 Test = MonkeyV2.CreateTest(19,5,2)
             },
             new MonkeyV2
             {
-                Items = MonkeyV2.ModuloIntList(new List<int>() { 86, 82, 82}),
-                Operation = (old) => old + 1,
+                Items = MonkeyV2.ModuloIntList(new List<int>() { 86, 82, 82 }),
+                Operation = old => old + 1,
                 Test = MonkeyV2.CreateTest(11,3,4)
             },
             new MonkeyV2
             {
-                Items = MonkeyV2.ModuloIntList(new List<int>() { 94, 68}),
-                Operation = (old) => old + 5,
+                Items = MonkeyV2.ModuloIntList(new List<int>() { 94, 68 }),
+                Operation = old => old + 5,
                 Test = MonkeyV2.CreateTest(17,7,6)
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 83, 62, 74, 58, 96, 68, 85 }),
-                Operation = (old) => old + 4,
+                Operation = old => old + 4,
                 Test = MonkeyV2.CreateTest(3,3,6)
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList(new List<int>() { 50, 68, 95, 82 }),
-                Operation = (old) => old + 8,
+                Operation = old => old + 8,
                 Test = MonkeyV2.CreateTest(7,2,4)
             },
             new MonkeyV2
             {
-                Items = MonkeyV2.ModuloIntList(new List<int>() { 75}),
-                Operation = (old) => old * 7,
+                Items = MonkeyV2.ModuloIntList(new List<int>() { 75 }),
+                Operation = old => old * 7,
                 Test = MonkeyV2.CreateTest(5,7,0)
             },
             new MonkeyV2
             {
                 Items = MonkeyV2.ModuloIntList( new List<int>() { 92, 52, 85, 89, 68, 82 }),
-                Operation = (old) => old * old,
+                Operation = old => old * old,
                 Test = MonkeyV2.CreateTest(2,0,1)
             },
         };
