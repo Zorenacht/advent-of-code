@@ -45,19 +45,19 @@ public sealed partial class Day12 : Day
     private class HillFinder
     {
         Grid Grid { get; set; }
-        IEnumerable<Point> Starts { get; set; }
+        IEnumerable<Point> StartPoints { get; set; }
         Point End { get; set; }
 
         public HillFinder(string[] lines)
         {
-            Starts = StartPoints(lines);
+            StartPoints = Parse(lines);
             Grid = new Grid(lines.Length, lines[0].Length);
         }
 
         public int ShortestPath()
         {
             int max = int.MaxValue;
-            foreach(var start in Starts)
+            foreach(var start in StartPoints)
             {
                 var sp = new AStarPath<Hill>(new Hill(Grid, start, End), new Hill(Grid, End, End));
                 sp.Run();
@@ -69,7 +69,7 @@ public sealed partial class Day12 : Day
             return max;
         }
 
-        private IEnumerable<Point> StartPoints(string[] lines)
+        private IEnumerable<Point> Parse(string[] lines)
         {
             var list = new List<Point>();
             for (int i = 0; i < lines.Length; i++)
@@ -94,9 +94,8 @@ public sealed partial class Day12 : Day
 
     public class Hill : IState<Hill>
     {
-        public Point Current { get; set; } = Point.O;
-        public Point Goal { get; set; } = Point.O;
-
+        public readonly Point Current;
+        public readonly Point Goal;
         public readonly Grid Hills;
 
         public Hill(Grid hills, Point current, Point goal)
@@ -105,8 +104,6 @@ public sealed partial class Day12 : Day
             Current = current;
             Goal = goal;
         }
-
-        public int Heuristic() => Math.Abs(Goal.X - Current.X) + Math.Abs(Goal.Y - Current.Y);
 
         public IEnumerable<Node<Hill>> NextNodes(int initialDistance)
         {
@@ -121,14 +118,8 @@ public sealed partial class Day12 : Day
             if (Hills.IsValid(w) && Hills.ValueAt(w) - c <= 1) yield return new Node<Hill>(new(Hills, w, Goal), initialDistance + 1);
         }
 
-        public bool Equals(Hill? other)
-        {
-            return Current == other?.Current;
-        }
-
-        public override int GetHashCode()
-        {
-            return Current.GetHashCode();
-        }
+        public int Heuristic() => Math.Abs(Goal.X - Current.X) + Math.Abs(Goal.Y - Current.Y);
+        public bool Equals(Hill? other) => Current == other?.Current;
+        public override int GetHashCode() => Current.GetHashCode();
     }
 }
