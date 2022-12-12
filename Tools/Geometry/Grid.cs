@@ -47,12 +47,12 @@ public class Grid : IEnumerable
     public bool IsValid(int i, int j)
     {
         return i >= 0 && i < Lattice.Length
-            && j >= 0 && j < Lattice.Length;
+            && j >= 0 && j < Lattice[0].Length;
     }
     public bool IsValid(Point point)
     {
         return point.X >= 0 && point.X < Lattice.Length
-            && point.Y >= 0 && point.Y < Lattice.Length;
+            && point.Y >= 0 && point.Y < Lattice[0].Length;
     }
 
     public int ValueAt(int row, int col)
