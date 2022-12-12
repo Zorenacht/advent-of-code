@@ -51,6 +51,7 @@ public sealed partial class Day12 : Day
         public HillFinder(string[] lines)
         {
             Starts = StartPoints(lines);
+            Grid = new Grid(lines.Length, lines[0].Length);
         }
 
         public int ShortestPath()
@@ -60,7 +61,7 @@ public sealed partial class Day12 : Day
             {
                 var sp = new AStarPath<Hill>(new Hill(Grid, start, End), new Hill(Grid, End, End));
                 sp.Run();
-                if(sp.ShortestPath >- 0 && max > sp.ShortestPath)
+                if (sp.ShortestPath >= 0 && max > sp.ShortestPath)
                 {
                     max = sp.ShortestPath;
                 }
@@ -71,13 +72,10 @@ public sealed partial class Day12 : Day
         private IEnumerable<Point> StartPoints(string[] lines)
         {
             var list = new List<Point>();
-            Grid = new Grid(lines.Length, lines[0].Length);
             for (int i = 0; i < lines.Length; i++)
             {
                 for (int j = 0; j < lines[i].Length; j++)
                 {
-                    if (lines[i][j] == 'S' || lines[i][j] == 'a') list.Add( new Point(i, j));
-                    if (lines[i][j] == 'E') End = new Point(i, j);
                     int value = lines[i][j] switch
                     {
                         'S' => 1,
@@ -85,6 +83,8 @@ public sealed partial class Day12 : Day
                         _ => lines[i][j] - 'a' + 1
                     };
                     Grid.UpdateAt(i, j, value);
+                    if (lines[i][j] == 'E') End = new Point(i, j);
+                    if (lines[i][j] == 'S' || lines[i][j] == 'a') list.Add( new Point(i, j));
                 }
             }
             return list;
@@ -106,10 +106,7 @@ public sealed partial class Day12 : Day
             Goal = goal;
         }
 
-        public int Heuristic()
-        {
-            return (Goal.X - Current.X) + (Goal.Y - Current.Y);
-        }
+        public int Heuristic() => Math.Abs(Goal.X - Current.X) + Math.Abs(Goal.Y - Current.Y);
 
         public IEnumerable<Node<Hill>> NextNodes(int initialDistance)
         {
@@ -126,7 +123,7 @@ public sealed partial class Day12 : Day
 
         public bool Equals(Hill? other)
         {
-            return Current == other.Current;
+            return Current == other?.Current;
         }
 
         public override int GetHashCode()
