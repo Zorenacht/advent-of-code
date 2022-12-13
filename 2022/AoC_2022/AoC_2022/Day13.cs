@@ -24,14 +24,14 @@ public sealed partial class Day13 : Day
     [TestCase("[1,[]]", "[1,[],1]")]
     [TestCase("[1,[], 1]", "[1,[],2]")]
     [TestCase("[[[]],2]", "[[[], 1],1]")]
-    public void Ordered(string first, string second) => CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(1);
+    public void Ordered(string first, string second) => CompareLines(first,second).Should().Be(1);
 
     [TestCase("[1,2]", "[1,2]")]
     [TestCase("[1,[2]]", "[1,2]")]
     [TestCase("[[]]", "[[]]")]
     [TestCase("[]", "[]")]
     [TestCase("[1,[]]", "[1,[]]")]
-    public void Equivalent(string first, string second) => CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(0);
+    public void Equivalent(string first, string second) => CompareLines(first, second).Should().Be(0);
 
     [TestCase("[1,2]", "[1,1]")]
     [TestCase("[1,[2]]", "[1,1]")]
@@ -39,7 +39,7 @@ public sealed partial class Day13 : Day
     [TestCase("[1]", "[]")]
     [TestCase("[[],2]", "[[]]")]
     [TestCase("[[],2]", "[[],1]")]
-    public void NotOrdered(string first, string second) => CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(-1);
+    public void NotOrdered(string first, string second) => CompareLines(first, second).Should().Be(-1);
 
     [Test]
     public void Example() => Simulate(InputExample).Should().Be(13);
@@ -68,7 +68,7 @@ public sealed partial class Day13 : Day
 
     private class DistressSignalComparer : IComparer<string>
     {
-        public int Compare(string? x, string? y) => CompareLines(ToList(y!).ToArray(), ToList(x!).ToArray());
+        public int Compare(string? x, string? y) => CompareLines(y!, x!);
     }
 
     private static int Simulate(string[] lines)
@@ -76,10 +76,10 @@ public sealed partial class Day13 : Day
         int result = 0;
         for (int i = 0; i < (lines.Length + 1) / 3; i++)
         {
-            var first = ToList(lines[i * 3]).ToArray();
-            var second = ToList(lines[i * 3 + 1]).ToArray();
+            var first = lines[i * 3];
+            var second = lines[i * 3 + 1];
             var compare = CompareLines(first, second);
-            result += compare == 1 ? i + 1 : 0;
+            result += compare >= 0 ? i + 1 : 0;
         }
         return result;
     }
@@ -105,44 +105,27 @@ public sealed partial class Day13 : Day
 
     static bool IsArray(string line) => line != string.Empty && line[0] == '[';
 
-    static int CompareLines(string[] firstArray, string[] secondArray)
+    static int CompareLines(string first1, string second2)
     {
+        var firstArray = ToList(first1).ToArray();
+        var secondArray = ToList(second2).ToArray();
         var shortCircuit = Math.Sign(secondArray.Length - firstArray.Length);
         foreach (var (first, second) in Enumerable.Range(0, Math.Min(firstArray.Length, secondArray.Length)).Select(i => (firstArray[i], secondArray[i])))
         {
             if (first == "" && second == "") continue;
             else if (first == "") return 1;
-            else if (second == "") return -1;
-
-            if (IsArray(first) && IsArray(second))
-            {
-                var f = ToList(first).ToArray();
-                var s = ToList(second).ToArray();
-                var compare = CompareLines(f, s);
-                if (compare != 0) return compare;
-            }
-            else if (!IsArray(first) && IsArray(second))
-            {
-                var f = ToList(Arrayfy(first)).ToArray();
-                var s = ToList(second).ToArray();
-                var compare = CompareLines(f, s);
-                if (compare != 0) return compare;
-            }
-            else if (IsArray(first) && !IsArray(second))
-            {
-                var f = ToList(first).ToArray();
-                var s = ToList(Arrayfy(second)).ToArray();
-                var compare = CompareLines(f, s);
-                if (compare != 0) return compare;
-            }
-            else if (!IsArray(first) && !IsArray(second))
+            else if (second == "") return -1; 
+            if (!IsArray(first) && !IsArray(second))
             {
                 int f = int.Parse(first);
                 int s = int.Parse(second);
-                if (f < s) return 1;
-                if (f == s) continue;
-                if (f > s) return -1;
+                if (s - f != 0) return s - f;
+                else continue;
             }
+            var firsty = IsArray(first) ? first : Arrayfy(first);
+            var secondy = IsArray(second) ? second : Arrayfy(second);
+            var compare = CompareLines(firsty, secondy);
+            if (compare != 0) return compare;
         }
         return shortCircuit;
     }
