@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AoC_2022;
 
-public static class ListExtension
+public static class ListExtensionForDistressSignal
 {
     public static int DecoderKey(this IEnumerable<string> sorted)
     {
@@ -24,20 +24,14 @@ public sealed partial class Day13 : Day
     [TestCase("[1,[]]", "[1,[],1]")]
     [TestCase("[1,[], 1]", "[1,[],2]")]
     [TestCase("[[[]],2]", "[[[], 1],1]")]
-    public void Ordered(string first, string second)
-    {
-        CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(1);
-    }
+    public void Ordered(string first, string second) => CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(1);
 
     [TestCase("[1,2]", "[1,2]")]
     [TestCase("[1,[2]]", "[1,2]")]
     [TestCase("[[]]", "[[]]")]
     [TestCase("[]", "[]")]
     [TestCase("[1,[]]", "[1,[]]")]
-    public void Equivalent(string first, string second)
-    {
-        CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(0);
-    }
+    public void Equivalent(string first, string second) => CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(0);
 
     [TestCase("[1,2]", "[1,1]")]
     [TestCase("[1,[2]]", "[1,1]")]
@@ -45,38 +39,39 @@ public sealed partial class Day13 : Day
     [TestCase("[1]", "[]")]
     [TestCase("[[],2]", "[[]]")]
     [TestCase("[[],2]", "[[],1]")]
-    public void NotOrdered(string first, string second)
-    {
-        CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(-1);
-    }
+    public void NotOrdered(string first, string second) => CompareLines(ToList(first).ToArray(), ToList(second).ToArray()).Should().Be(-1);
 
     [Test]
     public void Example() => Simulate(InputExample).Should().Be(13);
     [Test]
     public void Part1() => Simulate(InputPart1).Should().Be(5350);
+
+
+    private static readonly List<string> DividerPackets = new List<string> { "[[2]]", "[[6]]" };
     [Test]
     public void ExampleP2() => InputExample
-        .Where(x => x != string.Empty)
-        .Concat(new List<string>() { "[[2]]", "[[6]]" })
-        .OrderBy(x => x, new CodeComparer())
-        .DecoderKey()
-        .Should()
-        .Be(140);
-    [Test]
-    public void Part2() => InputPart1
-        .Where(x => x != string.Empty)
-        .Concat(new List<string>() { "[[2]]", "[[6]]" })
-        .OrderBy(x => x, new CodeComparer())
+        .Where(signal => signal != string.Empty)
+        .Concat(DividerPackets)
+        .OrderBy(signal => signal, new DistressSignalComparer())
         .DecoderKey()
         .Should()
         .Be(140);
 
-    private class CodeComparer : IComparer<string>
+    [Test]
+    public void Part2() => InputPart1
+        .Where(signal => signal != string.Empty)
+        .Concat(DividerPackets)
+        .OrderBy(signal => signal, new DistressSignalComparer())
+        .DecoderKey()
+        .Should()
+        .Be(19570);
+
+    private class DistressSignalComparer : IComparer<string>
     {
         public int Compare(string? x, string? y) => CompareLines(ToList(y!).ToArray(), ToList(x!).ToArray());
     }
 
-    private int Simulate(string[] lines)
+    private static int Simulate(string[] lines)
     {
         int result = 0;
         for (int i = 0; i < (lines.Length + 1) / 3; i++)
@@ -118,32 +113,27 @@ public sealed partial class Day13 : Day
             if (first == "" && second == "") continue;
             else if (first == "") return 1;
             else if (second == "") return -1;
+
             if (IsArray(first) && IsArray(second))
             {
                 var f = ToList(first).ToArray();
                 var s = ToList(second).ToArray();
                 var compare = CompareLines(f, s);
-                if (compare == 1) return 1;
-                if (compare == 0) continue;
-                if (compare == -1) return -1;
+                if (compare != 0) return compare;
             }
             else if (!IsArray(first) && IsArray(second))
             {
                 var f = ToList(Arrayfy(first)).ToArray();
                 var s = ToList(second).ToArray();
                 var compare = CompareLines(f, s);
-                if (compare == 1) return 1;
-                if (compare == 0) continue;
-                if (compare == -1) return -1;
+                if (compare != 0) return compare;
             }
             else if (IsArray(first) && !IsArray(second))
             {
                 var f = ToList(first).ToArray();
                 var s = ToList(Arrayfy(second)).ToArray();
                 var compare = CompareLines(f, s);
-                if (compare == 1) return 1;
-                if (compare == 0) continue;
-                if (compare == -1) return -1;
+                if (compare != 0) return compare;
             }
             else if (!IsArray(first) && !IsArray(second))
             {
