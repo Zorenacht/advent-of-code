@@ -50,8 +50,8 @@ public sealed partial class Day12 : Day
 
         public HillFinder(string[] lines)
         {
-            StartPoints = Parse(lines);
             Grid = new Grid(lines.Length, lines[0].Length);
+            StartPoints = Parse(lines);
         }
 
         public int ShortestPath()
