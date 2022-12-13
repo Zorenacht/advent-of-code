@@ -14,7 +14,6 @@ public static class ListExtensionForDistressSignal
     }
 }
 
-
 public sealed partial class Day13 : Day
 {
     [Test]
@@ -88,7 +87,7 @@ public sealed partial class Day13 : Day
         {
             if (first == "" && second == "") continue;
             else if (first == "") return 1;
-            else if (second == "") return -1; 
+            else if (second == "") return -1;
             if (!IsArray(first) && !IsArray(second))
             {
                 int f = int.Parse(first);
@@ -110,32 +109,29 @@ public sealed partial class Day13 : Day
 
 public sealed partial class Day13
 {
-
     public class UnitTests
     {
+        [TestCase("[1,2]", "[1,3]")]
+        [TestCase("[1,[2]]", "[1,3]")]
+        [TestCase("[[]]", "[[], 1]")]
+        [TestCase("[1,[]]", "[1,[],1]")]
+        [TestCase("[1,[], 1]", "[1,[],2]")]
+        [TestCase("[[[]],2]", "[[[], 1],1]")]
+        public void Ordered(string first, string second) => CompareLines(first, second).Should().Be(1);
 
-    [TestCase("[1,2]", "[1,3]")]
-    [TestCase("[1,[2]]", "[1,3]")]
-    [TestCase("[[]]", "[[], 1]")]
-    [TestCase("[1,[]]", "[1,[],1]")]
-    [TestCase("[1,[], 1]", "[1,[],2]")]
-    [TestCase("[[[]],2]", "[[[], 1],1]")]
-    public void Ordered(string first, string second) => CompareLines(first, second).Should().Be(1);
+        [TestCase("[1,2]", "[1,2]")]
+        [TestCase("[1,[2]]", "[1,2]")]
+        [TestCase("[[]]", "[[]]")]
+        [TestCase("[]", "[]")]
+        [TestCase("[1,[]]", "[1,[]]")]
+        public void Equivalent(string first, string second) => CompareLines(first, second).Should().Be(0);
 
-    [TestCase("[1,2]", "[1,2]")]
-    [TestCase("[1,[2]]", "[1,2]")]
-    [TestCase("[[]]", "[[]]")]
-    [TestCase("[]", "[]")]
-    [TestCase("[1,[]]", "[1,[]]")]
-    public void Equivalent(string first, string second) => CompareLines(first, second).Should().Be(0);
-
-    [TestCase("[1,2]", "[1,1]")]
-    [TestCase("[1,[2]]", "[1,1]")]
-    [TestCase("[[1]]", "[[]]")]
-    [TestCase("[1]", "[]")]
-    [TestCase("[[],2]", "[[]]")]
-    [TestCase("[[],2]", "[[],1]")]
-    public void NotOrdered(string first, string second) => CompareLines(first, second).Should().Be(-1);
-
+        [TestCase("[1,2]", "[1,1]")]
+        [TestCase("[1,[2]]", "[1,1]")]
+        [TestCase("[[1]]", "[[]]")]
+        [TestCase("[1]", "[]")]
+        [TestCase("[[],2]", "[[]]")]
+        [TestCase("[[],2]", "[[],1]")]
+        public void NotOrdered(string first, string second) => CompareLines(first, second).Should().Be(-1);
     }
 }
