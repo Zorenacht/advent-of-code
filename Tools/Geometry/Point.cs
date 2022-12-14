@@ -23,6 +23,13 @@ public readonly struct Point : IEquatable<Point>
         return new Point(X + x, Y + y);
     }
 
+    public Point Neighbor2(Direction direction)
+    {
+        int x = Convert.ToInt32(Math.Round(-Math.Sin(Convert.ToDouble(direction) * Math.PI / 4)));
+        int y = Convert.ToInt32(Math.Round(Math.Cos(Convert.ToDouble(direction) * Math.PI / 4)));
+        return new Point(X + x, Y + y);
+    }
+
     public Point Difference(Point other)
     {
         return new Point(X - other.X, Y - other.Y);

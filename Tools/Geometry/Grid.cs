@@ -28,7 +28,7 @@ public class Grid : IEnumerable
     public Grid(int row, int col)
     {
         Lattice = new int[row][];
-        for(int i=0; i<row; i++)
+        for (int i = 0; i < row; i++)
             Lattice[i] = new int[col];
     }
 
@@ -38,7 +38,7 @@ public class Grid : IEnumerable
     }
     public void Reset()
     {
-        foreach(var (index, val) in EnumerableWithIndex())
+        foreach (var (index, val) in EnumerableWithIndex())
         {
             UpdateAt(index, 0);
         }
@@ -78,6 +78,7 @@ public class Grid : IEnumerable
         }
         return IsValid(row, col);
     }
+
     public bool UpdateAt(Point point, int value)
     {
         if (IsValid(point))
@@ -85,29 +86,41 @@ public class Grid : IEnumerable
         return IsValid(point);
     }
 
-    public void ApplyToEach(Action<int,int> func)
+    public void ApplyToEach(Action<int, int> func)
     {
         for (int i = 0; i < Lattice.Length; i++)
         {
             for (int j = 0; j < Lattice[i].Length; j++)
             {
-                func(i,j);
+                func(i, j);
+            }
+        }
+    }
+
+    public void ApplyRange(Point from, Point to, int value)
+    {
+        for (int i = Math.Min(from.X, to.X); i <= Math.Max(from.X, to.X); i++)
+        {
+            for (int j = Math.Min(from.Y, to.Y); j <= Math.Max(from.Y, to.Y); j++)
+            {
+                UpdateAt(i, j, value);
             }
         }
     }
 
     public virtual void Print()
     {
-        Console.WriteLine(new string('-', 2*Lattice[0].Length));
-        foreach(int[] row in Lattice)
+        Console.WriteLine(new string('-', Lattice[0].Length));
+        foreach (int[] row in Lattice)
         {
-            foreach(int element in row)
+            foreach (int element in row)
             {
-                Console.Write(element + " ");
+                if (element == 0) Console.Write(" ");
+                else Console.Write(element);
             }
             Console.WriteLine();
         }
-        Console.WriteLine(new string('-', 2*Lattice[0].Length));
+        Console.WriteLine(new string('-', Lattice[0].Length));
     }
 
     public IEnumerator GetEnumerator()
