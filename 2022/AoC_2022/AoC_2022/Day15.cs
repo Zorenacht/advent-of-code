@@ -12,7 +12,7 @@ public sealed partial class Day15 : Day
     [Test]
     public void ExampleP2() => BeaconExclusion.Parse(InputExample).TuningFrequency(20).Should().Be(56000011);
     [Test]
-    public void Part2() => BeaconExclusion.Parse(InputPart1).TuningFrequency(4_000_000).Should().Be(-1);
+    public void Part2() => BeaconExclusion.Parse(InputPart1).TuningFrequency(4_000_000).Should().Be(10229191267339L);
 
     private class BeaconExclusion
     {
