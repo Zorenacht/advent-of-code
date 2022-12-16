@@ -12,7 +12,7 @@ public class CaveValves
         var valves = new Dictionary<int, ValveNode>();
         var nameMap = new Dictionary<string, int>();
         int no = 0;
-        //Parse all nodes
+        //Parse all nodes 
         foreach (var line in lines)
         {
             var split = line.Split(new string[] { "Valve ", " has flow rate=", "; tunnels lead to valves ", "; tunnel leads to valve ", ", " }, StringSplitOptions.None);
@@ -32,10 +32,13 @@ public class CaveValves
     //Create a graph with distances between all the non-zero pressure valves
     public ReducedCaveValves Reduce()
     {
-        var pressureValves = Valves.Where(p => p.Value.Value > 0).Append(Valves.First(p => p.Value.Name == "AA"));
+        var pressureValves = Valves.Where(p => p.Value.Value > 0).Append(Valves.First(p => p.Value.Name == "AA")).Select((pair, Index) => (Index, pair.Value));
         var reducedNodes = pressureValves.ToDictionary(
-            v => v.Key,
-            v => new ReducedValveNode() { Name = v.Value.Name, No = v.Value.No, Value = v.Value.Value });
+            pair => pair.Index,
+            pair => new ReducedValveNode() { Name = pair.Value.Name, No = pair.Index, Value = pair.Value.Value });
+        var nameMap = pressureValves.ToDictionary(
+            pair => pair.Value.Name,
+            pair => pair.Index);
 
 
         foreach (var (fKey, from) in pressureValves)
@@ -48,12 +51,12 @@ public class CaveValves
                     var aStar = new AStarPath<ValveNode>(from, to);
                     aStar.Run();
 
-                    list.Add(new DistanceNode<ReducedValveNode>() { Node = reducedNodes[to.No], Distance = aStar.ShortestPath });
+                    list.Add(new DistanceNode<ReducedValveNode>() { Node = reducedNodes[tKey], Distance = aStar.ShortestPath });
                 }
             }
             reducedNodes[fKey].Next = list;
         }
-        return new ReducedCaveValves() { Valves = reducedNodes, NameMap = NameMap };
+        return new ReducedCaveValves() { Valves = reducedNodes, NameMap = nameMap };
     }
 }
 
@@ -86,7 +89,7 @@ public class ReducedCaveValves
         int selfTime,
         ReducedValveNode elephant,
         int elephantTime,
-        long opened,
+        int opened,
         int time,
         int pressure)
     {
@@ -113,7 +116,7 @@ public class ReducedCaveValves
         int oldSelfTime,
         ReducedValveNode oldElephant,
         int oldElephantTime,
-        long opened,
+        int opened,
         int pressure,
         int time,
         DistanceNode<ReducedValveNode> newSelf,
@@ -124,10 +127,10 @@ public class ReducedCaveValves
         var elephant = newElephant is { } ? newElephant.Node : oldElephant;
         var elephantTime = newElephant is { } ? oldElephantTime - newElephant.Distance - 1 : oldElephantTime;
         opened = opened 
-            + (newSelf is { } ? (1L << newSelf.Node.No) : 0) 
-            + (newElephant is { } ? (1L << newElephant.Node.No) : 0);
-        var a = (newSelf is { } ? (1L << newSelf.Node.No) : 0);
-        var b= (newElephant is { } ? (1L << newElephant.Node.No) : 0);
+            + (newSelf is { } ? (1 << newSelf.Node.No) : 0) 
+            + (newElephant is { } ? (1 << newElephant.Node.No) : 0);
+        var a = (newSelf is { } ? (1 << newSelf.Node.No) : 0);
+        var b= (newElephant is { } ? (1 << newElephant.Node.No) : 0);
         if (a == b)
         {
             throw new Exception();
@@ -147,7 +150,7 @@ public class ReducedCaveValves
             pressure);
     }
 
-    public static int Recursive(ReducedValveNode current, long opened, int time, int pressure)
+    public static int Recursive(ReducedValveNode current, int opened, int time, int pressure)
     {
         if (time == 0) return pressure;
         var comb = current.Next
