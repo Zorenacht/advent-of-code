@@ -64,6 +64,7 @@ public class ReducedCaveValves
 {
     public Dictionary<int, ReducedValveNode> Valves { get; set; }
     public Dictionary<string, int> NameMap { get; set; }
+    public Dictionary<long, int> Memoization { get; set; } = new Dictionary<long, int>();
 
     public int Max(int time) => RecursiveElephant(
         self: Valves[NameMap["AA"]],
@@ -79,12 +80,12 @@ public class ReducedCaveValves
         selfTime: time,
         elephant: Valves[NameMap["AA"]],
         elephantTime: time,
-        opened: 0, 
-        time: time, 
+        opened: 0,
+        time: time,
         pressure: 0);
 
 
-    public static int RecursiveElephant(
+    public int RecursiveElephant(
         ReducedValveNode self,
         int selfTime,
         ReducedValveNode elephant,
@@ -93,14 +94,20 @@ public class ReducedCaveValves
         int time,
         int pressure)
     {
-        if (time == 0) return pressure;
+        long memoizeState = opened + ((selfTime + (self.No << 8)) << 16) + ((long)(elephantTime + (elephant.No << 8)) << 32);
+        if (memoizeState == 235102076)
+        {
+            var a = 1;
+        }
+        if (Memoization.ContainsKey(memoizeState)) 
+            return Memoization[memoizeState];
 
         //create all next possibilities
         var selfNext = selfTime == time
-            ? self.Next.Where(valve => time - valve.Distance > 0 && (opened & (1L << valve.Node.No)) == 0).ToList()
+            ? self.Next.Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0).ToList()
             : new List<DistanceNode<ReducedValveNode>>() { null };
         var elephantNext = elephantTime == time
-            ? elephant.Next.Where(valve => time - valve.Distance > 0 && (opened & (1L << valve.Node.No)) == 0).ToList()
+            ? elephant.Next.Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0).ToList()
             : new List<DistanceNode<ReducedValveNode>>() { null };
 
         var comb = selfNext.SelectMany(self => elephantNext
@@ -108,10 +115,13 @@ public class ReducedCaveValves
             .Select(elephant => new { Self = self, Elephant = elephant })).ToList();
         var list = comb.Select(pair => UseOldValuesIfNull(self, selfTime, elephant, elephantTime, opened, pressure, time, pair.Self, pair.Elephant))
             .ToList();
-        return list.Count > 0 ? list.Max() : pressure;
+
+        var max = list.Count > 0 ? list.Max() : pressure; 
+        /*if(!Memoization.ContainsKey(memoizeState))*/ Memoization.Add(memoizeState, max);
+        return max;
     }
 
-    private static int UseOldValuesIfNull(
+    private int UseOldValuesIfNull(
         ReducedValveNode oldSelf,
         int oldSelfTime,
         ReducedValveNode oldElephant,
@@ -126,17 +136,16 @@ public class ReducedCaveValves
         var selfTime = newSelf is { } ? oldSelfTime - newSelf.Distance - 1 : oldSelfTime;
         var elephant = newElephant is { } ? newElephant.Node : oldElephant;
         var elephantTime = newElephant is { } ? oldElephantTime - newElephant.Distance - 1 : oldElephantTime;
-        opened = opened 
-            + (newSelf is { } ? (1 << newSelf.Node.No) : 0) 
+        opened = opened
+            + (newSelf is { } ? (1 << newSelf.Node.No) : 0)
             + (newElephant is { } ? (1 << newElephant.Node.No) : 0);
         var a = (newSelf is { } ? (1 << newSelf.Node.No) : 0);
-        var b= (newElephant is { } ? (1 << newElephant.Node.No) : 0);
+        var b = (newElephant is { } ? (1 << newElephant.Node.No) : 0);
         if (a == b)
         {
             throw new Exception();
         }
-        pressure = pressure
-            + (newSelf is { } ? newSelf.Node.Value * (time - newSelf.Distance - 1) : 0)
+        pressure = (newSelf is { } ? newSelf.Node.Value * (time - newSelf.Distance - 1) : 0)
             + (newElephant is { } ? newElephant.Node.Value * (time - newElephant.Distance - 1) : 0);
         time = Math.Max(selfTime, elephantTime);
 
@@ -150,13 +159,12 @@ public class ReducedCaveValves
             pressure);
     }
 
-    public static int Recursive(ReducedValveNode current, int opened, int time, int pressure)
+    public int Recursive(ReducedValveNode current, int opened, int time, int pressure)
     {
-        if (time == 0) return pressure;
         var comb = current.Next
             .Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0)
             .ToList();
-        var list = comb  
+        var list = comb
             .Select(distNode => Recursive(
                 distNode.Node,
                 opened + (1 << distNode.Node.No),
