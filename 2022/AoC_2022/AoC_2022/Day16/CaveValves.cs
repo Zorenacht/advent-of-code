@@ -62,7 +62,15 @@ public class ReducedCaveValves
     public Dictionary<int, ReducedValveNode> Valves { get; set; }
     public Dictionary<string, int> NameMap { get; set; }
 
-    public int Max(int time) => Recursive(Valves[NameMap["AA"]], 0, time, 0);
+    public int Max(int time) => RecursiveElephant(
+        self: Valves[NameMap["AA"]],
+        selfTime: time,
+        elephant: Valves[NameMap["AA"]],
+        elephantTime: 0,
+        opened: 0,
+        time: time,
+        pressure: 0);
+
     public int MaxWithElephant(int time) => RecursiveElephant(
         self: Valves[NameMap["AA"]],
         selfTime: time,
@@ -86,10 +94,10 @@ public class ReducedCaveValves
 
         //create all next possibilities
         var selfNext = selfTime == time
-            ? self.Next.Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0).ToList()
+            ? self.Next.Where(valve => time - valve.Distance > 0 && (opened & (1L << valve.Node.No)) == 0).ToList()
             : new List<DistanceNode<ReducedValveNode>>() { null };
         var elephantNext = elephantTime == time
-            ? elephant.Next.Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0).ToList()
+            ? elephant.Next.Where(valve => time - valve.Distance > 0 && (opened & (1L << valve.Node.No)) == 0).ToList()
             : new List<DistanceNode<ReducedValveNode>>() { null };
 
         var comb = selfNext.SelectMany(self => elephantNext
@@ -116,8 +124,14 @@ public class ReducedCaveValves
         var elephant = newElephant is { } ? newElephant.Node : oldElephant;
         var elephantTime = newElephant is { } ? oldElephantTime - newElephant.Distance - 1 : oldElephantTime;
         opened = opened 
-            + (newSelf is { } ? (1 << newSelf.Node.No) : 0) 
-            + (newElephant is { } ? (1 << newElephant.Node.No) : 0);
+            + (newSelf is { } ? (1L << newSelf.Node.No) : 0) 
+            + (newElephant is { } ? (1L << newElephant.Node.No) : 0);
+        var a = (newSelf is { } ? (1L << newSelf.Node.No) : 0);
+        var b= (newElephant is { } ? (1L << newElephant.Node.No) : 0);
+        if (a == b)
+        {
+            throw new Exception();
+        }
         pressure = pressure
             + (newSelf is { } ? newSelf.Node.Value * (time - newSelf.Distance - 1) : 0)
             + (newElephant is { } ? newElephant.Node.Value * (time - newElephant.Distance - 1) : 0);
@@ -133,7 +147,7 @@ public class ReducedCaveValves
             pressure);
     }
 
-    public static int Recursive(ReducedValveNode current, long opened, int time = 30, int pressure = 0)
+    public static int Recursive(ReducedValveNode current, long opened, int time, int pressure)
     {
         if (time == 0) return pressure;
         var comb = current.Next
