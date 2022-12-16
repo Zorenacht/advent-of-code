@@ -13,7 +13,7 @@ public class ValveNode : IEquatable<ValveNode>, IState<ValveNode>
     public List<ValveNode> Next { get; set; } = new List<ValveNode>();
     public string Name { get; set; }
     public int No { get; set; }
-    public int Value { get; set; }
+    public int Pressure { get; set; }
 
     public IEnumerable<Node<ValveNode>> NextNodes(int initialDistance) => Next.Select(node => new Node<ValveNode>(node, initialDistance + 1));
     public int Heuristic() => 0;
