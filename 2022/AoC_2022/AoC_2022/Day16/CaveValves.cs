@@ -92,7 +92,7 @@ public class ReducedCaveValves
         int time)
     {
         long memoizeState = opened + ((selfTime + (self.No << 8)) << 16) + ((long)(elephantTime + (elephant.No << 8)) << 32);
-        if (Memoization.ContainsKey(memoizeState)) return Memoization[memoizeState];
+        if (Memoization.TryGetValue(memoizeState, out int memoized)) return memoized;
 
         var pressure = (selfTime == time ? self.Pressure * selfTime : 0)
             + (elephantTime == time ? elephant.Pressure * elephantTime : 0);
