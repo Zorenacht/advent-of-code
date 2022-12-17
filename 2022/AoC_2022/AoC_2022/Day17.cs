@@ -127,14 +127,13 @@ public sealed partial class Day17 : Day
                 {
                     //Add block to rocks
                     blockHeight++;
-                    var min = 0;
                     for (int i = 0; i < 4; i++)
                     {
                         Rocks[blockHeight + i] = Rocks[blockHeight + i] | CurrentBlock.Occupied[i];
                     }
 
                     //Determine obsolete rocks
-                    min = CleanupRocks();
+                    var min = CleanupRocks();
                     if (min > 0)
                     {
                         RockHeight += min;
