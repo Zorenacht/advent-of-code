@@ -75,13 +75,30 @@ public class ReducedCaveValves
         opened: 0,
         time: time);
 
-    public int MaxWithElephant(int time) => RecursiveElephant(
-        self: Valves[NameMap["AA"]],
-        selfTime: time,
-        elephant: Valves[NameMap["AA"]],
-        elephantTime: time,
-        opened: 0,
-        time: time);
+    public int MaxWithElephant(int time)
+    {
+        int full = (1 << 15) - 1;
+        int max = 0;
+        for (int opened = 0; opened < full; opened++)
+        {
+            var me = RecursiveElephant(
+                self: Valves[NameMap["AA"]],
+                selfTime: time,
+                elephant: Valves[NameMap["AA"]],
+                elephantTime: 0,
+                opened: opened,
+                time: time);
+            var elephant = RecursiveElephant(
+                self: Valves[NameMap["AA"]],
+                selfTime: time,
+                elephant: Valves[NameMap["AA"]],
+                elephantTime: 0,
+                opened: opened ^ full,
+                time: time);
+            if(max <= me + elephant) max = me + elephant;
+        }
+        return max;
+    }
 
     public int RecursiveElephant(
         ReducedValveNode self,
