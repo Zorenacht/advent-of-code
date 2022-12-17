@@ -1,5 +1,3 @@
-using MathNet.Numerics;
-using System.Runtime.InteropServices;
 using Tools.Geometry;
 namespace AoC_2022;
 
@@ -12,14 +10,15 @@ public sealed partial class Day17 : Day
     public void Part1() => Tetris.Parse(InputPart1).Simulate2(2022).Should().Be(3130);
 
     [Test]
-    public void ExampleP2() => TwoTetrices.Parse(InputExample).FindCycle().Should().Be(1514285714288L);
+    public void ExampleP2() => TwoTetrices.Parse(InputExample).FindHeight(1000000000000L).Should().Be(1514285714288L);
     [Test]
-    public void Part2() => TwoTetrices.Parse(InputPart1).FindCycle().Should().Be(1);
+    public void Part2() => TwoTetrices.Parse(InputPart1).FindHeight(1000000000000L).Should().Be(1);
 
     private class TwoTetrices
     {
         public Tetris Me { get; set; }
         public Tetris Elephant { get; set; }
+        public Tetris MeReset { get; set; }
 
         private Dictionary<long, long> Dict = new Dictionary<long, long>();
 
@@ -27,23 +26,45 @@ public sealed partial class Day17 : Day
         {
             Me = Tetris.Parse(input);
             Elephant = Tetris.Parse(input);
+            MeReset = Tetris.Parse(input);
         }
 
-        public long FindCycle()
+        public long FindHeight(long rocks)
         {
-            int count = 0;
-            while (count < 100_000)
+            //Find cycle
+            do
             {
                 Me.AddBlock();
                 Me.AddBlock();
                 Elephant.AddBlock();
-                if (Me.CurrentState == Elephant.CurrentState)
-                {
-                    break;
-                }
-                count++;
+            } while (Me.CurrentState != Elephant.CurrentState);
+
+            //Find initial start of cycle
+            while (MeReset.CurrentState != Elephant.CurrentState)
+            {
+                MeReset.AddBlock();
+                Elephant.AddBlock();
             }
-            return 1;
+            var initial = MeReset.BlockCount;
+            var initialHeight = MeReset.Height;
+
+            //Find period
+            MeReset.AddBlock();
+            while (MeReset.CurrentState != Elephant.CurrentState)
+            {
+                MeReset.AddBlock();
+            }
+            var period = MeReset.BlockCount - initial;
+            var periodHeight = MeReset.Height - initialHeight;
+
+            //Find remainder height
+            for (int i = 0; i < (rocks - initial) % period; i++)
+            {
+                MeReset.AddBlock();
+            }
+            var remainderHeight = MeReset.Height - periodHeight - initialHeight;
+            var a = rocks / period;
+            return initialHeight + remainderHeight + (rocks - initial) / period * periodHeight;
         }
 
         public static TwoTetrices Parse(string[] input) => new TwoTetrices(input);
@@ -53,8 +74,7 @@ public sealed partial class Day17 : Day
     private class Tetris
     {
         private readonly string Wind;
-        private int _blockType = 0;
-        private int BlockType => (_blockType++ % 5);
+        private int BlockType { get; set; }
 
         private int WindIndex { get; set; }
 
@@ -64,7 +84,7 @@ public sealed partial class Day17 : Day
         {
             Wind = wind;
 
-            Rocks = Enumerable.Repeat(0, 6000).ToArray();
+            Rocks = Enumerable.Repeat(0, 80).ToArray();
             Rocks[0] = (1 << 30) - 1;
         }
 
@@ -78,86 +98,15 @@ public sealed partial class Day17 : Day
             return Height;
         }
 
-        public int Simulate()
-        {
-            int rockHeight = 0;
-            var rocks = Enumerable.Repeat(0, 10000).ToArray();
-            rocks[0] = (1 << 30) - 1;
-
-            int blockCount = 1;
-            int blockHeight = 4;
-            Block block = new Block(BlockType);
-            while (blockCount <= MaxBlockCount)
-            {
-                var wind = Wind[WindIndex];
-                //try to be blown by wind
-                if (wind == '>') block.MoveRight();
-                else if (wind == '<') block.MoveLeft();
-                else throw new Exception();
-
-                //Console.WriteLine(string.Join("\n", rocks.Take(20).Reverse().Select(x => Convert.ToString(x, 2).PadLeft(7, '0'))));
-
-                //if result overlaps move back
-                if (block.Overlap(rocks[blockHeight..(blockHeight + 4)]))
-                {
-                    if (wind == '>') block.MoveLeft();
-                    else if (wind == '<') block.MoveRight();
-                }
-                //Console.WriteLine("After moving to the side");
-                //Console.WriteLine(string.Join("\n", block.Occupied.Reverse().Select(x => Convert.ToString(x, 2).PadLeft(7, '0'))));
-
-                //try move block down
-                blockHeight--;
-                if (block.Overlap(rocks[blockHeight..(blockHeight + 4)]))
-                {
-                    if (block.Type == 3)
-                    {
-                        var a = 1;
-                    }
-                    //Add block to rocks
-                    blockHeight++;
-                    for (int i = 0; i < 4; i++)
-                    {
-                        rocks[blockHeight + i] = rocks[blockHeight + i] | block.Occupied[i];
-                    }
-
-                    //Remove unneeded
-                    var highestRockIndices = new int[7];
-                    for (int i = 0; i < 7; i++)
-                    {
-                        var index = rocks.ToList().FindLastIndex(x => (x & 1 << i) != 0);
-                        highestRockIndices[i] = index;
-                    }
-                    //Console.WriteLine("Before remove");
-                    //Console.WriteLine(string.Join("\n", rocks.Take(20).Reverse().Select(x => Convert.ToString(x, 2).PadLeft(7, '0'))));
-                    var min = rocks.ToList().FindLastIndex(x => x == (1 << 7) - 1);
-                    if (min > 0)
-                    {
-                        rockHeight += min;
-                        rocks = rocks.Skip(min).Concat(Enumerable.Repeat(0, min)).ToArray();
-                    }
-                    //Console.WriteLine("After remove");
-                    //Console.WriteLine(string.Join("\n", rocks.Take(20).Reverse().Select(x => Convert.ToString(x, 2).PadLeft(7, '0'))));
-
-                    //Create new block
-                    block = new Block(BlockType);
-                    blockCount++;
-                    blockHeight = rocks.ToList().FindLastIndex(x => x != 0) + 4;
-                }
-
-            }
-            Console.WriteLine(string.Join("\n", rocks.Skip(1000).Take(20).Reverse().Select(x => Convert.ToString(x, 2).PadLeft(7, '0'))));
-            return rockHeight + rocks.ToList().FindLastIndex(x => x != 0);
-        }
 
         public class State
         {
             int[] Rocks;
-            long BlockCount;
+            public long BlockCount { get; }
             int BlockType;
             int WindIndex;
 
-            public State (int[] rocks, long blockCount, int blockType, int windIndex)
+            public State(int[] rocks, long blockCount, int blockType, int windIndex)
             {
                 Rocks = rocks;
                 BlockCount = blockCount;
@@ -167,10 +116,9 @@ public sealed partial class Day17 : Day
 
             public static bool operator ==(State self, State other)
             {
-                return /*self?.BlockCount == other?.BlockCount
-                    && self?.BlockType == other?.BlockType
-                    && self?.WindIndex == other?.WindIndex
-                    &&*/ Enumerable.SequenceEqual(self.Rocks, other.Rocks);
+                return self?.BlockType == other?.BlockType
+                && self?.WindIndex == other?.WindIndex
+                && Enumerable.SequenceEqual(self.Rocks, other.Rocks);
             }
 
             public static bool operator !=(State self, State other) => !(self == other);
@@ -226,6 +174,8 @@ public sealed partial class Day17 : Day
                     //Console.WriteLine("Before remove");
                     //Console.WriteLine(string.Join("\n", rocks.Take(20).Reverse().Select(x => Convert.ToString(x, 2).PadLeft(7, '0'))));
                     //var min = Rocks.ToList().FindLastIndex(x => x == (1 << 7) - 1);
+                    min = CleanupRocks();
+
                     if (min > 0)
                     {
                         RockHeight += min;
@@ -241,9 +191,53 @@ public sealed partial class Day17 : Day
                 }
                 WindIndex = (WindIndex + 1) % Wind.Length;
             }
-
+            BlockType = (BlockType + 1) % 5;
             return 0;
         }
+
+        //DFS to determine a path from left to right and save the minimum value
+        private int CleanupRocks()
+        {
+            var rocks = Rocks.ToList();
+            var leftRow = rocks.FindLastIndex(x => (x & (1 << 6)) != 0);
+            var rightRow = rocks.FindLastIndex(x => (x & (1 << 0)) != 0);
+            var leftPoint = new Point(leftRow, 6);
+            var current = new Point(rightRow, 0);
+            var stack = new Stack<Point>(Neighbors(current).Where(Valid));
+            var visited = new HashSet<Point>(new List<Point>() { current });
+            var min = int.MaxValue;
+            while (stack.Count > 0)
+            {
+                current = stack.Pop();
+                if (!visited.Contains(current))
+                {
+                    if (current == leftPoint) break;
+                    visited.Add(current);
+                    foreach (var next in Neighbors(current).Where(Valid))
+                    {
+                        stack.Push(next);
+                        min = Math.Min(min, next.X);
+                    }
+                }
+            }
+            return min;
+        }
+
+        private bool Valid(Point point) =>
+            point.X >= 0 &&
+            point.Y >= 0 && point.Y < 7 &&
+            (Rocks[point.X] & (1 << point.Y)) > 0;
+
+        private static List<Point> Neighbors(Point point)
+        {
+            var list = new List<Point>();
+            list.Add(new Point(point.X, point.Y - 1));
+            list.Add(new Point(point.X - 1, point.Y));
+            list.Add(new Point(point.X, point.Y + 1));
+            list.Add(new Point(point.X + 1, point.Y));
+            return list;
+        }
+
 
         public class Block
         {
