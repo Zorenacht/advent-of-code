@@ -1,5 +1,4 @@
 using ShortestPath;
-using System.Diagnostics;
 
 namespace AoC_2022;
 
@@ -65,15 +64,12 @@ public class ReducedCaveValves
 {
     public Dictionary<int, ReducedValveNode> Valves { get; set; }
     public Dictionary<string, int> NameMap { get; set; }
-    public Dictionary<long, int> Memoization { get; set; } = new Dictionary<long, int>(100_000_000);
+    public Dictionary<int, int> Memoization { get; set; } = new Dictionary<int, int>(10_000_000);
 
     public int Max(int time) => RecursiveElephant(
         self: Valves[NameMap["AA"]],
-        selfTime: time,
-        elephant: Valves[NameMap["AA"]],
-        elephantTime: 0,
-        opened: 0,
-        time: time);
+        time: time,
+        opened: 0);
 
     public int MaxWithElephant(int time)
     {
@@ -83,18 +79,12 @@ public class ReducedCaveValves
         {
             var me = RecursiveElephant(
                 self: Valves[NameMap["AA"]],
-                selfTime: time,
-                elephant: Valves[NameMap["AA"]],
-                elephantTime: 0,
-                opened: opened,
-                time: time);
+                time: time,
+                opened: opened);
             var elephant = RecursiveElephant(
                 self: Valves[NameMap["AA"]],
-                selfTime: time,
-                elephant: Valves[NameMap["AA"]],
-                elephantTime: 0,
-                opened: opened ^ full,
-                time: time);
+                time: time,
+                opened: opened ^ full);
             if(max <= me + elephant) max = me + elephant;
         }
         return max;
@@ -102,76 +92,24 @@ public class ReducedCaveValves
 
     public int RecursiveElephant(
         ReducedValveNode self,
-        int selfTime,
-        ReducedValveNode elephant,
-        int elephantTime,
-        int opened,
-        int time)
+        int time,
+        int opened)
     {
-        long memoizeState = opened + ((selfTime + (self.No << 8)) << 16) + ((long)(elephantTime + (elephant.No << 8)) << 32);
+        int memoizeState = opened + ((time + (self.No << 8)) << 16);
         if (Memoization.TryGetValue(memoizeState, out int memoized)) return memoized;
 
-        var pressure = (selfTime == time ? self.Pressure * selfTime : 0)
-            + (elephantTime == time ? elephant.Pressure * elephantTime : 0);
+        var pressure = self.Pressure * time;
 
-        //create all next possibilities
-        var selfNext = selfTime == time
-            ? self.Next.Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0).ToList()
-            : new List<DistanceNode<ReducedValveNode>>() { null };
-        var elephantNext = elephantTime == time
-            ? elephant.Next.Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0).ToList()
-            : new List<DistanceNode<ReducedValveNode>>() { null };
-        
-        var pressures = selfNext.SelectMany(self => elephantNext
-            .Where(elephant => elephant?.Node != self?.Node)
-            .Select(elephant => new { Self = self, Elephant = elephant }))
-            .Select(pair => UseOldValuesIfNull(self, selfTime, elephant, elephantTime, opened, pair.Self, pair.Elephant))
+        var list = self.Next
+            .Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0)
+            .Select(distNode => RecursiveElephant(
+                distNode.Node,
+                time - distNode.Distance - 1,
+                opened + (1 << distNode.Node.No)))
             .ToList();
 
-        var max = pressures.Count > 0 ? pressures.Max() : 0;
+        var max = list.Count > 0 ? list.Max() : 0;
         Memoization.Add(memoizeState, pressure + max);
         return pressure + max;
-    }
-
-    private int UseOldValuesIfNull(
-        ReducedValveNode oldSelf,
-        int oldSelfTime,
-        ReducedValveNode oldElephant,
-        int oldElephantTime,
-        int opened,
-        DistanceNode<ReducedValveNode> newSelf,
-        DistanceNode<ReducedValveNode> newElephant)
-    {
-        var self = newSelf is { } ? newSelf.Node : oldSelf;
-        var selfTime = newSelf is { } ? oldSelfTime - newSelf.Distance - 1 : oldSelfTime;
-        var elephant = newElephant is { } ? newElephant.Node : oldElephant;
-        var elephantTime = newElephant is { } ? oldElephantTime - newElephant.Distance - 1 : oldElephantTime;
-        opened = opened
-            + (newSelf is { } ? (1 << newSelf.Node.No) : 0)
-            + (newElephant is { } ? (1 << newElephant.Node.No) : 0);
-
-        var time = Math.Max(selfTime, elephantTime);
-
-        return RecursiveElephant(
-            self,
-            selfTime,
-            elephant,
-            elephantTime,
-            opened,
-            time);
-    }
-
-    public int Recursive(ReducedValveNode current, int opened, int time, int pressure)
-    {
-        var comb = current.Next
-            .Where(valve => time - valve.Distance > 0 && (opened & (1 << valve.Node.No)) == 0)
-            .ToList();
-        var list = comb
-            .Select(distNode => Recursive(
-                distNode.Node,
-                opened + (1 << distNode.Node.No),
-                time - distNode.Distance - 1,
-                pressure + distNode.Node.Pressure * (time - distNode.Distance - 1))).ToList();
-        return list.Count > 0 ? list.Max() : pressure;
     }
 }

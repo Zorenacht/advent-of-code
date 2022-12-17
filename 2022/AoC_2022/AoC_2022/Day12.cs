@@ -1,5 +1,3 @@
-using MathNet.Numerics.LinearAlgebra.Factorization;
-using Newtonsoft.Json.Linq;
 using ShortestPath;
 using Tools.Geometry;
 
