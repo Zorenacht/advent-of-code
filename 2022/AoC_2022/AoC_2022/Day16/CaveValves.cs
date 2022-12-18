@@ -75,7 +75,7 @@ public class ReducedCaveValves
     {
         int full = (1 << 15) - 1;
         int max = 0;
-        for (int opened = 0; opened < full; opened++)
+        for (int opened = 0; opened < (full+1)/2; opened++)
         {
             var me = RecursiveElephant(
                 self: Valves[NameMap["AA"]],
