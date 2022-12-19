@@ -1,5 +1,6 @@
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
+using NUnit.Framework.Constraints;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -14,9 +15,9 @@ public sealed partial class Day19 : Day
     public void Part1() => Geodes.Parse(InputPart1).Max().Should().Be(-100);
 
     [Test]
-    public void ExampleP2() => Geodes.Parse(InputExample).Max().Should().Be(-100);
+    public void ExampleP2() => Geodes.Parse(InputExample).Top3().Should().Be(-100);
     [Test]
-    public void Part2() => Geodes.Parse(InputPart1).Max().Should().Be(-100);
+    public void Part2() => Geodes.Parse(InputPart1).Top3().Should().Be(-100);
 
     private class Geodes
     {
@@ -34,7 +35,7 @@ public sealed partial class Day19 : Day
         public int Max()
         {
             int count = 0;
-            foreach(Blueprint blueprint in Blueprints.Skip(1).Take(1))
+            foreach(Blueprint blueprint in Blueprints)
             {
                 count += blueprint.No * Recursive(
                     new int[4] { 1, 0, 0, 0 },
@@ -43,6 +44,20 @@ public sealed partial class Day19 : Day
                     blueprint);
             }
             return count;
+        }
+        public int Top3()
+        {
+            var list = new List<int>();
+            foreach (Blueprint blueprint in Blueprints)
+            {
+                list.Add(blueprint.No * Recursive(
+                    new int[4] { 1, 0, 0, 0 },
+                    new int[4] { 0, 0, 0, 0 },
+                    24,
+                    blueprint));
+            }
+            var top3 = list.Take(3).ToArray();
+            return top3[0] * top3[1] * top3[2];
         }
 
         public string Encode(int[] robots, int[] resources, int time, Blueprint blueprint)
@@ -72,7 +87,6 @@ public sealed partial class Day19 : Day
                 if (turns[i] <= 0 || time - turns[i] < 0) continue;
                 var newRobots = (int[])robots.Clone();
                 newRobots[i] += 1;
-                //newResources incorrect, substract robot build cost
                 var newResource = robots.Zip(resources, (robot, resource) => turns[i] * robot + resource).ToArray();
                 blueprint.SubstractRobotResource(newResource, i);
                 list.Add(Recursive(newRobots, newResource, time - turns[i], blueprint));
