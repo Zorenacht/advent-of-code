@@ -8,7 +8,7 @@ public sealed partial class Day20 : Day
     [Test]
     public void Example() => Geodes.Parse(InputExample).Mix().Top3().Should().Be(3);
     [Test]
-    public void Part1() => Geodes.Parse(InputPart1).Mix().Top3().Should().Be(-100);
+    public void Part1() => Geodes.Parse(InputPart1).Mix().Top3().Should().Be(0);
 
     [Test]
     public void ExampleP2() => Geodes.Parse(InputExample).Mix().Top3().Should().Be(-100);
@@ -29,15 +29,15 @@ public sealed partial class Day20 : Day
         {
             var node = OriginalOrder.First(x => x.Value == 0);
             var list = new List<int>() { 
-                1000 % OriginalOrder.Count, 
-                2000 % OriginalOrder.Count, 
-                3000 % OriginalOrder.Count 
+                1000, 
+                2000, 
+                3000
             }.Order();
             int count = 0;
             var sum = new List<int>();
             while(sum.Count != 3)
             {
-                count = (count + 1) % OriginalOrder.Count();
+                count = (count + 1);
                 node = node.Next;
                 if (list.Contains(count))
                 {
@@ -45,6 +45,16 @@ public sealed partial class Day20 : Day
                 }
             }
             return sum.Sum();
+        }
+
+        public bool LoopTest(Node head)
+        {
+            var current = head;
+            for(int i =0; i< OriginalOrder.Count * 10; i++)
+            {
+                current = current.Prev;
+            }
+            return current == head;
         }
 
         public int[] LinkedListToArray()
@@ -107,7 +117,7 @@ public sealed partial class Day20 : Day
                 original.Add(current);
                 old = current;
             }
-            current.Next = old;
+            current.Next = head;
             head.Prev = current;
 
             return new Geodes(original);
