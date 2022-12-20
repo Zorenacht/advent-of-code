@@ -1,6 +1,3 @@
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.Optimization;
-using NUnit.Framework.Constraints;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -90,6 +87,7 @@ public sealed partial class Day19 : Day
                 var newResource = robots.Zip(resources, (robot, resource) => turns[i] * robot + resource).ToArray();
                 blueprint.SubstractRobotResource(newResource, i);
                 list.Add(Recursive(newRobots, newResource, time - turns[i], blueprint));
+                if (i == 3 && turns[3] == 1) break;
             }
             var max = list.Count > 0 ? Math.Max(list.Max(), resources[3]) : resources[3];
             Memoized.Add(encoded, max);
