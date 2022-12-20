@@ -1,93 +1,71 @@
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 namespace AoC_2022;
 
 
 public sealed partial class Day20 : Day
 {
     [Test]
-    public void Example() => Geodes.Parse(InputExample).Mix().Top3().Should().Be(3);
+    public void Example() => Mixir.Parse(InputExample ,1).Mix(1).Top3().Should().Be(3);
     [Test]
-    public void Part1() => Geodes.Parse(InputPart1).Mix().Top3().Should().Be(0);
+    public void Part1() => Mixir.Parse(InputPart1, 1).Mix(1).Top3().Should().Be(4151);
 
     [Test]
-    public void ExampleP2() => Geodes.Parse(InputExample).Mix().Top3().Should().Be(-100);
+    public void ExampleP2() => Mixir.Parse(InputExample, 811589153).Mix(10).Top3().Should().Be(1623178306L);
     [Test]
-    public void Part2() => Geodes.Parse(InputPart1).Mix().Top3().Should().Be(-100);
+    public void Part2() => Mixir.Parse(InputPart1, 811589153).Mix(10).Top3().Should().Be(7848878698663L);
 
-    private class Geodes
+    private class Mixir
     {
         //private readonly List<Node> Sequence;
         private readonly List<Node> OriginalOrder;
 
-        public Geodes(List<Node> original)
+        public Mixir(List<Node> original)
         {
             OriginalOrder = original;
         }
 
-        public int Top3()
+        public long Top3()
         {
             var node = OriginalOrder.First(x => x.Value == 0);
-            var list = new List<int>() { 
-                1000, 
-                2000, 
-                3000
-            }.Order();
-            int count = 0;
-            var sum = new List<int>();
-            while(sum.Count != 3)
+            long sum = 0;
+            for (int i = 1; i <= 3000; i++)
             {
-                count = (count + 1);
                 node = node.Next;
-                if (list.Contains(count))
+                if (i % 1000 == 0)
                 {
-                    sum.Add(node.Value);
+                    sum += node.Value;
                 }
             }
-            return sum.Sum();
+            return sum;
         }
 
-        public bool LoopTest(Node head)
+        public Mixir Mix(int times)
         {
-            var current = head;
-            for(int i =0; i< OriginalOrder.Count * 10; i++)
+            for(int j=0; j<times; j++)
             {
-                current = current.Prev;
+                Mix();
             }
-            return current == head;
+            return this;
         }
 
-        public int[] LinkedListToArray()
-        {
-            var list = new List<int>();
-            var current = OriginalOrder[0];
-            for (int i = 0; i < OriginalOrder.Count; i++)
-            {
-                list.Add(current.Value);
-                current = current.Next;
-            }
-            return list.ToArray();
-        }
-
-        public Geodes Mix()
+        private void Mix()
         {
             foreach (var node in OriginalOrder)
             {
-                int counter = 0;
                 var current = node;
-                if (node.Value == 0) continue;
-                while (counter != node.Value)
+                var sign = Math.Sign(node.Value);
+                if (node.Value == 0)
                 {
-                    var sign = Math.Sign(node.Value);
+                    continue;
+                }
+                for (int i = 0; i < Math.Abs(node.Value) % (OriginalOrder.Count - 1); i += 1)
+                {
                     if (sign > 0) current = current.Next;
                     else if (sign < 0) current = current.Prev;
-                    counter += Math.Sign(node.Value);
                 }
                 Remove(node);
-                if (Math.Sign(node.Value) > 0) InsertBefore(current.Next!, node);
+                if (Math.Sign(node.Value) > 0) InsertBefore(current.Next, node);
                 if (Math.Sign(node.Value) < 0) InsertBefore(current, node);
             }
-            return this;
         }
 
         private void Remove(Node node)
@@ -104,15 +82,15 @@ public sealed partial class Day20 : Day
             before.Prev = insert;
         }
 
-        public static Geodes Parse(string[] lines)
+        public static Mixir Parse(string[] lines, int key)
         {
-            var head = new Node() { Value = int.Parse(lines[0]) };
+            var head = new Node() { Value = long.Parse(lines[0]) * key };
             var original = new List<Node>() { head };
             Node? old = head;
             Node? current = head;
             foreach (var line in lines.Skip(1))
             {
-                current = new Node() { Value = int.Parse(line), Prev = old };
+                current = new Node() { Value = long.Parse(line) * key, Prev = old };
                 old.Next = current;
                 original.Add(current);
                 old = current;
@@ -120,7 +98,7 @@ public sealed partial class Day20 : Day
             current.Next = head;
             head.Prev = current;
 
-            return new Geodes(original);
+            return new Mixir(original);
         }
     }
 
@@ -128,6 +106,6 @@ public sealed partial class Day20 : Day
     {
         public Node? Prev { get; set; }
         public Node? Next { get; set; }
-        public int Value;
+        public long Value;
     }
 }
