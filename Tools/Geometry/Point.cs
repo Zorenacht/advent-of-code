@@ -16,6 +16,17 @@ public readonly struct Point : IEquatable<Point>
     }
 
 
+    //Neighbor visually correct
+    public Point NeighborV(Direction direction)
+        => direction switch
+        {
+            Direction.N => new Point(X, Y - 1),
+            Direction.S => new Point(X, Y + 1),
+            Direction.W => new Point(X - 1, Y),
+            Direction.E => new Point(X + 1, Y),
+            _ => throw new NotSupportedException()
+        };
+
     public Point Neighbor(Direction direction)
     {
         int x = Convert.ToInt32(Math.Round(Math.Cos(Convert.ToDouble(direction) * Math.PI / 4)));
