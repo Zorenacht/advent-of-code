@@ -24,6 +24,10 @@ public readonly struct Point : IEquatable<Point>
             Direction.S => new Point(X, Y + 1),
             Direction.W => new Point(X - 1, Y),
             Direction.E => new Point(X + 1, Y),
+            Direction.NW => new Point(X - 1, Y - 1),
+            Direction.SW => new Point(X - 1, Y + 1),
+            Direction.SE => new Point(X + 1, Y + 1),
+            Direction.NE => new Point(X + 1, Y - 1),
             _ => throw new NotSupportedException()
         };
 
