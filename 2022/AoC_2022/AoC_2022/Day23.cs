@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Tools.Geometry;
@@ -8,119 +9,170 @@ namespace AoC_2022;
 public sealed partial class Day23 : Day
 {
     [Test]
-    public void Example() => ElfRectangle.Parse(InputExample).Simulate().Should().Be(6032);
+    public void Example() => ElfRectangle.Parse(InputExample).Simulate().Should().Be(110);
     [Test]
-    public void Part1() => ElfRectangle.Parse(InputPart1).Simulate().Should().Be(57350);
+    public void Part1() => ElfRectangle.Parse(InputPart1).Simulate().Should().Be(4249);
 
     [Test]
-    public void ExampleP2() => ElfRectangle.Parse(InputPart1).Simulate().Should().BeGreaterThan(-100);
+    public void ExampleP2() => ElfRectangle.Parse(InputExample).FirstTurnNoMoves().Should().Be(20);
     [Test]
-    public void Part2() => ElfRectangle.Parse(InputPart1).Simulate().Should().Be(-100);
+    public void Part2() => ElfRectangle.Parse(InputPart1).FirstTurnNoMoves().Should().Be(980);
 
 
 
     private class ElfRectangle
     {
-        public readonly Dictionary<Point, Elf> Elves;
+        public readonly HashSet<Point> Elves;
         public readonly Dictionary<Point, Point> FromTo;
         public readonly Dictionary<Point, int> ToCount;
+        public readonly int XMax;
+        public readonly int YMax;
 
-        public ElfRectangle(Dictionary<Point, Elf> elves)
+        public ElfRectangle(HashSet<Point> elves, int xMax, int yMax)
         {
             Elves = elves;
-            FromTo = new Dictionary<Point,Point>();
+            XMax = xMax;
+            YMax = yMax;
+            FromTo = new Dictionary<Point, Point>();
             ToCount = new Dictionary<Point, int>();
         }
 
-        public int Simulate()
+        private void Print()
         {
-            for (int i = 0; i < 10; i++)
+            var x = Elves.OrderBy(elf => elf.X).ToList();
+            var y = Elves.OrderBy(elf => elf.Y).ToList();
+            Console.WriteLine("-----------------------------------");
+            for (int i = y.First().Y; i <= y.Last().Y; i++)
             {
-                foreach (var pair in Elves)
+                for (int j = x.First().X; j <= x.Last().X; j++)
                 {
-                    FirstHalf(pair.Value);
+                    if (Elves.Contains(new Point(j, i))) Console.Write('#');
+                    else Console.Write('.');
                 }
-                foreach(var pair in FromTo)
+                Console.WriteLine();
+            }
+        }
+        public int FirstTurnNoMoves()
+        {
+            int turn = 0;
+            bool moved = true;
+            while(moved)
+            {
+                moved = false;
+                foreach (var elf in Elves)
                 {
-                    if(ToCount[pair.Value] == 1)
+                    if (!AnyAdjecent(elf)) continue;
+                    FirstHalf(elf, turn);
+                }
+                foreach (var pair in FromTo)
+                {
+                    if (ToCount[pair.Value] == 1)
                     {
-                        var elf = Elves[pair.Key];
+                        moved = true;
                         Elves.Remove(pair.Key);
-                         
-                        elf.Point = pair.Value;
-                        Elves.Add(pair.Value, elf);
+                        Elves.Add(pair.Value);
                     }
                 }
                 FromTo.Clear();
                 ToCount.Clear();
+                turn++;
             }
-            return MinRectangle();
+            return turn;
         }
 
-        public void FirstHalf(Elf elf)
+        public int Simulate()
+        {
+            Print();
+            for (int i = 0; i < 10; i++)
+            {
+                foreach (var elf in Elves)
+                {
+                    if (!AnyAdjecent(elf)) continue;
+                    FirstHalf(elf, i);
+                }
+                foreach (var pair in FromTo)
+                {
+                    if (ToCount[pair.Value] == 1)
+                    {
+                        Elves.Remove(pair.Key);
+                        Elves.Add(pair.Value);
+                    }
+                }
+                FromTo.Clear();
+                ToCount.Clear();
+                Print();
+            }
+            return MinRectangle() - Elves.Count;
+        }
+
+        private bool AnyAdjecent(Point elf)
+        {
+            for(int i=0; i<8; i++)
+            {
+                if (Elves.Contains(elf.NeighborV((Direction)i))) 
+                    return true;
+            }
+            return false;
+        }
+
+        public void FirstHalf(Point elf, int cmd)
         {
             for (int i = 0; i < 4; i++)
             {
-                foreach (var dir in elf.Directions())
+                var dirs = Directions(cmd + i);
+                var nb1 = elf.NeighborV(dirs[0]);
+                var nb2 = elf.NeighborV(dirs[1]);
+                var nb3 = elf.NeighborV(dirs[2]);
+                if (!Elves.Contains(nb1) &&
+                    !Elves.Contains(nb2) &&
+                    !Elves.Contains(nb3))
                 {
-                    var nb = elf.Point.NeighborV(dir);
-                    if (!Elves.ContainsKey(nb))
-                    {
-                        FromTo.Add(elf.Point, nb);
-                        if (ToCount.ContainsKey(nb)) ToCount[nb]++;
-                        else ToCount.Add(nb, 1);
-                        return;
-                    }
+                    FromTo.Add(elf, nb1);
+                    if (ToCount.ContainsKey(nb1)) ToCount[nb1]++;
+                    else ToCount.Add(nb1, 1);
+                    return;
                 }
             }
+        }
+        public List<Direction> Directions(int cmd)
+        {
+            var result = (cmd % 4) switch
+            {
+                0 => new List<Direction>() { Direction.N, Direction.NE, Direction.NW },
+                1 => new List<Direction>() { Direction.S, Direction.SE, Direction.SW },
+                2 => new List<Direction>() { Direction.W, Direction.NW, Direction.SW },
+                3 => new List<Direction>() { Direction.E, Direction.NE, Direction.SE },
+                _ => throw new NotImplementedException()
+            };
+            //cmd = (cmd + 1) % 4;
+            return result;
         }
 
         private int MinRectangle()
         {
-            var x = Elves.OrderBy(elf => elf.Key.X).ToList();
-            var y = Elves.OrderBy(elf => elf.Key.Y).ToList();
-            return (x.Last().Key.X - x.First().Key.X + 1) * (y.Last().Key.Y - y.First().Key.Y + 1);
+            var x = Elves.OrderBy(elf => elf.X).ToList();
+            var y = Elves.OrderBy(elf => elf.Y).ToList();
+            return (x.Last().X - x.First().X + 1) * (y.Last().Y - y.First().Y + 1);
         }
 
         public static ElfRectangle Parse(string[] lines)
         {
-            var dict = new Dictionary<Point, Elf>();
+            var set = new HashSet<Point>();
             for (int row = 0; row < lines.Length; row++)
             {
                 var line = lines[row];
                 for (int col = 0; col < line.Length; col++)
                 {
-                    var point = new Point(col + 1, row + 1);
-                    if (line[col] == '#') dict.Add(point, new Elf() { Point = point });
+                    var point = new Point(col, row);
+                    if (line[col] == '#') set.Add(point);
                 }
             }
-            return new ElfRectangle(dict);
+            return new ElfRectangle(set, lines[0].Length, lines.Length);
         }
 
         public class Elf
         {
             public Point Point { get; set; }
-            public int Cmd { get; set; }
-            public List<Direction> Directions()
-            {
-                var result = Cmd switch
-                {
-                    0 => new List<Direction>() { Direction.N, Direction.NE, Direction.NW },
-                    1 => new List<Direction>() { Direction.S, Direction.SE, Direction.SW },
-                    2 => new List<Direction>() { Direction.W, Direction.NW, Direction.SW },
-                    3 => new List<Direction>() { Direction.E, Direction.NE, Direction.SE },
-                    _ => throw new NotImplementedException()
-                };
-                Cmd = (Cmd + 1) % 4;
-                return result;
-            }
-
-            public int IncreaseMod(int cmd)
-            {
-                int original = cmd;
-                cmd = (cmd + 1) % 4;
-                return original;
-            }
         }
     }
 }
