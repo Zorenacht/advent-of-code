@@ -32,6 +32,12 @@ public class Grid : IEnumerable
             Lattice[i] = new int[col];
     }
 
+    public int[] this[int row]
+    {
+        get { return Lattice[row]; }
+        set { Lattice[row] = value; }
+    }
+
     public int[] As1D()
     {
         return Enumerable().ToArray();
@@ -154,4 +160,17 @@ public class Grid : IEnumerable
             }
         }
     }
+
+    public static bool operator ==(Grid grid1, Grid grid2)
+    {
+        if (grid1.ColumnLength != grid2.ColumnLength) return false;
+        if (grid1.RowLength != grid2.RowLength) return false;
+        foreach(var (point,val) in grid1.EnumerableWithIndex())
+        {
+            if (val != grid2.ValueAt(point)) return false;
+        }
+        return true;
+    }
+
+    public static bool operator !=(Grid grid1, Grid grid2) => !(grid1 == grid2);
 }

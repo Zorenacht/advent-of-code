@@ -9,7 +9,7 @@ public sealed partial class Day19 : Day
     [Test]
     public void Example() => Geodes.Parse(InputExample).Max().Should().Be(33);
     [Test]
-    public void Part1() => Geodes.Parse(InputPart1).Max().Should().Be(-100);
+    public void Part1() => Geodes.Parse(InputPart1).Max().Should().Be(1650);
 
     [Test]
     public void ExampleP2() => Geodes.Parse(InputExample).Top3().Should().Be(-100);
