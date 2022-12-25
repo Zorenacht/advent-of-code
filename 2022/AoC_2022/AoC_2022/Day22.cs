@@ -102,6 +102,11 @@ public sealed partial class Day22 : Day
             }
         }
 
+        private void ConnectCube()
+        {
+
+        }
+
         public static Maze Parse(string[] lines)
         {
             var mazeLines = lines.Take(lines.Length - 2).ToArray();
