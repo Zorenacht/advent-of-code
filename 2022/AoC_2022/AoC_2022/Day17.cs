@@ -149,7 +149,7 @@ public sealed partial class Day17 : Day
             BlockType = (BlockType + 1) % 5;
         }
 
-        //DFS to determine a path from left to right and return the minimum row value of the path
+        //DFS to determine a path from right to left and return the minimum row value of the path
         private int CleanupRocks()
         {
             var rocks = Rocks.ToList();
