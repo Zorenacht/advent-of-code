@@ -182,17 +182,13 @@ public sealed partial class Day17 : Day
             point.Y >= 0 && point.Y < 7 &&
             (Rocks[point.X] & (1 << point.Y)) > 0;
 
-        private static List<Point> Neighbors(Point point)
+        private static List<Point> Neighbors(Point point) => new()
         {
-            var list = new List<Point>
-            {
-                new Point(point.X - 1, point.Y),
-                new Point(point.X, point.Y - 1),
-                new Point(point.X, point.Y + 1),
-                new Point(point.X + 1, point.Y)
-            };
-            return list;
-        }
+            new Point(point.X - 1, point.Y),
+            new Point(point.X, point.Y - 1),
+            new Point(point.X, point.Y + 1),
+            new Point(point.X + 1, point.Y)
+        };
     }
 }
 
