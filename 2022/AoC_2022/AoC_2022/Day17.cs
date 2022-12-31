@@ -184,11 +184,13 @@ public sealed partial class Day17 : Day
 
         private static List<Point> Neighbors(Point point)
         {
-            var list = new List<Point>();
-            list.Add(new Point(point.X, point.Y - 1));
-            list.Add(new Point(point.X - 1, point.Y));
-            list.Add(new Point(point.X, point.Y + 1));
-            list.Add(new Point(point.X + 1, point.Y));
+            var list = new List<Point>
+            {
+                new Point(point.X - 1, point.Y),
+                new Point(point.X, point.Y - 1),
+                new Point(point.X, point.Y + 1),
+                new Point(point.X + 1, point.Y)
+            };
             return list;
         }
     }
