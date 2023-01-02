@@ -69,7 +69,6 @@ public sealed partial class Day14 : Day
         public static Cave Parse(string[] lines)
         {
             Grid grid = new Grid(200, 1000);
-            int result = 0;
             foreach (var line in lines)
             {
                 //parse input

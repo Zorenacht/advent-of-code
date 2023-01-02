@@ -16,7 +16,7 @@ public sealed partial class Day25 : Day
 
     public static string Parse(string[] input)
     {
-        var total = input.Select(input => Base5To10(input)).Sum();
+        var total = input.Select(Base5To10).Sum();
         return Base10To5(total);
     }
 

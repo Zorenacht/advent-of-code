@@ -23,7 +23,6 @@ public sealed partial class Day15 : Day
 
         public int Simulate(int row)
         {
-            int count = 0;
             foreach (var m in Measurements)
             {
                 var rowToSensorYdifference = Math.Abs(row - m.Sensor.Y);
