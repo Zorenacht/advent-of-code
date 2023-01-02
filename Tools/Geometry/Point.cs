@@ -45,10 +45,6 @@ public readonly struct Point : IEquatable<Point>
         return new Point(X + x, Y + y);
     }
 
-    public Point Difference(Point other)
-    {
-        return new Point(X - other.X, Y - other.Y);
-    }
 
     public int Norm => X * X + Y * Y;
 
@@ -78,13 +74,12 @@ public readonly struct Point : IEquatable<Point>
     public bool Equals(Point other) => other.X == X && other.Y == Y;
     public override int GetHashCode() => X ^ (Y << 16);
 
-    public static bool operator ==(Point left, Point right)
-    {
-        return left.Equals(right);
-    }
+    public static bool operator ==(Point left, Point right) => left.Equals(right);
+    public static bool operator !=(Point left, Point right) => !(left == right);
 
-    public static bool operator !=(Point left, Point right)
-    {
-        return !(left == right);
-    }
+    public static Point operator -(Point left, Point right) => new(left.X - right.X, left.Y - right.Y);
+    public static Point operator +(Point left, Point right) => new(left.X + right.X, left.Y + right.Y);
+    public static Point operator *(int left, Point right) => new(left * right.X, left * right.Y);
+
+    public Point Difference(Point other) => new Point(X - other.X, Y - other.Y);
 }
