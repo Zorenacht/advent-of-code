@@ -202,31 +202,31 @@ public class TetrisBlock
         Type = blockType;
         if (Type == 0)
         {
-            Occupied[0] = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4;
+            Occupied[0] = 0b11110;
         }
         else if (Type == 1)
         {
-            Occupied[2] = 1 << 3;
-            Occupied[1] = 1 << 2 | 1 << 3 | 1 << 4;
-            Occupied[0] = 1 << 3;
+            Occupied[2] = 0b01000;
+            Occupied[1] = 0b11100;
+            Occupied[0] = 0b01000;
         }
         else if (Type == 2)
         {
-            Occupied[2] = 1 << 2;
-            Occupied[1] = 1 << 2;
-            Occupied[0] = 1 << 2 | 1 << 3 | 1 << 4;
+            Occupied[2] = 0b00100;
+            Occupied[1] = 0b00100;
+            Occupied[0] = 0b11100;
         }
         else if (Type == 3)
         {
-            Occupied[3] = 1 << 4;
-            Occupied[2] = 1 << 4;
-            Occupied[1] = 1 << 4;
-            Occupied[0] = 1 << 4;
+            Occupied[3] = 0b10000;
+            Occupied[2] = 0b10000;
+            Occupied[1] = 0b10000;
+            Occupied[0] = 0b10000;
         }
         else if (Type == 4)
         {
-            Occupied[1] = 1 << 3 | 1 << 4;
-            Occupied[0] = 1 << 3 | 1 << 4;
+            Occupied[1] = 0b11000;
+            Occupied[0] = 0b11000;
         }
     }
 
