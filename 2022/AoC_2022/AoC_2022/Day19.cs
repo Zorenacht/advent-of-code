@@ -19,41 +19,46 @@ public sealed partial class Day19 : Day
     private class Geodes
     {
         private readonly List<Blueprint> Blueprints;
-        private readonly Dictionary<string,int> Memoized;
+        private readonly Dictionary<long, int> Memoized;
         private readonly HashSet<int> Outside;
 
         public Geodes(List<Blueprint> blueprints)
         {
             Blueprints = blueprints;
-            Memoized = new Dictionary<string,int>();
+            Memoized = new Dictionary<long, int>();
             Outside = new HashSet<int>();
         }
 
         public int Max()
         {
+            int count2 = 0;
             int count = 0;
-            foreach(Blueprint blueprint in Blueprints)
+            foreach (var blueprint in Blueprints)
             {
                 count += blueprint.No * Recursive(
                     new int[4] { 1, 0, 0, 0 },
                     new int[4] { 0, 0, 0, 0 },
                     24,
-                    blueprint);
+                    blueprint,
+                    ref count2);
             }
             return count;
         }
+
         public int Top3()
         {
+            int count = 0;
             var list = new List<int>();
-            foreach (Blueprint blueprint in Blueprints)
+            foreach (var blueprint in Blueprints.Take(3))
             {
                 list.Add(blueprint.No * Recursive(
                     new int[4] { 1, 0, 0, 0 },
                     new int[4] { 0, 0, 0, 0 },
                     24,
-                    blueprint));
+                    blueprint,
+                    ref count));
             }
-            var top3 = list.Take(3).ToArray();
+            var top3 = list.ToArray();
             return top3[0] * top3[1] * top3[2];
         }
 
@@ -67,10 +72,31 @@ public sealed partial class Day19 : Day
             return sb.ToString();
         }
 
-        public int Recursive(int[] robots, int[] resources, int time, Blueprint blueprint)
+        public long Encode2(int[] robots, int[] resources, int time, Blueprint blueprint)
         {
+            var sb = new StringBuilder();
+            sb.Append(string.Join("", robots.Select(x => x.ToString("000"))));
+            sb.Append(string.Join("", resources.Select(x => x.ToString("000"))));
+            sb.Append(time.ToString("000"));
+            sb.Append(blueprint.No.ToString("000"));
+
+            int robot = robots[0]
+                + (robots[1] << 5)
+                + (robots[2] << 10)
+                + (robots[3] << 15);
+            int resource = resources[0]
+                + (resources[1] << 8)
+                + (resources[2] << 16)
+                + (resources[3] << 24);
+            int meta = time + (blueprint.No << 5);
+            return robot + (((long)resource) << 20) + (((long)meta) << 48);
+        }
+
+        public int Recursive(int[] robots, int[] resources, int time, Blueprint blueprint, ref int count)
+        {
+            count++;
             if (time == 0) return resources[3];
-            var encoded = Encode(robots,resources,time,blueprint);
+            var encoded = Encode2(robots, resources, time, blueprint);
             if (Memoized.TryGetValue(encoded, out var val))
             {
                 return val;
@@ -86,7 +112,7 @@ public sealed partial class Day19 : Day
                 newRobots[i] += 1;
                 var newResource = robots.Zip(resources, (robot, resource) => turns[i] * robot + resource).ToArray();
                 blueprint.SubstractRobotResource(newResource, i);
-                list.Add(Recursive(newRobots, newResource, time - turns[i], blueprint));
+                list.Add(Recursive(newRobots, newResource, time - turns[i], blueprint, ref count));
                 if (i == 3 && turns[3] == 1) break;
             }
             var max = list.Count > 0 ? Math.Max(list.Max(), resources[3]) : resources[3];
@@ -125,11 +151,11 @@ public sealed partial class Day19 : Day
     {
         public void SubstractRobotResource(int[] resources, int robot)
         {
-            if(robot == 0)
+            if (robot == 0)
             {
                 resources[0] -= RobotOre;
             }
-            else if (robot == 1) 
+            else if (robot == 1)
             {
                 resources[0] -= ClayOre;
             }
@@ -147,14 +173,14 @@ public sealed partial class Day19 : Day
 
         public int[] TurnsToMakeRobot(int[] robots, int[] resources)
         {
-            var oreRobotTurns = Math.Ceiling(Math.Max(RobotOre - resources[0],0) / (float)robots[0]);
-            var clayRobotTurns = Math.Ceiling(Math.Max(ClayOre - resources[0],0) / (float)robots[0]);
+            var oreRobotTurns = Math.Ceiling(Math.Max(RobotOre - resources[0], 0) / (float)robots[0]);
+            var clayRobotTurns = Math.Ceiling(Math.Max(ClayOre - resources[0], 0) / (float)robots[0]);
             var obsidianRobotTurns = Math.Max(
-                Math.Ceiling(Math.Max(ObsidianOre - resources[0],0) / (float)robots[0]),
-                Math.Ceiling(Math.Max(ObsidianClay - resources[1],0) / (float)robots[1]));
+                Math.Ceiling(Math.Max(ObsidianOre - resources[0], 0) / (float)robots[0]),
+                Math.Ceiling(Math.Max(ObsidianClay - resources[1], 0) / (float)robots[1]));
             var geodeRobotTurns = Math.Max(
-                Math.Ceiling(Math.Max(GeodeOre - resources[0],0) / (float)robots[0]),
-                Math.Ceiling(Math.Max(GeodeObsidian - resources[2],0) / (float)robots[2]));
+                Math.Ceiling(Math.Max(GeodeOre - resources[0], 0) / (float)robots[0]),
+                Math.Ceiling(Math.Max(GeodeObsidian - resources[2], 0) / (float)robots[2]));
             return new int[4] {
                 (int)oreRobotTurns + 1,
                 (int)clayRobotTurns + 1,
