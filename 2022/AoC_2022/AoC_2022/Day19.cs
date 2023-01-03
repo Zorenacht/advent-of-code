@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Tools.Geometry;
 
 namespace AoC_2022;
 
@@ -12,111 +14,146 @@ public sealed partial class Day19 : Day
     public void Part1() => Geodes.Parse(InputPart1).Max().Should().Be(1650);
 
     [Test]
-    public void ExampleP2() => Geodes.Parse(InputExample).Top3().Should().Be(-100);
+    public void ExampleP2() => Geodes.Parse(InputExample).Top3().Should().Be(3472);
     [Test]
-    public void Part2() => Geodes.Parse(InputPart1).Top3().Should().Be(-100);
+    public void Part2() => Geodes.Parse(InputPart1).Top3().Should().Be(5824);
 
     private class Geodes
     {
         private readonly List<Blueprint> Blueprints;
         private readonly Dictionary<long, int> Memoized;
-        private readonly HashSet<int> Outside;
 
         public Geodes(List<Blueprint> blueprints)
         {
             Blueprints = blueprints;
             Memoized = new Dictionary<long, int>();
-            Outside = new HashSet<int>();
         }
 
         public int Max()
         {
-            int count2 = 0;
             int count = 0;
             foreach (var blueprint in Blueprints)
             {
                 count += blueprint.No * Recursive(
-                    new int[4] { 1, 0, 0, 0 },
-                    new int[4] { 0, 0, 0, 0 },
-                    24,
-                    blueprint,
-                    ref count2);
+                    1 + ((long)24 << _timeStart) + ((long)blueprint.No << _blueprintStart),
+                    blueprint
+                );
             }
             return count;
         }
 
         public int Top3()
         {
-            int count = 0;
-            var list = new List<int>();
+            int prod = 1;
             foreach (var blueprint in Blueprints.Take(3))
             {
-                list.Add(blueprint.No * Recursive(
-                    new int[4] { 1, 0, 0, 0 },
-                    new int[4] { 0, 0, 0, 0 },
-                    24,
-                    blueprint,
-                    ref count));
+                prod *= Recursive(
+                    1 + ((long)32 << _timeStart) + ((long)blueprint.No << _blueprintStart),
+                    blueprint
+                );
+                Memoized.Clear();
             }
-            var top3 = list.ToArray();
-            return top3[0] * top3[1] * top3[2];
+            return prod;
         }
 
-        public string Encode(int[] robots, int[] resources, int time, Blueprint blueprint)
+        const int _robotBits = 5;
+        const int _resourceBits = 8;
+        const int _timeBits = 6;
+        const int _blueprintBits = 5;
+
+        const int _robotStart = 0;
+        const int _resourceStart = 20;
+        const int _timeStart = 52;
+        const int _blueprintStart = 58;
+
+        public static int ResourceStart(int resourceIndex) => _resourceStart + _resourceBits * resourceIndex;
+        public static int RobotStart(int resourceIndex) => _robotBits * resourceIndex;
+
+        public static int ResourceAmount(long state, int resourceIndex) => (int)Bits.Extract(state, ResourceStart(resourceIndex), _resourceBits);
+        public static int RobotAmount(long state, int resourceIndex) => (int)Bits.Extract(state, RobotStart(resourceIndex), _robotBits);
+        public static int Time(long state) => (int)Bits.Extract(state, _timeStart, _timeBits);
+
+        public long SubstractRobotResource(long state, int robotIndex, Blueprint blueprint)
         {
-            var sb = new StringBuilder();
-            sb.Append(string.Join("", robots.Select(x => x.ToString("000"))));
-            sb.Append(string.Join("", resources.Select(x => x.ToString("000"))));
-            sb.Append(time.ToString("000"));
-            sb.Append(blueprint.No.ToString("000"));
-            return sb.ToString();
+            if (robotIndex == 0)
+            {
+                state -= (long)blueprint.RobotOre << ResourceStart(0);
+            }
+            else if (robotIndex == 1)
+            {
+                state -= (long)blueprint.ClayOre << ResourceStart(0);
+            }
+            else if (robotIndex == 2)
+            {
+                state -= (long)blueprint.ObsidianOre << ResourceStart(0);
+                state -= (long)blueprint.ObsidianClay << ResourceStart(1);
+            }
+            else if (robotIndex == 3)
+            {
+                state -= (long)blueprint.GeodeOre << ResourceStart(0);
+                state -= (long)blueprint.GeodeObsidian << ResourceStart(2);
+            }
+            return state;
         }
 
-        public long Encode2(int[] robots, int[] resources, int time, Blueprint blueprint)
+        private static long AddTurnResources(long state, int turns)
         {
-            var sb = new StringBuilder();
-            sb.Append(string.Join("", robots.Select(x => x.ToString("000"))));
-            sb.Append(string.Join("", resources.Select(x => x.ToString("000"))));
-            sb.Append(time.ToString("000"));
-            sb.Append(blueprint.No.ToString("000"));
-
-            int robot = robots[0]
-                + (robots[1] << 5)
-                + (robots[2] << 10)
-                + (robots[3] << 15);
-            int resource = resources[0]
-                + (resources[1] << 8)
-                + (resources[2] << 16)
-                + (resources[3] << 24);
-            int meta = time + (blueprint.No << 5);
-            return robot + (((long)resource) << 20) + (((long)meta) << 48);
+            for (int i = 0; i < 4; i++)
+            {
+                state += ((long)RobotAmount(state, i) * turns) << ResourceStart(i);
+            }
+            return state;
         }
 
-        public int Recursive(int[] robots, int[] resources, int time, Blueprint blueprint, ref int count)
+
+        private int[] TurnsToMakeRobot(long state, Blueprint bp)
         {
-            count++;
-            if (time == 0) return resources[3];
-            var encoded = Encode2(robots, resources, time, blueprint);
-            if (Memoized.TryGetValue(encoded, out var val))
+            var resources = new int[4] {
+                ResourceAmount(state, 0),
+                ResourceAmount(state, 1),
+                ResourceAmount(state, 2),
+                ResourceAmount(state, 3),
+            };
+            var robots = new int[4]
+            {
+                RobotAmount(state, 0),
+                RobotAmount(state, 1),
+                RobotAmount(state, 2),
+                RobotAmount(state, 3),
+            };
+            var a = bp.TurnsToMakeRobot(robots, resources);
+            return a;
+        }
+
+        public int Recursive(long state, Blueprint blueprint)
+        {
+            int time = Time(state);
+
+            if (time == 0) return ResourceAmount(state, 3);
+            if (Memoized.TryGetValue(state, out var val))
             {
                 return val;
             }
 
-            var turns = blueprint.TurnsToMakeRobot(robots, resources);
+            var turns = TurnsToMakeRobot(state, blueprint);
             var list = new List<int>();
             //start with geode robot first
-            for (int i = 3; i >= 0; i--)
+            for (int robotIndex = 3; robotIndex >= 0; robotIndex--)
             {
-                if (turns[i] <= 0 || time - turns[i] < 0) continue;
-                var newRobots = (int[])robots.Clone();
-                newRobots[i] += 1;
-                var newResource = robots.Zip(resources, (robot, resource) => turns[i] * robot + resource).ToArray();
-                blueprint.SubstractRobotResource(newResource, i);
-                list.Add(Recursive(newRobots, newResource, time - turns[i], blueprint, ref count));
-                if (i == 3 && turns[3] == 1) break;
+                if (RobotAmount(state, robotIndex) >= blueprint.MaxNeeded[robotIndex])
+                {
+                    continue;
+                }
+                if (turns[robotIndex] <= 0 || time - turns[robotIndex] < 0) continue;
+                var newState = AddTurnResources(state, turns[robotIndex]);
+                newState += 1L << RobotStart(robotIndex);
+                newState = SubstractRobotResource(newState, robotIndex, blueprint);
+                newState -= (long)turns[robotIndex] << _timeStart;
+                list.Add(Recursive(newState, blueprint));
+                if (robotIndex == 3 && turns[3] == 1) break;
             }
-            var max = list.Count > 0 ? Math.Max(list.Max(), resources[3]) : resources[3];
-            Memoized.Add(encoded, max);
+            var max = list.Count > 0 ? Math.Max(list.Max(), ResourceAmount(state, 3)) : ResourceAmount(state, 3);
+            Memoized.Add(state, max);
             return max;
         }
 
@@ -149,27 +186,12 @@ public sealed partial class Day19 : Day
         int GeodeOre,
         int GeodeObsidian)
     {
-        public void SubstractRobotResource(int[] resources, int robot)
-        {
-            if (robot == 0)
-            {
-                resources[0] -= RobotOre;
-            }
-            else if (robot == 1)
-            {
-                resources[0] -= ClayOre;
-            }
-            else if (robot == 2)
-            {
-                resources[0] -= ObsidianOre;
-                resources[1] -= ObsidianClay;
-            }
-            else if (robot == 3)
-            {
-                resources[0] -= GeodeOre;
-                resources[2] -= GeodeObsidian;
-            }
-        }
+        public int[] MaxNeeded = new int[4] { 
+            Math.Max(Math.Max(RobotOre, ClayOre), Math.Max(ObsidianOre, GeodeOre)),
+            ObsidianClay,
+            GeodeObsidian,
+            int.MaxValue,
+        };
 
         public int[] TurnsToMakeRobot(int[] robots, int[] resources)
         {
