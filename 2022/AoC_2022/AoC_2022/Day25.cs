@@ -2,7 +2,6 @@ using System.Text;
 
 namespace AoC_2022;
 
-
 public sealed partial class Day25 : Day
 {
     [Test]
@@ -11,58 +10,34 @@ public sealed partial class Day25 : Day
     public void Part1() => Parse(InputPart1).Should().Be("2011-=2=-1020-1===-1");
 
     [Test]
-    public void Base5() => Base5To10("1121-1110-1=0").Should().Be(314159265);
+    public void Base5() => SnafuToLong("1121-1110-1=0").Should().Be(314159265);
 
-
-    public static string Parse(string[] input)
+    private static string Parse(string[] input)
     {
-        var total = input.Select(Base5To10).Sum();
-        return Base10To5(total);
+        var total = input.Select(SnafuToLong).Sum();
+        return LongToSnafu(total);
     }
 
-    public static string Base10To5(long base10)
+    private static string LongToSnafu(long base10)
     {
         var sb = new StringBuilder();
         while (base10 != 0)
         {
-            long remainder = SnafuMod(base10);
-            sb.Append(ValueSymbol(remainder));
-            base10 -= remainder;
+            base10 += 2;
+            int remainder = (int)(base10 % 5);
+            sb.Insert(0, "=-012"[remainder]);
             base10 /= 5;
         }
-        return new string(sb.ToString().Reverse().ToArray());
+        return sb.ToString();
     }
 
-    private static long SnafuMod(long value) => value % 5 < 3 ? value % 5 : (value % 5) - 5;
-
-    public static long Base5To10(string base5)
+    private static long SnafuToLong(string snafu)
     {
         long count = 0;
-        for (int i = base5.Length - 1; i >= 0; i--)
+        foreach (var ch in snafu)
         {
-            int pow = base5.Length - 1 - i;
-            count += (long)Math.Pow(5, pow) * SymbolValue(base5[i]);
+            count = count * 5 + "=-012".IndexOf(ch) - 2;
         }
         return count;
     }
-
-    private static char ValueSymbol(long val) => val switch
-    {
-        -2 => '=',
-        -1 => '-',
-        0 => '0',
-        1 => '1',
-        2 => '2',
-        _ => throw new NotSupportedException(),
-    };
-
-    private static int SymbolValue(char c) => c switch
-    {
-        '=' => -2,
-        '-' => -1,
-        '0' => 0,
-        '1' => 1,
-        '2' => 2,
-        _ => throw new NotSupportedException(),
-    };
 }
