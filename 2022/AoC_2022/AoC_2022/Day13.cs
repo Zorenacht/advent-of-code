@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework.Internal;
 using System.Text;
 
