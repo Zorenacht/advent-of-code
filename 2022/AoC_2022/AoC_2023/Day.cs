@@ -1,14 +1,21 @@
 namespace AoC_2023;
 
-public class Tests
+public class Day
 {
-    [SetUp]
-    public void Setup()
+    [Test]
+    public void Example()
     {
+        Assert.Pass();
     }
 
     [Test]
-    public void Test1()
+    public void Part1()
+    {
+        Assert.Pass();
+    }
+
+    [Test]
+    public void Part2()
     {
         Assert.Pass();
     }
