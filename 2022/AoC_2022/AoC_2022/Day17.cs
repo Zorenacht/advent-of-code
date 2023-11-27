@@ -89,7 +89,7 @@ public sealed partial class Day17 : Day
         {
             Wind = wind;
             Rocks = Enumerable.Repeat(0, 80).ToArray();
-            Rocks[0] = (1 << 30) - 1;
+            Rocks[0] = (1 << 30) - 1; //-1 is better
         }
 
         public long BruteForceHeight(int times)
