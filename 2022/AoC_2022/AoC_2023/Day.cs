@@ -17,6 +17,6 @@ public class Day
     [Test]
     public void Part2()
     {
-        Assert.Pass();
+        Assert.Fail();
     }
 }
