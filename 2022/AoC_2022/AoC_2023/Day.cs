@@ -1,22 +1,16 @@
+using Tools;
+
 namespace AoC_2023;
 
-public class Day
+public abstract class Day
 {
-    [Test]
-    public void Example()
-    {
-        Assert.Pass();
-    }
+    protected readonly string[] InputExample = Array.Empty<string>();
+    protected readonly string[] Input = Array.Empty<string>();
 
-    [Test]
-    public void Part1()
+    protected Day()
     {
-        Assert.Fail();
-    }
-
-    [Test]
-    public void Part2()
-    {
-        Assert.Fail();
+        var className = GetType().Name;
+        Reader.TryReadLines(@$"InputFiles\{className}-Example.txt", out InputExample);
+        Reader.TryReadLines(@$"InputFiles\{className}.txt", out Input);
     }
 }
