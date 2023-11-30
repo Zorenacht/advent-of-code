@@ -1,0 +1,53 @@
+<Playlist Version="2.0">
+  <Rule Name="Includes" Match="Any">
+    <Rule Match="All">
+      <Property Name="Solution" />
+      <Rule Match="Any">
+        <Rule Match="All">
+          <Property Name="Project" Value="AoC_2023" />
+          <Rule Match="Any">
+            <Rule Match="All">
+              <Property Name="Namespace" Value="AoC_2023" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="Day00" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="AoC_2023.Day00.Part1" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Part1" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="AoC_2023.Day00.Part2" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Part2" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+                <Rule Match="All">
+                  <Property Name="Class" Value="Day01" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="AoC_2023.Day01.Part1" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Part1" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="AoC_2023.Day01.Part2" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Part2" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+          </Rule>
+        </Rule>
+      </Rule>
+    </Rule>
+  </Rule>
+</Playlist>
