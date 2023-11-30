@@ -8,8 +8,8 @@ public sealed class Day01 : Day
     public void Part1()
     {
         int result = 0;
-        var parse = Input.Select(Int32.Parse).ToArray();
-        var set = new HashSet<int>(parse);
+        var parsed = Input;
+        var text = Input[0]!;
         result.Should().Be(0);
     }
 
@@ -17,8 +17,8 @@ public sealed class Day01 : Day
     public void Part2()
     {
         int result = 0;
-        var parse = Input.Select(Int32.Parse).ToArray();
-        var set = new HashSet<int>(parse);
+        var parsed = Input;
+        var text = Input[0]!;
         result.Should().Be(0);
     }
 }
