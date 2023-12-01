@@ -4,19 +4,19 @@ public static class Reader
 {
     public static string ReadAsText(string filename)
     {
-        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\", filename);
+        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\Input", filename);
         return File.ReadAllText(fileLocation);
     }
 
     public static string[] ReadLines(string filename)
     {
-        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\", filename);
+        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\Input", filename);
         return File.ReadAllLines(fileLocation);
     }
 
     public static bool TryReadLines(string filename, out string[] lines)
     {
-        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\", filename);
+        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\Input", filename);
         if (File.Exists(fileLocation))
         {
             lines = ReadLines(fileLocation);

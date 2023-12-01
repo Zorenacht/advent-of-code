@@ -1,17 +1,14 @@
 using FluentAssertions;
-using MathNet.Numerics.Providers.LinearAlgebra;
-using System.Linq;
-using System.Text;
 
 namespace AoC_2023;
 
 public sealed class Day01 : Day
 {
-    [Test]
-    public void Part1()
+    [Puzzle(54697)]
+    public int Part1(string input)
     {
         int result = 0;
-        foreach (var line in Input)
+        foreach (var line in input.Lines())
         {
             var digits = line
                 .Where(Digits.Contains)
@@ -19,17 +16,17 @@ public sealed class Day01 : Day
                 .ToArray();
             result += digits[0] * 10 + digits[^1];
         }
-        result.Should().Be(54697);
+        return result;
     }
 
     public string Digits = "0123456789";
     public List<string> DigitWords = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
 
-    [Test]
-    public void Part2()
+    [Puzzle(54885)]
+    public int Part2(string input)
     {
         int result = 0;
-        foreach (var line in Input)
+        foreach (var line in input.Lines())
         {
             var digits = new List<int>();
             for (int i = 0; i < line.Length; i++)
@@ -43,6 +40,6 @@ public sealed class Day01 : Day
             }
             result += digits[0] * 10 + digits[^1];
         }
-        result.Should().Be(54885);
+        return result;
     }
 }
