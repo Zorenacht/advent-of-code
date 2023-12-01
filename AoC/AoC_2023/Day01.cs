@@ -13,14 +13,17 @@ public sealed class Day01 : Day
         int result = 0;
         foreach (var line in Input)
         {
-            var first = line.First(x => x >= '0' && x <= '9');
-            var last = line.Last(x => x >= '0' && x <= '9');
-            result += (first - '0') * 10 + (last - '0');
+            var digits = line
+                .Where(Digits.Contains)
+                .Select(ch => Digits.IndexOf(ch))
+                .ToArray();
+            result += digits[0] * 10 + digits[^1];
         }
         result.Should().Be(54697);
     }
 
-    public string[] Digits = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    public string Digits = "0123456789";
+    public List<string> DigitWords = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
 
     [Test]
     public void Part2()
@@ -28,44 +31,17 @@ public sealed class Day01 : Day
         int result = 0;
         foreach (var line in Input)
         {
-            int first = 0;
-            int last = 0;
+            var digits = new List<int>();
             for (int i = 0; i < line.Length; i++)
             {
-                if (line[i] >= '0' && line[i] <= '9')
+                if (Digits.Contains(line[i])) digits.Add(line[i] - '0');
+                else
                 {
-                    first = line[i] - '0';
-                    break;
-                }
-                for (int j = 0; j < Digits.Length; j++)
-                {
-                    if (line[0..(i + 1)].Contains(Digits[j]))
-                    {
-                        first = j + 1;
-                        i = line.Length;
-                        break;
-                    }
+                    var index = DigitWords.FindIndex(line[0..(i + 1)].EndsWith);
+                    if (index != -1) digits.Add(index + 1);
                 }
             }
-            for (int i = line.Length - 1; i >= 0; i--)
-            {
-                if (line[i] >= '0' && line[i] <= '9')
-                {
-                    last = line[i] - '0';
-                    break;
-                }
-                for (int j = 0; j < Digits.Length; j++)
-                {
-                    if (line[i..].Contains(Digits[j]))
-                    {
-                        last = j + 1;
-                        i = 0;
-                        break;
-                    }
-                }
-            }
-            var calibration = first * 10 + last;
-            result += calibration;
+            result += digits[0] * 10 + digits[^1];
         }
         result.Should().Be(54885);
     }
