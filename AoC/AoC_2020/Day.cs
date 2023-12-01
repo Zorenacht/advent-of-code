@@ -1,6 +1,6 @@
 using Tools;
 
-namespace AoC_2023;
+namespace AoC_2020;
 
 public abstract class Day
 {
@@ -10,7 +10,7 @@ public abstract class Day
     protected Day()
     {
         var className = GetType().Name;
-        Reader.TryReadLines(@$"Input\{className}-Example.txt", out InputExample);
-        Reader.TryReadLines(@$"Input\{className}.txt", out Input);
+        Reader.TryReadLines(@$"{className}-Example.txt", out InputExample);
+        Reader.TryReadLines(@$"{className}.txt", out Input);
     }
 }

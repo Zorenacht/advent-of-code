@@ -9,9 +9,9 @@ public abstract class Day
     protected Day()
     {
         var className = GetType().Name;
-        Reader.TryReadLines(@$"InputFiles\{className}-Example.txt", out InputExample);
-        Reader.TryReadLines(@$"InputFiles\{className}-1.txt", out InputPart1);
-        if (!Reader.TryReadLines(@$"InputFiles\{className}-2.txt", out InputPart2) || InputPart2.Length == 0)
+        Reader.TryReadLines(@$"{className}-Example.txt", out InputExample);
+        Reader.TryReadLines(@$"{className}-1.txt", out InputPart1);
+        if (!Reader.TryReadLines(@$"{className}-2.txt", out InputPart2) || InputPart2.Length == 0)
         {
             InputPart2 = InputPart1;
         };

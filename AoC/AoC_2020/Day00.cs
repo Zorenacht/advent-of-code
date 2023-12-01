@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace AoC_2023;
+namespace AoC_2020;
 
 public sealed class Day00 : Day
 {

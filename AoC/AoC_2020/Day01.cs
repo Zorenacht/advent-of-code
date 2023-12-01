@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace AoC_2023;
+namespace AoC_2020;
 
 public sealed class Day01 : Day
 {
@@ -10,7 +10,7 @@ public sealed class Day01 : Day
         int result = 0;
         var parse = Input.Select(Int32.Parse).ToArray();
         var set = new HashSet<int>(parse);
-        for(int i=0; i<parse.Count(); i++)
+        for (int i = 0; i < parse.Count(); i++)
         {
             if (set.Contains(2020 - parse[i]))
             {
@@ -29,7 +29,7 @@ public sealed class Day01 : Day
         var set = new HashSet<int>(parse);
         for (int i = 0; i < parse.Count(); i++)
         {
-            for(int j = i+1; j < parse.Count(); j++)
+            for (int j = i + 1; j < parse.Count(); j++)
             {
                 if (set.Contains(2020 - parse[i] - parse[j]))
                 {
