@@ -9,8 +9,6 @@ public sealed class Day02 : Day
     [Puzzle(answer: 2283)]
     public int Part1(string input)
     {
-        //only 12 red cubes, 13 green cubes, and 14 blue cubes
-        //var dict = new Dictionary<string, int>(new ] });
         int result = 0;
         var lines = input.Lines();
         foreach (var line in lines)
@@ -40,8 +38,6 @@ public sealed class Day02 : Day
     [Puzzle(answer: 78669)]
     public int Part2(string input)
     {
-        //only 12 red cubes, 13 green cubes, and 14 blue cubes
-        //var dict = new Dictionary<string, int>(new ] });
         int result = 0;
         var lines = input.Lines();
         foreach (var line in lines)
