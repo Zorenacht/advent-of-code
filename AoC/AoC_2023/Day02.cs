@@ -1,5 +1,4 @@
 using FluentAssertions;
-using MathNet.Numerics.Providers.LinearAlgebra;
 using Tools;
 
 namespace AoC_2023;

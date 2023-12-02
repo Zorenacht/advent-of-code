@@ -1,20 +1,16 @@
 ﻿using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Builders;
+using Tools;
 
-namespace Tools;
+namespace AoC_2023;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public class PuzzleAttribute : Attribute, ITestBuilder, IImplyFixture, IApplyToTest
+public class PuzzleAttribute(object? answer) : NUnitAttribute, ITestBuilder, IImplyFixture
 {
     internal object? Input;
     internal string? Filename;
-    private readonly object? _answer;
-
-    public PuzzleAttribute(object? answer)
-    {
-        _answer = answer;
-    }
+    private readonly object? _answer = answer;
 
     public IEnumerable<TestMethod> BuildFrom(IMethodInfo method, Test? suite)
     {
@@ -31,9 +27,4 @@ public class PuzzleAttribute : Attribute, ITestBuilder, IImplyFixture, IApplyToT
 
     private static string TestName(IMethodInfo method, object? input)
         => $"{method.Name[..^1]} {method.Name[^1]}: {(input is { } ? $"Answer is {input}" : "Calculating answer")}";
-
-    public void ApplyToTest(Test test)
-    {
-        var a = test.IsSuite;
-    }
 }
