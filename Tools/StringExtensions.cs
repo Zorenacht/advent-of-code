@@ -24,6 +24,6 @@ public static class StringExtensions
             modified.Add(sb.ToString());
         }
         modified.Add(last);
-        return modified.ToArray();
+        return [.. modified];
     }
 }

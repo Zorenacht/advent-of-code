@@ -18,7 +18,7 @@ public sealed class Day03 : Day
             {
                 if (Digits.Contains(lines[i][j]))
                 {
-                    accu = accu * 10 + (lines[i][j] - '0');
+                    accu = accu * 10 + lines[i][j].ToInt();
                     if (numberStartIndex == -1) numberStartIndex = j;
                 }
                 else if (numberStartIndex != -1)
@@ -56,23 +56,21 @@ public sealed class Day03 : Day
             int numberStartIndex = -1;
             for (int j = 0; j < lines[0].Length; j++)
             {
-                if (Digits.Contains(lines[i][j]))
+                if (char.IsDigit(lines[i][j]))
                 {
-                    accu = accu * 10 + (lines[i][j] - '0');
+                    accu = accu * 10 + lines[i][j].ToInt();
                     if (numberStartIndex == -1) numberStartIndex = j;
                 }
                 else if (numberStartIndex != -1)
                 {
-                    if (lines[i][j] == '.' || lines[i][j] == '*')
+                    for (int col = i - 1; col <= i + 1; col++)
                     {
-                        for (int col = i - 1; col <= i + 1; col++)
+                        int index = lines[col][(numberStartIndex - 1)..(j + 1)].IndexOf('*');
+                        if (index != -1)
                         {
-                            int index = numberStartIndex - 1 + lines[col][(numberStartIndex - 1)..(j + 1)].IndexOf('*');
-                            if (lines[col][(numberStartIndex - 1)..(j + 1)].IndexOf('*') != -1)
-                            {
-                                if (dict.ContainsKey((col, index))) dict[(col, index)].Add(accu);
-                                else dict[(col, index)] = new List<int>() { accu };
-                            }
+                            index += numberStartIndex - 1;
+                            if (dict.ContainsKey((col, index))) dict[(col, index)].Add(accu);
+                            else dict[(col, index)] = new List<int>() { accu };
                         }
                     }
                     numberStartIndex = -1;
