@@ -3,7 +3,7 @@ using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Builders;
 using Tools;
 
-namespace AoC_2020;
+namespace AoC;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
 public class PuzzleAttribute(object? answer) : NUnitAttribute, ITestBuilder, IImplyFixture

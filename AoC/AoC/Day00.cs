@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace AoC_2023;
+namespace AoC;
 
 public static class Template
 {

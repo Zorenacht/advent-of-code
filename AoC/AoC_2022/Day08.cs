@@ -8,7 +8,7 @@ public sealed partial class Day08 : Day
     public void Example()
     {
         var result = 0;
-        Trees(@"Day08-Example.txt", out Grid grid, out Grid counter);
+        Trees(InputExample, out Grid grid, out Grid counter);
         foreach (var count in counter.Enumerable())
         {
             result += count;
@@ -19,7 +19,7 @@ public sealed partial class Day08 : Day
     [Test]
     public void ExamplePart2()
     {
-        Trees(@"Day08-Example.txt", out Grid grid, out Grid counter);
+        Trees(InputExample, out Grid grid, out Grid counter);
         TreeView2(grid, out Grid left, out Grid right, out Grid up, out Grid down);
         int max = 0;
         for (int i = 0; i < grid.RowLength; i++)
@@ -40,7 +40,7 @@ public sealed partial class Day08 : Day
     public void Part1()
     {
         var result = 0;
-        Trees(@"Day08-1.txt", out Grid grid, out Grid counter);
+        Trees(InputPart1, out Grid grid, out Grid counter);
         foreach (var count in counter.Enumerable())
         {
             result += count;
@@ -51,7 +51,7 @@ public sealed partial class Day08 : Day
     [Test]
     public void Part2()
     {
-        Trees(@"Day08-1.txt", out Grid grid, out Grid counter);
+        Trees(InputPart2, out Grid grid, out Grid counter);
         TreeView2(grid, out Grid left, out Grid right, out Grid up, out Grid down);
         int max = 0;
         for (int i = 0; i < grid.RowLength; i++)
@@ -68,9 +68,9 @@ public sealed partial class Day08 : Day
         max.Should().Be(504000);
     }
 
-    private void Trees(string fileName, out Grid grid, out Grid counter)
+    private void Trees(string[] input, out Grid grid, out Grid counter)
     {
-        grid = new Grid(Reader.ReadAsText(fileName));
+        grid = new Grid(input);
         counter = new Grid(grid.RowLength, grid.ColumnLength);
         var rowMin = Enumerable.Repeat(-1, grid.RowLength).ToArray();
         var rowMinRev = Enumerable.Repeat(-1, grid.RowLength).ToArray();

@@ -4,6 +4,12 @@
       <Property Name="Solution" />
       <Rule Match="Any">
         <Property Name="Project" Value="AoC_2023" />
+        <Rule Match="All">
+          <Property Name="Project" Value="AoC" />
+          <Rule Match="Any">
+            <Property Name="Namespace" Value="AoC_2023" />
+          </Rule>
+        </Rule>
       </Rule>
     </Rule>
   </Rule>

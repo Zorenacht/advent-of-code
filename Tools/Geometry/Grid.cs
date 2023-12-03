@@ -10,10 +10,8 @@ public class Grid : IEnumerable
     public int RowLength { get { return Lattice.Length; } }
     public int ColumnLength { get { return Lattice[0].Length; } }
 
-
-    public Grid(string text)
+    public Grid(string[] lines)
     {
-        string[] lines = text.Split(Environment.NewLine);
         Lattice = new int[lines.Length][];
         for (int i = 0; i < lines.Length; i++)
         {
