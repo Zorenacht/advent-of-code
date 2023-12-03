@@ -9,75 +9,33 @@ public sealed class Day03 : Day
     public int Part1(string input)
     {
         var result = new List<int>();
-        var lines = input.Lines();
-        var overlap = new char[lines.Length][];
-        for(int i = 0; i < lines.Length; i++)
-        {
-            overlap[0] = new char[lines[i].Length];
-        }
-        for(int i=0; i<lines.Length; i++)
+        var lines = input.Lines().AddBorder('.');
+        for (int i = 0; i < lines.Length; i++)
         {
             int accu = 0;
-            int startI = -1;
-            int endI = -1;
+            int numberStartIndex = -1;
             for (int j = 0; j < lines[0].Length; j++)
             {
-                if(lines[i][j] == '.')
-                {
-                    if (startI != -1)
-                    {
-                        endI = j;
-
-                        int minRow = i > 0 ? i - 1 : i;
-                        int maxRow = i < lines.Length-1 ? i + 1 : i;
-                        int minCol = startI > 0 ? startI - 1 : startI;
-                        int maxCol = j;
-                        bool contains = false;
-                        for (int a = minRow; a <= maxRow; a++)
-                        {
-                            if (lines[a][minCol..(maxCol + 1)].Any(x => !DigitsOrDot.Contains(x)))
-                            {
-                                contains = true;
-                                break;
-                            }
-                        }
-                        if(contains) result.Add(accu);
-                        startI = -1;
-                        accu = 0;
-                    }
-                }
-                else if(Digits.Contains(lines[i][j])) 
+                if (Digits.Contains(lines[i][j]))
                 {
                     accu = accu * 10 + (lines[i][j] - '0');
-                    if (startI == -1) startI = j;
+                    if (numberStartIndex == -1) numberStartIndex = j;
                 }
-                else
+                else if (numberStartIndex != -1)
                 {
-                    if (startI != -1)
+                    bool contains = false;
+                    for (int row = i - 1; row <= i + 1; row++)
                     {
-                        result.Add(accu);
-                        startI = -1;
-                        accu = 0;
+                        if (lines[row][(numberStartIndex - 1)..(j + 1)].Any(x => !DigitsOrDot.Contains(x)))
+                        {
+                            contains = true;
+                            break;
+                        }
                     }
+                    if (contains) result.Add(accu);
+                    numberStartIndex = -1;
+                    accu = 0;
                 }
-            }
-            if (startI != -1)
-            {
-                int minRow = i > 0 ? i - 1 : i;
-                int maxRow = i < lines.Length - 1 ? i + 1 : i;
-                int minCol = startI > 0 ? startI - 1 : startI;
-                int maxCol = lines[0].Length - 1;
-                bool contains = false;
-                for (int a = minRow; a <= maxRow; a++)
-                {
-                    if (lines[a][minCol..(maxCol + 1)].Any(x => !DigitsOrDot.Contains(x)))
-                    {
-                        contains = true;
-                        break;
-                    }
-                }
-                if (contains) result.Add(accu);
-                accu = 0;
             }
         }
         return result.Sum();
@@ -90,75 +48,36 @@ public sealed class Day03 : Day
     public int Part2(string input)
     {
         var result = new List<int>();
-        var lines = input.Lines();
-        var overlap = new char[lines.Length][];
+        var lines = input.Lines().AddBorder('.');
         var dict = new Dictionary<(int, int), List<int>>();
         for (int i = 0; i < lines.Length; i++)
         {
-            overlap[0] = new char[lines[i].Length];
-        }
-        for (int i = 0; i < lines.Length; i++)
-        {
             int accu = 0;
-            int startI = -1;
-            int endI = -1;
+            int numberStartIndex = -1;
             for (int j = 0; j < lines[0].Length; j++)
             {
-                if (lines[i][j] == '.' || lines[i][j] == '*')
-                {
-                    if (startI != -1)
-                    {
-                        endI = j;
-
-                        int minRow = i > 0 ? i - 1 : i;
-                        int maxRow = i < lines.Length - 1 ? i + 1 : i;
-                        int minCol = startI > 0 ? startI - 1 : startI;
-                        int maxCol = j;
-                        bool contains = false;
-                        for (int a = minRow; a <= maxRow; a++)
-                        {
-                            int index = minCol + lines[a][minCol..(maxCol + 1)].IndexOf('*');
-                            if (lines[a][minCol..(maxCol + 1)].IndexOf('*') != -1)
-                            {
-                                if (dict.ContainsKey((a, index))) dict[(a, index)].Add(accu);
-                                else dict[(a, index)] = new List<int>() { accu };
-                            }
-                        }
-                        startI = -1;
-                        accu = 0;
-                    }
-                }
-                else if (Digits.Contains(lines[i][j]))
+                if (Digits.Contains(lines[i][j]))
                 {
                     accu = accu * 10 + (lines[i][j] - '0');
-                    if (startI == -1) startI = j;
+                    if (numberStartIndex == -1) numberStartIndex = j;
                 }
-                else
+                else if (numberStartIndex != -1)
                 {
-                    if (startI != -1)
+                    if (lines[i][j] == '.' || lines[i][j] == '*')
                     {
-                        startI = -1;
-                        accu = 0;
+                        for (int col = i - 1; col <= i + 1; col++)
+                        {
+                            int index = numberStartIndex - 1 + lines[col][(numberStartIndex - 1)..(j + 1)].IndexOf('*');
+                            if (lines[col][(numberStartIndex - 1)..(j + 1)].IndexOf('*') != -1)
+                            {
+                                if (dict.ContainsKey((col, index))) dict[(col, index)].Add(accu);
+                                else dict[(col, index)] = new List<int>() { accu };
+                            }
+                        }
                     }
+                    numberStartIndex = -1;
+                    accu = 0;
                 }
-            }
-            if (startI != -1)
-            {
-                int minRow = i > 0 ? i - 1 : i;
-                int maxRow = i < lines.Length - 1 ? i + 1 : i;
-                int minCol = startI > 0 ? startI - 1 : startI;
-                int maxCol = lines[0].Length - 1;
-                bool contains = false;
-                for (int a = minRow; a <= maxRow; a++)
-                {
-                    int index = minCol + lines[a][minCol..(maxCol + 1)].IndexOf('*');
-                    if (lines[a][minCol..(maxCol + 1)].IndexOf('*') != -1)
-                    {
-                        if (dict.ContainsKey((a, index))) dict[(a, index)].Add(accu);
-                        else dict[(a, index)] = new List<int>() { accu };
-                    }
-                }
-                accu = 0;
             }
         }
         return dict.Where(x => x.Value.Count == 2).Sum(x => x.Value[0] * x.Value[1]);
