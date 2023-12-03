@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortestPath", "..\ShortestPath\ShortestPath\ShortestPath.csproj", "{951979FC-0649-4354-9166-247152DD1C32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.Tests", "Tools.Tests\Tools.Tests.csproj", "{7555B25D-292E-4111-B9A4-B65CAF9ECA7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{951979FC-0649-4354-9166-247152DD1C32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{951979FC-0649-4354-9166-247152DD1C32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{951979FC-0649-4354-9166-247152DD1C32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7555B25D-292E-4111-B9A4-B65CAF9ECA7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7555B25D-292E-4111-B9A4-B65CAF9ECA7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7555B25D-292E-4111-B9A4-B65CAF9ECA7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7555B25D-292E-4111-B9A4-B65CAF9ECA7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
