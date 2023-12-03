@@ -4,8 +4,8 @@ namespace AoC_2020;
 
 public sealed class Day01 : Day
 {
-    [Test]
-    public void Part1()
+    [Puzzle(776064)]
+    public int Part1()
     {
         int result = 0;
         var parse = Input.Select(Int32.Parse).ToArray();
@@ -18,11 +18,11 @@ public sealed class Day01 : Day
                 break;
             }
         }
-        result.Should().Be(776064);
+        return result;
     }
 
-    [Test]
-    public void Part2()
+    [Puzzle(6964490)]
+    public int Part2()
     {
         int result = 0;
         var parse = Input.Select(Int32.Parse).ToArray();
@@ -38,6 +38,6 @@ public sealed class Day01 : Day
                 }
             }
         }
-        result.Should().Be(6964490);
+        return result;
     }
 }
