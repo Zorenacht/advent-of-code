@@ -6,11 +6,10 @@ namespace AoC_2023;
 public sealed class Day02 : Day
 {
     [Puzzle(answer: 2283)]
-    public int Part1(string input)
+    public int Part1()
     {
         int result = 0;
-        var lines = input.Lines();
-        foreach (var line in lines)
+        foreach (var line in Input)
         {
             var split1 = line.Split(": ");
             int game = int.Parse(split1[0].Split("Game ")[1]);
@@ -35,11 +34,10 @@ public sealed class Day02 : Day
     }
 
     [Puzzle(answer: 78669)]
-    public int Part2(string input)
+    public int Part2()
     {
         int result = 0;
-        var lines = input.Lines();
-        foreach (var line in lines)
+        foreach (var line in Input)
         {
             var split1 = line.Split(": ");
             int game = int.Parse(split1[0].Split("Game ")[1]);

@@ -8,14 +8,11 @@ namespace AoC_2023;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
 public class PuzzleAttribute(object? answer) : NUnitAttribute, ITestBuilder, IImplyFixture
 {
-    internal object? Input;
-    internal string? Filename;
     private readonly object? _answer = answer;
 
     public IEnumerable<TestMethod> BuildFrom(IMethodInfo method, Test? suite)
     {
-        var input = Input ?? Reader.ReadAsText($"{method.MethodInfo.DeclaringType!.Name}.txt");
-        var parameters = new TestCaseParameters([input])
+        var parameters = new TestCaseParameters()
         {
             ExpectedResult = _answer,
         };

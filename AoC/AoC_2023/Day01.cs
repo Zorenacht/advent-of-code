@@ -4,11 +4,11 @@ namespace AoC_2023;
 
 public sealed class Day01 : Day
 {
-    [Puzzle(54697)]
-    public int Part1(string input)
+    [Puzzle(answer: 54697)]
+    public int Part1()
     {
         int result = 0;
-        foreach (var line in input.Lines())
+        foreach (var line in Input)
         {
             var digits = line
                 .Where(Digits.Contains)
@@ -22,11 +22,11 @@ public sealed class Day01 : Day
     public string Digits = "0123456789";
     public List<string> DigitWords = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
 
-    [Puzzle(54885)]
-    public int Part2(string input)
+    [Puzzle(answer: 54885)]
+    public int Part2()
     {
         int result = 0;
-        foreach (var line in input.Lines())
+        foreach (var line in Input)
         {
             var digits = new List<int>();
             for (int i = 0; i < line.Length; i++)

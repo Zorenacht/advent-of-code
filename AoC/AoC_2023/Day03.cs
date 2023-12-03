@@ -6,10 +6,10 @@ namespace AoC_2023;
 public sealed class Day03 : Day
 {
     [Puzzle(answer: 538046)]
-    public int Part1(string input)
+    public int Part1()
     {
         var result = new List<int>();
-        var lines = input.Lines().AddBorder('.');
+        var lines = Input.AddBorder('.');
         for (int i = 0; i < lines.Length; i++)
         {
             int accu = 0;
@@ -45,10 +45,10 @@ public sealed class Day03 : Day
     public string Digits = "0123456789";
 
     [Puzzle(answer: 81709807)]
-    public int Part2(string input)
+    public int Part2()
     {
         var result = new List<int>();
-        var lines = input.Lines().AddBorder('.');
+        var lines = Input.AddBorder('.');
         var dict = new Dictionary<(int, int), List<int>>();
         for (int i = 0; i < lines.Length; i++)
         {
