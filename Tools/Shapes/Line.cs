@@ -36,12 +36,12 @@ public record StraightLine : Line
         if(Type == LineType.Horizontal && line.Type == LineType.Vertical)
         {
             var point = new Point(ConstantValue, line.ConstantValue);
-            return Contains(point) ? point : null;
+            return Contains(point) && line.Contains(point) ? point : null;
         }
         if (Type == LineType.Vertical && line.Type == LineType.Horizontal)
         {
             var point = new Point(line.ConstantValue, ConstantValue);
-            return Contains(point) ? point : null;
+            return Contains(point) && line.Contains(point) ? point : null;
         }
         return null;
     }
