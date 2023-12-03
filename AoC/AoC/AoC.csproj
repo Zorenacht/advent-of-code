@@ -33,7 +33,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\ShortestPath\ShortestPath\ShortestPath.csproj" />
-        <ProjectReference Include="..\..\Tools\Tools.csproj" />
+        <ProjectReference Include="..\Tools\Tools.csproj" />
     </ItemGroup>
 
 </Project>
