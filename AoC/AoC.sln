@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AoC_2022", "AoC_2022\AoC_2022.csproj", "{C2369D55-BE12-44E9-8018-F8F743D2CABA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShortestPath", "..\..\ShortestPath\ShortestPath\ShortestPath.csproj", "{49618284-2537-4492-A3BB-CFFEA0ECC5FF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "..\Tools\Tools.csproj", "{FA447B33-2B1D-4A6B-8973-A89BFD18251B}"
@@ -22,10 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C2369D55-BE12-44E9-8018-F8F743D2CABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2369D55-BE12-44E9-8018-F8F743D2CABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2369D55-BE12-44E9-8018-F8F743D2CABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2369D55-BE12-44E9-8018-F8F743D2CABA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{49618284-2537-4492-A3BB-CFFEA0ECC5FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{49618284-2537-4492-A3BB-CFFEA0ECC5FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49618284-2537-4492-A3BB-CFFEA0ECC5FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
