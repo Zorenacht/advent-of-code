@@ -1,6 +1,3 @@
-
-using System.Reflection.Metadata.Ecma335;
-
 namespace AoC_2022;
 
 public class Day04 : Day

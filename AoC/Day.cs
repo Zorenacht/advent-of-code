@@ -1,5 +1,3 @@
-using Tools;
-
 namespace AoC;
 
 public abstract class Day

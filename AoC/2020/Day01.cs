@@ -1,5 +1,3 @@
-using FluentAssertions;
-
 namespace AoC_2020;
 
 public sealed class Day01 : Day

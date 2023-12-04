@@ -163,7 +163,7 @@ public class Grid : IEnumerable
     {
         if (grid1.ColumnLength != grid2.ColumnLength) return false;
         if (grid1.RowLength != grid2.RowLength) return false;
-        foreach(var (point,val) in grid1.EnumerableWithIndex())
+        foreach (var (point, val) in grid1.EnumerableWithIndex())
         {
             if (val != grid2.ValueAt(point)) return false;
         }

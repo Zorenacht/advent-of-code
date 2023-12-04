@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 using Tools.Geometry;
 
@@ -186,7 +184,7 @@ public sealed partial class Day19 : Day
         int GeodeOre,
         int GeodeObsidian)
     {
-        public int[] MaxNeeded = new int[4] { 
+        public int[] MaxNeeded = new int[4] {
             Math.Max(Math.Max(RobotOre, ClayOre), Math.Max(ObsidianOre, GeodeOre)),
             ObsidianClay,
             GeodeObsidian,

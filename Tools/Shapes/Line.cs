@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Tools.Shapes;
+﻿namespace Tools.Shapes;
 
 public enum LineType
 {
@@ -11,16 +9,16 @@ public enum LineType
 public record StraightLine : Line
 {
     private LineType Type { get; }
-    private int ConstantValue 
+    private int ConstantValue
         => Type == LineType.Horizontal
-            ? Start.Row 
+            ? Start.Row
             : Start.Col;
 
     public StraightLine(Point start, Point end) : base(start, end)
     {
         if (Start.Col != End.Col && Start.Row != End.Row) throw new NotSupportedException("Line must be straight.");
         Type = Start.Col == End.Col
-            ? LineType.Vertical 
+            ? LineType.Vertical
             : LineType.Horizontal;
     }
 
@@ -33,7 +31,7 @@ public record StraightLine : Line
 
     public Point? Intersection(StraightLine line)
     {
-        if(Type == LineType.Horizontal && line.Type == LineType.Vertical)
+        if (Type == LineType.Horizontal && line.Type == LineType.Vertical)
         {
             var point = new Point(ConstantValue, line.ConstantValue);
             return Contains(point) && line.Contains(point) ? point : null;

@@ -27,7 +27,7 @@ public sealed partial class Day08 : Day
             for (int j = 0; j < grid.ColumnLength; j++)
             {
                 var prod = left.Lattice[i][j] * right.Lattice[i][j] * up.Lattice[i][j] * down.Lattice[i][j];
-                if(prod > max)
+                if (prod > max)
                 {
                     max = prod;
                 }

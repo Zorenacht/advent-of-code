@@ -1,5 +1,4 @@
 using Tools.Geometry;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AoC_2022;
 

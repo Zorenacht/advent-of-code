@@ -1,5 +1,3 @@
-using MathNet.Numerics.Optimization;
-
 namespace AoC_2022;
 
 

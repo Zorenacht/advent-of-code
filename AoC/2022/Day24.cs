@@ -33,7 +33,7 @@ public sealed partial class Day24 : Day
 
         public bool Equals(BlizzardState? other)
         {
-            return (StateIndex % FieldStates.Count) == (other?.StateIndex % FieldStates.Count) 
+            return (StateIndex % FieldStates.Count) == (other?.StateIndex % FieldStates.Count)
                 && Pos == other?.Pos && ReachedOnce == other?.ReachedOnce && WentBack == other?.WentBack;
         }
 
@@ -104,19 +104,21 @@ public sealed partial class Day24 : Day
             var fromPoint = new Point(0, fromCol);
             var toPoint = new Point(lastRow, toCol);
 
-            var from = new BlizzardState() { 
-                FieldStates = FieldStates, 
-                Pos = fromPoint, 
-                StateIndex = 0, 
+            var from = new BlizzardState()
+            {
+                FieldStates = FieldStates,
+                Pos = fromPoint,
+                StateIndex = 0,
                 Start = fromPoint,
                 Goal = toPoint,
                 ReachedOnce = !retrieve,
                 WentBack = !retrieve,
             };
             int min = int.MaxValue;
-            var to = new BlizzardState() { 
-                FieldStates = FieldStates, 
-                Pos = toPoint, 
+            var to = new BlizzardState()
+            {
+                FieldStates = FieldStates,
+                Pos = toPoint,
                 Goal = toPoint
             };
             var astar = new AStarPath<BlizzardState>(from, to, state => state.ReachedGoal());

@@ -1,6 +1,3 @@
-using FluentAssertions;
-using Tools;
-
 namespace AoC_2023;
 
 public sealed class Day04 : Day
@@ -9,10 +6,10 @@ public sealed class Day04 : Day
     public int Part1()
     {
         var result = 0;
-        foreach(var line in Input)
+        foreach (var line in Input)
         {
             var split = line.Split(':');
-            var start = split[0].Split(new string[] { " ", "  " },StringSplitOptions.RemoveEmptyEntries);
+            var start = split[0].Split(new string[] { " ", "  " }, StringSplitOptions.RemoveEmptyEntries);
             var card = split[1].Split(" | ")[0];
             var hand = split[1].Split(" | ")[1];
             var no = start[1];
@@ -31,7 +28,7 @@ public sealed class Day04 : Day
     public int Part2()
     {
         var handMatches = new int[Input.Length];
-        for(int i=0; i<Input.Length;  i++)
+        for (int i = 0; i < Input.Length; i++)
         {
             var line = Input[i];
             var split = line.Split(':');
@@ -50,11 +47,11 @@ public sealed class Day04 : Day
         int[] amount = Enumerable.Repeat(1, Input.Length).ToArray();
         for (int i = 0; i < Input.Length; i++)
         {
-            for (int j = i+1; j <= i + handMatches[i]; j++)
+            for (int j = i + 1; j <= i + handMatches[i]; j++)
             {
                 amount[j] += amount[i];
             }
         }
-        return amount.Sum() ;
+        return amount.Sum();
     }
 }

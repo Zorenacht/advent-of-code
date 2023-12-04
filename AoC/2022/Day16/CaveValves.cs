@@ -75,7 +75,7 @@ public class ReducedCaveValves
     {
         int full = (1 << 15) - 1;
         int max = 0;
-        for (int opened = 0; opened < (full+1)/2; opened++)
+        for (int opened = 0; opened < (full + 1) / 2; opened++)
         {
             var me = RecursiveElephant(
                 self: Valves[NameMap["AA"]],
@@ -85,7 +85,7 @@ public class ReducedCaveValves
                 self: Valves[NameMap["AA"]],
                 time: time,
                 opened: opened ^ full);
-            if(max <= me + elephant) max = me + elephant;
+            if (max <= me + elephant) max = me + elephant;
         }
         return max;
     }

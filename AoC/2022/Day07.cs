@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace AoC_2022;
@@ -97,11 +96,11 @@ public sealed partial class Day07 : Day
 
     int SetFolderSizes(File current)
     {
-        if(current.Size > 0)
+        if (current.Size > 0)
         {
             return current.Size;
         }
-        foreach(var child in current.Children)
+        foreach (var child in current.Children)
         {
             current.Size += SetFolderSizes(child);
         }
@@ -110,16 +109,16 @@ public sealed partial class Day07 : Day
 
     void FindSizesGreaterThan100000(File current, ref int sizeCount)
     {
-        if(current.Type == "dir" && current.Size <= 100000)
+        if (current.Type == "dir" && current.Size <= 100000)
         {
             sizeCount += current.Size;
         }
-        foreach(var child in current.Children)
+        foreach (var child in current.Children)
         {
             FindSizesGreaterThan100000(child, ref sizeCount);
         }
     }
-    
+
     void FindSmallestToBeDeleted(File current, int sizeToBeDeleted, ref int currentMinSize)
     {
         if (current.Type == "dir" && current.Size >= sizeToBeDeleted && current.Size <= currentMinSize)

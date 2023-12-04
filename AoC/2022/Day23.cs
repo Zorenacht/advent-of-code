@@ -1,6 +1,3 @@
-using NUnit.Framework.Constraints;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using Tools.Geometry;
 
 namespace AoC_2022;
@@ -56,7 +53,7 @@ public sealed partial class Day23 : Day
         {
             int turn = 0;
             bool moved = true;
-            while(moved)
+            while (moved)
             {
                 moved = false;
                 foreach (var elf in Elves)
@@ -107,9 +104,9 @@ public sealed partial class Day23 : Day
 
         private bool AnyAdjecent(Point elf)
         {
-            for(int i=0; i<8; i++)
+            for (int i = 0; i < 8; i++)
             {
-                if (Elves.Contains(elf.NeighborV((Direction)i))) 
+                if (Elves.Contains(elf.NeighborV((Direction)i)))
                     return true;
             }
             return false;

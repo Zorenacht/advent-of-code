@@ -30,7 +30,7 @@ public sealed partial class Day14 : Day
         {
             Point current = Sand;
             int count = 0;
-            while(current.X < CaveGrid.RowLength - 1)
+            while (current.X < CaveGrid.RowLength - 1)
             {
                 if (CaveGrid.ValueAt(current.Neighbor2(Direction.S)) == 0) current = current.Neighbor2(Direction.S);
                 else if (CaveGrid.ValueAt(current.Neighbor2(Direction.SW)) == 0) current = current.Neighbor2(Direction.SW);
@@ -50,7 +50,7 @@ public sealed partial class Day14 : Day
         {
             Point current = Sand;
             int count = 0;
-            while (CaveGrid.ValueAt(Sand) == 0 )
+            while (CaveGrid.ValueAt(Sand) == 0)
             {
                 if (CaveGrid.ValueAt(current.Neighbor2(Direction.S)) == 0) current = current.Neighbor2(Direction.S);
                 else if (CaveGrid.ValueAt(current.Neighbor2(Direction.SW)) == 0) current = current.Neighbor2(Direction.SW);
@@ -92,7 +92,7 @@ public sealed partial class Day14 : Day
 
         public Cave AddFloor()
         {
-            CaveGrid.ApplyRange(new Point(HighestRock + 2, 0), new Point(HighestRock + 2, CaveGrid.ColumnLength-1), 1);
+            CaveGrid.ApplyRange(new Point(HighestRock + 2, 0), new Point(HighestRock + 2, CaveGrid.ColumnLength - 1), 1);
             return this;
         }
     }

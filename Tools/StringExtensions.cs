@@ -4,7 +4,7 @@ namespace Tools;
 
 public static class StringExtensions
 {
-    public static string[] Lines(this string str) 
+    public static string[] Lines(this string str)
         => str.Split(
             Environment.NewLine,
             StringSplitOptions.None);
@@ -16,7 +16,7 @@ public static class StringExtensions
         var last = new string(symbol, strings[^1].Length + 2);
 
         modified.Add(first);
-        foreach(var str in strings)
+        foreach (var str in strings)
         {
             var sb = new StringBuilder(str);
             sb.Insert(0, symbol);

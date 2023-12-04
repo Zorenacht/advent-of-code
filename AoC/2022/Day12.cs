@@ -55,7 +55,7 @@ public sealed partial class Day12 : Day
         public int ShortestPath()
         {
             int max = int.MaxValue;
-            foreach(var start in StartPoints)
+            foreach (var start in StartPoints)
             {
                 var sp = new AStarPath<Hill>(new Hill(Grid, start, End), new Hill(Grid, End, End));
                 sp.Run();
@@ -82,7 +82,7 @@ public sealed partial class Day12 : Day
                     };
                     Grid.UpdateAt(i, j, value);
                     if (lines[i][j] == 'E') End = new Point(i, j);
-                    if (lines[i][j] == 'S' || lines[i][j] == 'a') list.Add( new Point(i, j));
+                    if (lines[i][j] == 'S' || lines[i][j] == 'a') list.Add(new Point(i, j));
                 }
             }
             return list;

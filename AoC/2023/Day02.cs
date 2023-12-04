@@ -1,6 +1,3 @@
-using FluentAssertions;
-using Tools;
-
 namespace AoC_2023;
 
 public sealed class Day02 : Day

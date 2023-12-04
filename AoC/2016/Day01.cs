@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Tools.Shapes;
+﻿using Tools.Shapes;
 
 namespace AoC_2016;
 
@@ -48,7 +47,7 @@ public sealed class Day01 : Day
             if (dir % 4 == 3) right -= ele.Item2;
             var end = new Point(up, right);
             var newLine = new StraightLine(start, end);
-            if (lines.Take(lines.Count-1).Select(line => line.Intersection(newLine)).FirstOrDefault(x => x is not null) is { } intersection)
+            if (lines.Take(lines.Count - 1).Select(line => line.Intersection(newLine)).FirstOrDefault(x => x is not null) is { } intersection)
             {
                 return Math.Abs(intersection.Row) + Math.Abs(intersection.Col);
             }

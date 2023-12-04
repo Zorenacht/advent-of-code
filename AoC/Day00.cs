@@ -1,5 +1,3 @@
-using FluentAssertions;
-
 namespace AoC;
 
 public static class Template

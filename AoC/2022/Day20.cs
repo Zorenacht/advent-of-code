@@ -4,7 +4,7 @@ namespace AoC_2022;
 public sealed partial class Day20 : Day
 {
     [Test]
-    public void Example() => Mixir.Parse(InputExample ,1).Mix(1).Top3().Should().Be(3);
+    public void Example() => Mixir.Parse(InputExample, 1).Mix(1).Top3().Should().Be(3);
     [Test]
     public void Part1() => Mixir.Parse(InputPart1, 1).Mix(1).Top3().Should().Be(4151);
 
@@ -40,7 +40,7 @@ public sealed partial class Day20 : Day
 
         public Mixir Mix(int times)
         {
-            for(int j=0; j<times; j++)
+            for (int j = 0; j < times; j++)
             {
                 Mix();
             }

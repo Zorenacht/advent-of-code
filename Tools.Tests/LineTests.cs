@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Tools.Shapes;
 
 namespace Tools.Tests;
