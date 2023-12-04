@@ -27,9 +27,6 @@ public sealed class Day04 : Day
         return result;
     }
 
-    public string DigitsOrDot = "0123456789.";
-    public string Digits = "0123456789";
-
     [Puzzle(answer: 5833065)]
     public int Part2()
     {
