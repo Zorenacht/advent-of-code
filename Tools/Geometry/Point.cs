@@ -72,7 +72,7 @@ public readonly struct Point : IEquatable<Point>
 
     public override bool Equals([NotNullWhen(true)] object? obj) => obj is Point other && Equals(other);
     public bool Equals(Point other) => other.X == X && other.Y == Y;
-    public override int GetHashCode() => X ^ (Y << 16);
+    public override int GetHashCode() => (X + Y) * (X + Y + 1) / 2 + Y;
 
     public static bool operator ==(Point left, Point right) => left.Equals(right);
     public static bool operator !=(Point left, Point right) => !(left == right);

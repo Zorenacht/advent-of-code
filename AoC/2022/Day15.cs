@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Tools.Geometry;
 namespace AoC_2022;
 
@@ -7,7 +8,7 @@ public sealed partial class Day15 : Day
     [Test]
     public void Example() => BeaconExclusion.Parse(InputExample).Simulate(10).Should().Be(26);
     [Test]
-    public void Part1() => BeaconExclusion.Parse(InputPart1).Simulate(2000000).Should().Be(5144286);
+    public void Part1() => BeaconExclusion.Parse(InputPart1).Simulate(2_000_000).Should().Be(5144286);
 
     [Test]
     public void ExampleP2() => BeaconExclusion.Parse(InputExample).TuningFrequency(20).Should().Be(56000011);
@@ -23,6 +24,12 @@ public sealed partial class Day15 : Day
 
         public int Simulate(int row)
         {
+            var beacons = Measurements
+                .Where(m => m.Beacon.Y == row)
+                .Select(m => m.Beacon.X)
+                .GroupBy(x => x)
+                .Select(m => m.First())
+                .ToHashSet();
             foreach (var m in Measurements)
             {
                 var rowToSensorYdifference = Math.Abs(row - m.Sensor.Y);
@@ -31,7 +38,7 @@ public sealed partial class Day15 : Day
                     var diff = m.Dist - rowToSensorYdifference;
                     for (int i = m.Sensor.X - diff; i <= m.Sensor.X + diff; i++)
                     {
-                        if (!Measurements.Select(m => m.Beacon).Contains(new Point(i, row)))
+                        if (!beacons.Contains(i))
                             ExclusionsInRow.Add(i);
                     }
                 }
