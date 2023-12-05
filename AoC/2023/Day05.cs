@@ -1,4 +1,6 @@
+using MathNet.Numerics;
 using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
 using Tools.Shapes;
 
 namespace AoC_2023;
@@ -8,109 +10,78 @@ public sealed class Day05 : Day
     [Puzzle(answer: 31599214)]
     public long Part1()
     {
-        var set = new HashSet<int>();
-        var dictionary = new Dictionary<string, int>();
-        var seeds = Input[0].Split(": ")[1].Split(" ").Select(x => long.Parse(x)).ToArray();
-        var groups = new List<List<long[]>>();
-        int group = 0;
-        foreach (var line in Input.Skip(1))
-        {
-            if (line == string.Empty)
-            {
-                group++;
-                groups.Add(new List<long[]>());
-                continue;
-            }
-            var nums = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => long.Parse(x)).ToArray();
-            groups[^1].Add(nums);
-        }
-
-        var locations = new List<long>();
-        foreach (long seed in seeds)
-        {
-            long iter = seed;
-            foreach (var g in groups)
-            {
-                foreach (var arr in g)
-                {
-                    if (arr[1] <= iter && iter < arr[1] + arr[2])
-                    {
-                        iter = arr[0] + iter - arr[1];
-                        break;
-                    }
-                }
-            }
-            locations.Add(iter);
-        }
-        return locations.Min();
+        var seeds = Fertilizer.ParseSeeds(Input[0]);
+        var groups = Fertilizer.ParseMaps(Input[2..]);
+        var min = new Fertilizer(groups).Min(seeds);
+        return min;
     }
 
-    public record Interval(long Start, long End)
-    {
-        public bool Overlap(Interval other)
-        {
-            return Math.Max(Start, other.Start) <= Math.Min(End, other.End);
-        }
-
-        public Interval Intersection(Interval other)
-        {
-            return Overlap(other)
-                ? new Interval(Math.Max(Start, other.Start), Math.Min(End, other.End))
-                : throw new Exception();
-        }
-    }
-
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 20358599)]
     public long Part2()
     {
-        var set = new HashSet<int>();
-        var dictionary = new Dictionary<string, int>();
-        var seedsInput = Input[0].Split(": ")[1].Split(" ").Select(x => long.Parse(x)).ToArray();
-        var seeds = new List<Interval>();
-        for (int i = 0; i < seedsInput.Length / 2; i++)
+        var seeds = Fertilizer.ParseSeedRanges(Input[0]);
+        var groups = Fertilizer.ParseMaps(Input[2..]);
+        var min = new Fertilizer(groups).Min(seeds);
+        return min;
+    }
+
+    public record Fertilizer(long[][][] Maps)
+    {
+        public long Min(IEnumerable<Interval> seeds)
         {
-            seeds.Add(new Interval(seedsInput[i], seedsInput[i] + seedsInput[i + 1] - 1));
-        }
-        var groups = new List<List<long[]>>();
-        int group = 0;
-        foreach (var line in Input.Skip(1))
-        {
-            if (line == string.Empty)
+            var locations = new List<Interval>();
+            var current = seeds;
+            foreach (var maps in Maps)
             {
-                group++;
-                groups.Add(new List<long[]>());
-                continue;
+                var next = new List<Interval>() { };
+                foreach (var curr in current)
+                {
+                    var mappedToItself = new List<Interval>() { curr };
+                    foreach (var map in maps)
+                    {
+                        var range = new Interval(map[1], map[1] + map[2] - 1);
+                        if (curr.Overlap(range))
+                        {
+                            var inter = curr.Intersection(range);
+                            long translation = map[0] - map[1];
+                            next.Add(inter + translation);
+                        }
+                        mappedToItself = mappedToItself.SelectMany(x => x.Remove(range)).ToList();
+                    }
+                    next.AddRange(mappedToItself);
+                }
+                current = next;
             }
-            var nums = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => long.Parse(x)).ToArray();
-            groups[^1].Add(nums);
+            return current.Min(x => x.Start);
         }
 
-        var locations = new List<Interval>();
-        foreach (var seed in seeds)
+        public static Interval[] ParseSeeds(string line)
+            => line.Split(": ")[1]
+                .Split(" ")
+                .Select(x => new Interval(long.Parse(x), long.Parse(x)))
+                .ToArray();
+
+        public static Interval[] ParseSeedRanges(string line)
         {
-            var iter = new List<Interval>() { seed };
-            var next = new List<Interval>() { };
-            foreach (Interval it in iter)
-            {
-                foreach (var g in groups)
-                {
-                    foreach (var arr in g)
-                    {
-                        var range = new Interval(arr[1], arr[1] + arr[2] - 1);
-                        if (it.Overlap(range))
-                        {
-                            var inter = it.Intersection(range);
-                            long st = arr[0] + inter.Start - arr[1];
-                            var newRange = new Interval(st, st + inter.End - inter.Start);
-                            next.Add(it.Intersection(newRange));
-                            break;
-                        }
-                    }
-                }
-            }
-            iter = next;
-            locations.AddRange(next);
+            var seedsInput = line.Split(": ")[1]
+                .Split(" ")
+                .Select(x => long.Parse(x));
+
+            return seedsInput
+                .Zip(seedsInput.Skip(1), (first, second) => new Interval(first, first + second - 1))
+                .Where((_, index) => index % 2 == 0)
+                .ToArray();
         }
-        return locations.Min(x => x.Start);
+
+        public static long[][][] ParseMaps(string[] lines)
+            => lines
+                .Where(x => !x.Contains("map"))
+                .GroupBy("")
+                .Select(group => group
+                    .Select(line => line
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => long.Parse(x)).ToArray())
+                    .ToArray())
+                .ToArray();
     }
 }
