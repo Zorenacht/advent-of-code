@@ -25,6 +25,15 @@ public sealed class Day05 : Day
         return min;
     }
 
+    [Puzzle(answer: 46)]
+    public long Part2_Example()
+    {
+        var seeds = Fertilizer.ParseSeedRanges(InputExample[0]);
+        var groups = Fertilizer.ParseMaps(InputExample[2..]);
+        var min = new Fertilizer(groups).Min(seeds);
+        return min;
+    }
+
     public record Fertilizer(long[][][] Maps)
     {
         public long Min(IEnumerable<Interval> seeds)

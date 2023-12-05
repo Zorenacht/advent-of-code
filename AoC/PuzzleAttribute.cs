@@ -22,5 +22,5 @@ public class PuzzleAttribute(object? answer) : NUnitAttribute, ITestBuilder, IIm
     }
 
     private static string TestName(IMethodInfo method, object? input)
-        => $"{method.Name[..^1]} {method.Name[^1]}: {(input is { } ? $"Answer is {input}" : "Calculating answer")}";
+        => $"{method.Name[..4]} {method.Name[4..]}: {(input is { } ? $"Answer is {input}" : "Calculating answer")}";
 }

@@ -13,7 +13,7 @@ public abstract class Day
         var className = GetType().Name;
         Reader.TryReadLines(@$"{year}\Input\{className}-Example.txt", out InputExample);
         Reader.TryReadLines(@$"{year}\Input\{className}.txt", out Input);
-        InputAsText = Reader.ReadAsText(@$"{year}\Input\{className}-Example.txt");
+        InputExampleAsText = Reader.ReadAsText(@$"{year}\Input\{className}-Example.txt");
         InputAsText = Reader.ReadAsText(@$"{year}\Input\{className}.txt");
     }
 }
