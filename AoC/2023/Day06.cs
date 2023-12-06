@@ -30,11 +30,15 @@ public sealed class Day06 : Day
         long time = 61677571;
         long dist = 430103613071150;
         long no = 0;
-        for (int j = 0; j <= time; j++)
-        {
-            var d = j * (time - j);
-            if (d > dist) no++;
+        long left = 0;
+        long right = 61677571/2;
+        while(left < right) {
+            long mid = (left + right + 1) / 2;
+            long midDist = mid * (time - mid);
+            if (midDist > dist) right = mid-1;
+            else if (midDist <= dist) left = mid+1;
         }
-        return no;
+
+        return time + 1 - (left + 1)*2;
     }
 }
