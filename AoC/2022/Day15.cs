@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Tools.Geometry;
 namespace AoC_2022;
 

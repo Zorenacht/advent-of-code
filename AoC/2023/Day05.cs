@@ -1,6 +1,3 @@
-using MathNet.Numerics;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.RegularExpressions;
 using Tools.Shapes;
 
 namespace AoC_2023;
