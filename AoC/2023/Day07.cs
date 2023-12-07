@@ -39,7 +39,6 @@ public sealed class Day07 : Day
         foreach (char ch in hand) counter[cards.IndexOf(ch)]++;
 
         //set value based on pair priority
-        int maxShift = 30;
         int max, secondMax;
         if (withJoker)
         {
@@ -52,16 +51,18 @@ public sealed class Day07 : Day
             (max, secondMax) = (ordered[0], ordered[1]);
         }
          
-        int value = (max, secondMax) switch
+        int pairStrength = (max, secondMax) switch
         {
-            (5, _) => 1 << (maxShift),
-            (4, _) => 1 << (maxShift - 1),
-            (3, 2) => 1 << (maxShift - 2),
-            (3, _) => 1 << (maxShift - 3),
-            (2, 2) => 1 << (maxShift - 4),
-            (2, _) => 1 << (maxShift - 5),
+            (5, _) => 6,
+            (4, _) => 5,
+            (3, 2) => 4,
+            (3, _) => 3,
+            (2, 2) => 2,
+            (2, _) => 1,
             _ => 0
         };
+        int maxShift = 25;
+        int value = pairStrength << maxShift;
 
         //set value based on card values
         for (int i = 0; i < hand.Length; i++)
