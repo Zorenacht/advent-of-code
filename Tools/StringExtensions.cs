@@ -15,11 +15,11 @@ public static class StringExtensions
     {
         var groups = new List<List<string>>();
         groups.Add(new List<string>());
-        foreach(var l in lines)
+        foreach (var l in lines)
         {
             if (l == line)
             {
-                groups.Add(new List<string>()); 
+                groups.Add(new List<string>());
                 continue;
             }
             groups[^1].Add(l);

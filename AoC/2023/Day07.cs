@@ -50,7 +50,7 @@ public sealed class Day07 : Day
             var ordered = counter.OrderByDescending(x => x).ToArray();
             (max, secondMax) = (ordered[0], ordered[1]);
         }
-         
+
         int pairStrength = (max, secondMax) switch
         {
             (5, _) => 6,
