@@ -26,8 +26,8 @@ public sealed class Day08 : Day
             .Where(x => startCondition(x.Key))
             .Select(x => x.Key)
             .ToArray();
-        var period = new int[currentNodes.Length];
-        for (var i = 0; i < period.Length; i++)
+        var periods = new int[currentNodes.Length];
+        for (var i = 0; i < periods.Length; i++)
         {
             int steps = 0;
             var node = currentNodes[i];
@@ -38,9 +38,9 @@ public sealed class Day08 : Day
                 if (lr == 'R') node = mapping[node].Right;
                 steps++;
             }
-            period[i] = steps;
+            periods[i] = steps;
         }
-        var minPeriod = period
+        var minPeriod = periods
             .Select(x => new BigInteger(x))
             .Aggregate((x, y) => x * y / BigInteger.GreatestCommonDivisor(x, y));
         return (long)minPeriod;
