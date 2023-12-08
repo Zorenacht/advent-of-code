@@ -4,13 +4,13 @@ using Tools.Geometry;
 
 namespace AoC_2023;
 
-public sealed class Day09 : Day
+public sealed class DayTemplate : Day
 {
-    [Puzzle(answer: null)]
-    public int Part1Example() => Part1(InputExample);
+    //[Puzzle(answer: null)]
+    public int Part1Example() => P1(InputExample);
 
-    [Puzzle(answer: null)]
-    public int Part1() => Part1(Input);
+    //[Puzzle(answer: null)]
+    public int Part1() => P1(Input);
 
     Direction[] dirs = [
         Direction.N,
@@ -22,7 +22,7 @@ public sealed class Day09 : Day
         Direction.SE,
         Direction.NE];
 
-    public int Part1(string[] input)
+    public int P1(string[] input)
     {
         int result = 0;
         var parse = input.Select(x =>
@@ -40,30 +40,25 @@ public sealed class Day09 : Day
             {
             }
         }
-        var current = new List<Point>() { new Point(1,1) };
+        var current = new List<Point>();
         var visited = new HashSet<Point>();
-        int dist = 0;
         while (current.Count > 0)
         {
             var next = new List<Point>();
             foreach (var curr in current)
             {
-                if (visited.Contains(curr) || board[curr.X][curr.Y] == '*') continue;
-                if (board[curr.X][curr.Y] == 'X') return dist;
+                if (visited.Contains(curr)) continue;
                 next.AddRange(dirs.Select(x => curr.NeighborV(x)));
-                visited.Add(curr);
             }
-            current = next;
-            dist++;
         }
-        return dist;
+        return result;
     }
 
-    [Puzzle(answer: null)]
-    public int Part2Example() => Part2(InputExample);
+    //[Puzzle(answer: null)]
+    public int Part2Example() => P1(InputExample);
 
-    [Puzzle(answer: null)]
-    public int Part2() => Part2(Input);
+    //[Puzzle(answer: null)]
+    public int Part2() => P1(Input);
 
     public int Part2(string[] input)
     {
