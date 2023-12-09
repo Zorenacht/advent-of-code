@@ -33,19 +33,19 @@ public sealed class Day05 : Day
 
     public record Fertilizer(long[][][] Maps)
     {
-        public long Min(IEnumerable<Interval> seeds)
+        public long Min(IEnumerable<Interval1D> seeds)
         {
-            var locations = new List<Interval>();
+            var locations = new List<Interval1D>();
             var current = seeds;
             foreach (var maps in Maps)
             {
-                var next = new List<Interval>() { };
+                var next = new List<Interval1D>() { };
                 foreach (var curr in current)
                 {
-                    var mappedToItself = new List<Interval>() { curr };
+                    var mappedToItself = new List<Interval1D>() { curr };
                     foreach (var map in maps)
                     {
-                        var range = new Interval(map[1], map[1] + map[2] - 1);
+                        var range = new Interval1D(map[1], map[1] + map[2] - 1);
                         if (curr.Overlap(range))
                         {
                             var inter = curr.Intersection(range);
@@ -61,20 +61,20 @@ public sealed class Day05 : Day
             return current.Min(x => x.Start);
         }
 
-        public static Interval[] ParseSeeds(string line)
+        public static Interval1D[] ParseSeeds(string line)
             => line.Split(": ")[1]
                 .Split(" ")
-                .Select(x => new Interval(long.Parse(x), long.Parse(x)))
+                .Select(x => new Interval1D(long.Parse(x), long.Parse(x)))
                 .ToArray();
 
-        public static Interval[] ParseSeedRanges(string line)
+        public static Interval1D[] ParseSeedRanges(string line)
         {
             var seedsInput = line.Split(": ")[1]
                 .Split(" ")
                 .Select(x => long.Parse(x));
 
             return seedsInput
-                .Zip(seedsInput.Skip(1), (first, second) => new Interval(first, first + second - 1))
+                .Zip(seedsInput.Skip(1), (first, second) => new Interval1D(first, first + second - 1))
                 .Where((_, index) => index % 2 == 0)
                 .ToArray();
         }
