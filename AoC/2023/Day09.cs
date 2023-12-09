@@ -6,77 +6,56 @@ namespace AoC_2023;
 
 public sealed class Day09 : Day
 {
-    [Puzzle(answer: null)]
-    public int Part1Example() => Part1(InputExample);
+    [Puzzle(answer: 114)]
+    public long Part1Example() => Part1(
+        InputExample
+            .Select(x => x.Split().Select(x => int.Parse(x)).ToArray())
+            .ToArray());
 
-    [Puzzle(answer: null)]
-    public int Part1() => Part1(Input);
+    [Puzzle(answer: 1806615041)]
+    public long Part1() => Part1(
+        Input
+            .Select(x => x.Split().Select(x => int.Parse(x)).ToArray())
+            .ToArray());
 
-    Direction[] dirs = [
-        Direction.N,
-        Direction.S,
-        Direction.W,
-        Direction.E,
-        Direction.NW,
-        Direction.SW,
-        Direction.SE,
-        Direction.NE];
+    [Puzzle(answer: 2)]
+    public long Part2Example() => Part1(
+        InputExample
+            .Select(x => x.Split()
+                .Select(x => int.Parse(x))
+                .Reverse()
+                .ToArray())
+            .Reverse()
+            .ToArray());
 
-    public int Part1(string[] input)
+    [Puzzle(answer: 1211)]
+    public long Part2() => Part1(
+        Input
+            .Select(x => x.Split()
+                .Select(x => int.Parse(x))
+                .Reverse()
+                .ToArray())
+            .Reverse()
+            .ToArray());
+
+    public long Part1(int[][] input)
     {
-        int result = 0;
-        var parse = input.Select(x =>
+        long sum = 0;
+        foreach (var line in input)
         {
-            var split1 = x.Split("", StringSplitOptions.None);
-            var split2 = x.Split("", StringSplitOptions.None);
-            var split3 = x.Split("", StringSplitOptions.None);
-            var kv = new KeyValuePair<string, string>(split1[0], split2[0]);
-            return x;
-        });
-        var board = input.AddBorder('*');
-        for (int i = 0; i < board.Length; i++)
-        {
-            for (int j = 0; j < board[0].Length; j++)
+            var curr = line.ToList();
+            while (curr.Any(x => x != 0))
             {
+                var next = new List<int>();
+                sum += curr[^1];
+                for (int i = 0; i < curr.Count - 1; i++)
+                {
+                    next.Add(curr[i + 1] - curr[i]);
+                }
+                curr = next;
             }
+
         }
-        var current = new List<Point>() { new Point(1,1) };
-        var visited = new HashSet<Point>();
-        int dist = 0;
-        while (current.Count > 0)
-        {
-            var next = new List<Point>();
-            foreach (var curr in current)
-            {
-                if (visited.Contains(curr) || board[curr.X][curr.Y] == '*') continue;
-                if (board[curr.X][curr.Y] == 'X') return dist;
-                next.AddRange(dirs.Select(x => curr.NeighborV(x)));
-                visited.Add(curr);
-            }
-            current = next;
-            dist++;
-        }
-        return dist;
+        return sum;
     }
-
-    [Puzzle(answer: null)]
-    public int Part2Example() => Part2(InputExample);
-
-    [Puzzle(answer: null)]
-    public int Part2() => Part2(Input);
-
-    public int Part2(string[] input)
-    {
-        int result = 0;
-        var parse = input.Select(x =>
-        {
-            var split1 = x.Split("", StringSplitOptions.None);
-            var split2 = x.Split("", StringSplitOptions.None);
-            var split3 = x.Split("", StringSplitOptions.None);
-            var kv = new KeyValuePair<string, string>(split1[0], split2[0]);
-            return x;
-        });
-        return result;
-    }
-
 }
