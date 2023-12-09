@@ -2,7 +2,7 @@ using Tools.Geometry;
 
 namespace AoC_2023;
 
-public sealed class DayTemplate : Day
+public sealed class Day10 : Day
 {
     //[Puzzle(answer: null)]
     public int Part1Example() => P1(InputExample);
