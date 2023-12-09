@@ -1,6 +1,8 @@
-﻿namespace Tools.Shapes;
+﻿using System.Collections;
 
-public record Interval(long Start, long End)
+namespace Tools.Shapes;
+
+public record Interval(long Start, long End) : IEnumerable<long>
 {
     public bool Overlap(Interval other)
     {
@@ -21,6 +23,16 @@ public record Interval(long Start, long End)
             ? new Interval(Math.Max(Start, other.Start), Math.Min(End, other.End))
             : throw new Exception();
     }
+
+    public IEnumerator<long> GetEnumerator()
+    {
+        for(long start = Start; start <= End; start++)
+        {
+            yield return start;
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public static Interval operator +(Interval left, long right) => new(left.Start + right, left.End + right);
     public static Interval operator +(long left, Interval right) => right + left;

@@ -14,7 +14,7 @@ public record StraightLine : Line
             ? Start.Row
             : Start.Col;
 
-    public StraightLine(Point start, Point end) : base(start, end)
+    public StraightLine(Index2D start, Index2D end) : base(start, end)
     {
         if (Start.Col != End.Col && Start.Row != End.Row) throw new NotSupportedException("Line must be straight.");
         Type = Start.Col == End.Col
@@ -22,23 +22,23 @@ public record StraightLine : Line
             : LineType.Horizontal;
     }
 
-    public bool Contains(Point point)
+    public bool Contains(Index2D point)
     {
         return Type == LineType.Horizontal
             ? point.Row == ConstantValue && (Start.Col <= point.Col && point.Col <= End.Col || End.Col <= point.Col && point.Col <= Start.Col)
             : point.Col == ConstantValue && (Start.Row <= point.Row && point.Row <= End.Row || End.Row <= point.Row && point.Row <= Start.Row);
     }
 
-    public Point? Intersection(StraightLine line)
+    public Index2D? Intersection(StraightLine line)
     {
         if (Type == LineType.Horizontal && line.Type == LineType.Vertical)
         {
-            var point = new Point(ConstantValue, line.ConstantValue);
+            var point = new Index2D(ConstantValue, line.ConstantValue);
             return Contains(point) && line.Contains(point) ? point : null;
         }
         if (Type == LineType.Vertical && line.Type == LineType.Horizontal)
         {
-            var point = new Point(line.ConstantValue, ConstantValue);
+            var point = new Index2D(line.ConstantValue, ConstantValue);
             return Contains(point) && line.Contains(point) ? point : null;
         }
         return null;
@@ -47,10 +47,10 @@ public record StraightLine : Line
 
 public record Line : IEquatable<Line>
 {
-    public Point Start { get; }
-    public Point End { get; }
+    public Index2D Start { get; }
+    public Index2D End { get; }
 
-    public Line(Point start, Point end)
+    public Line(Index2D start, Index2D end)
     {
         Start = start;
         End = end;
