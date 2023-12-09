@@ -1,7 +1,3 @@
-using MathNet.Numerics.Distributions;
-using System.Numerics;
-using Tools.Geometry;
-
 namespace AoC_2023;
 
 public sealed class Day09 : Day

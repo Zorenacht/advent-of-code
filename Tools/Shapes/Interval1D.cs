@@ -26,7 +26,7 @@ public record Interval1D(long Start, long End) : IEnumerable<long>
 
     public IEnumerator<long> GetEnumerator()
     {
-        for(long start = Start; start <= End; start++)
+        for (long start = Start; start <= End; start++)
         {
             yield return start;
         }

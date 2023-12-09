@@ -40,12 +40,12 @@ public sealed class Day01 : Day
         foreach (var ele in parse)
         {
             dir = ele.Item1 == 'R' ? dir + 1 : dir + 3;
-            var start = new Tools.Shapes.Index2D(up, right);
+            var start = new Index2D(up, right);
             if (dir % 4 == 0) up += ele.Item2;
             if (dir % 4 == 1) right += ele.Item2;
             if (dir % 4 == 2) up -= ele.Item2;
             if (dir % 4 == 3) right -= ele.Item2;
-            var end = new Tools.Shapes.Index2D(up, right);
+            var end = new Index2D(up, right);
             var newLine = new StraightLine(start, end);
             if (lines.Take(lines.Count - 1).Select(line => line.Intersection(newLine)).FirstOrDefault(x => x is not null) is { } intersection)
             {

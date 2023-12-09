@@ -1,4 +1,3 @@
-using MathNet.Numerics.Distributions;
 using System.Numerics;
 
 namespace AoC_2023;
@@ -11,7 +10,7 @@ public sealed class Day08 : Day
     [Puzzle(answer: 15726453850399)]
     public long Part2() => MinSteps(str => str.EndsWith("A"), str => str.EndsWith("Z"));
 
-    private long MinSteps(Func<string,bool> startCondition, Func<string,bool> endCondition)
+    private long MinSteps(Func<string, bool> startCondition, Func<string, bool> endCondition)
     {
         var sequence = Input[0];
         var mapping = Input[2..]
