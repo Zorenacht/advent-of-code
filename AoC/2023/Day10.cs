@@ -153,6 +153,7 @@ public sealed class Day10 : Day
 
     //lower probably than 547]
     //not 479
+    //not 382
     [Puzzle(answer: null)]
     public int Part2() => Part2(Input);
 
@@ -202,9 +203,7 @@ public sealed class Day10 : Day
             cycleStart.Item1,
             (Direction)(((int)cycleStart.Item2 + 4) % 8));
 
-
-
-        var free = new HashSet<Point>();
+        /*var free = new HashSet<Point>();
         var enclosed = new HashSet<Point>();
         var visited1 = new HashSet<Point>();
         for (int i = 0; i < board.Length; i++)
@@ -237,12 +236,11 @@ public sealed class Day10 : Day
                     else enclosed.UnionWith(all);
                 }
             }
-        }
+        }*/
 
-        var left = new HashSet<Point>();
+        /*var left = new HashSet<Point>();
         var right = new HashSet<Point>();
         var first = visited.First(x => x.Item1 == start);
-        var starts = visited.Where(x => x.Item1 == start).ToList();
         var looping = visited.First(x => x.Item1 == start);
         looping = (looping.Item1.NeighborV(looping.Item2), (Direction)(((int)looping.Item2 + 4)  % 8));
         do
@@ -258,17 +256,90 @@ public sealed class Day10 : Day
             {
                 right.Add(r);
             }
-            //if (looping.Item1 == start) looping = (p.NeighborV(looping.Item2), looping.Item2); //first looping has arrived to start from looping.Item2 direction
             looping = Mapping(board[p.Y][p.X], looping.Item1, looping.Item2).First();
-        } while (looping.Item1 != start);
+        } while (looping.Item1 != start);*/
 
-        PrintColor(board, [(free, ConsoleColor.Yellow), (enclosed, ConsoleColor.Green), (left, ConsoleColor.Red) , (right, ConsoleColor.Blue)]);
+        var left = new HashSet<Point>();
+        var right = new HashSet<Point>();
+        var iterator = (
+            cycleStart.Item1.NeighborV((Direction)(((int)cycleStart.Item2 + 4) % 8)), 
+            cycleStart.Item2);
+        do
+        {
+            var p = iterator.Item1;
+            var dir = iterator.Item2;
+            var lef = Left(p, dir, board[p.Y][p.X]);
+            var rig = Right(p, dir, board[p.Y][p.X]);
+            foreach(var l in lef)
+            {
+                if (board[l.Y][l.X] != '*' && !cycle.Contains(l) && !left.Contains(l) && !right.Contains(l))
+                {
+                    left.Add(l);
+                }
+            }
+            foreach (var r in rig)
+            {
+                if (board[r.Y][r.X] != '*' && !cycle.Contains(r) && !left.Contains(r) && !right.Contains(r))
+                {
+                    right.Add(r);
+                }
+            }
+            iterator = Mapping(board[p.Y][p.X], iterator.Item1, iterator.Item2).First();
+            cycle.Add(iterator.Item1);
+        } while (iterator.Item1 != start);
+
+
+        //PrintColor(board, [(free, ConsoleColor.Yellow), (enclosed, ConsoleColor.Green), (left, ConsoleColor.Red) , (right, ConsoleColor.Blue)]);
         PrintColor(board, [(cycle, ConsoleColor.Magenta), (left, ConsoleColor.Red), (right, ConsoleColor.Blue)]);
-        var outsideBorder = Math.Max(left.Count, right.Count) == left.Count ? left : right;
-        enclosed.ExceptWith(outsideBorder);
-        return enclosed.Count;
+
+
+        FloodFill(board, left, right, cycle); 
+        PrintColor(board, [(cycle, ConsoleColor.Magenta), (left, ConsoleColor.Red), (right, ConsoleColor.Blue)]);
+
+        //enclosed.ExceptWith(outsideBorder);
+        //return enclosed.Count;
+        return Math.Min(left.Count, right.Count);
     }
 
+    public void FloodFill(string[] board, HashSet<Point> left, HashSet<Point> right, HashSet<Point> cycle)
+    {
+        for (int i = 0; i < board.Length; i++)
+        {
+            for (int j = 0; j < board[0].Length; j++)
+            {
+                var p = new Point(j, i);
+                bool? foundLeft = null;
+                if (board[p.Y][p.X] != '*' && !cycle.Contains(p) && !left.Contains(p) && !right.Contains(p))
+                {
+                    var all = new HashSet<Point>() { };
+                    var currs = new List<Point>() { p };
+                    while (currs.Count > 0)
+                    {
+                        var next = new List<Point>();
+                        foreach (var curr in currs)
+                        {
+                            if (all.Contains(curr) || cycle.Contains(curr) || board[curr.Y][curr.X] == '*') continue;
+                            /*if (board[curr.Y][curr.X] == '*')
+                            {
+                                all.Add(curr);
+                                continue;
+                            }*/
+                            var nbs = Neighbors(curr);
+                            next.AddRange(Neighbors(curr).Where(poi => !cycle.Contains(poi) && board[poi.Y][poi.X] != '*'));
+                            all.Add(curr);
+                        }
+                        currs = next;
+                    }
+                    if (all.Overlaps(left)) foundLeft = true;
+                    if (all.Overlaps(right)) foundLeft = false;
+                    all.UnionWith(all);
+                    if (foundLeft is null) throw new Exception();
+                    else if (foundLeft.Value) left.UnionWith(all);
+                    else if (!foundLeft.Value) right.UnionWith(all);
+                }
+            }
+        }
+    }
 
     public HashSet<Point> CyclePoints(string[] board, Point start, Direction direction)
     {
@@ -284,16 +355,24 @@ public sealed class Day10 : Day
     }
 
 
-    public Point Left(Point p, Direction incoming)
+    public IEnumerable<Point> Left(Point p, Direction incoming, char ch)
     {
         var left = (Direction)(((int)incoming + 2) % 8);
-        return p.NeighborV(left);
+        yield return p.NeighborV(left);
+        var nextIncomingDir = Mapping(ch, p, incoming).First().Item2;
+        var diff = ((int)nextIncomingDir - (int)incoming + 8) % 8;
+        var straight = (Direction)(((int)incoming + 4) % 8);
+        if (diff == 2) yield return p.NeighborV(straight);
     }
 
-    public Point Right(Point p, Direction incoming)
+    public IEnumerable<Point> Right(Point p, Direction incoming, char ch)
     {
         var right = (Direction)(((int)incoming + 6) % 8);
-        return p.NeighborV(right);
+        yield return p.NeighborV(right);
+        var nextIncomingDir = Mapping(ch, p, incoming).First().Item2;
+        var diff = ((int)nextIncomingDir - (int)incoming + 8) % 8;
+        var straight = (Direction)(((int)incoming + 4) % 8);
+        if (diff == 6) yield return p.NeighborV(straight);
     }
 
     public Point[] Neighbors(Point p)
