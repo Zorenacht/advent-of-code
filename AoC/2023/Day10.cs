@@ -31,24 +31,29 @@ public sealed class Day10 : Day
     private class Loop : IEnumerable<Point>
     {
         public readonly string[] _board;
-        private readonly HashSet<Point> _cycle;
+        public readonly HashSet<Point> _cycle;
         public PointDirection Start { get; private set; }
 
         public Loop(string[] board)
         {
             _board = board.AddBorder('*');
-            var start = board
+            var start = _board
                 .SelectMany((line, row) => line
                     .Select((ch, col) => (col, ch))
                     .Where(comb => comb.ch == 'S')
                     .Select(comb => new Point(comb.col, row)))
                 .First();
-            var dir = StartDirection(board, start);
-            _cycle = CyclePoints(board, start, dir);
+            var dir = StartDirection(_board, start);
+            _cycle = CyclePoints(_board, start, dir);
             Start = new PointDirection(start, dir);
         }
 
         public int Length => _cycle.Count;
+
+        public int Inner()
+        {
+            return 0;
+        }
 
         public record PointDirection(Point Point, Direction Direction);
 
@@ -157,43 +162,13 @@ public sealed class Day10 : Day
         var loop = new Loop(input);
         var start = loop.Start.Point;
         var board = loop._board;
-
-
-        var current = new List<(Point, Direction)>() {
-            (start, Direction.SW),
-        };
-        var visited = new HashSet<(Point, Direction)>();
-        var visitedPoints = new HashSet<Point>();
-        var dists = new Dictionary<Point, int>();
-        int count = 0;
-        while (current.Count > 0 && visited.Count(x => x.Item1 == start) < 3)
-        {
-            //PrintColor(board, current.Select(x => x.Item1).ToHashSet());
-            var next = new List<(Point, Direction)>();
-            foreach (var curr in current)
-            {
-                var ch = board[curr.Item1.Y][curr.Item1.X];
-                if (visited.Contains(curr) || ch == '*') continue;
-                next.AddRange(Mapping(ch, curr.Item1, curr.Item2));
-                visited.Add(curr);
-                visitedPoints.Add(curr.Item1);
-            }
-            current = next;
-            count++;
-        }
-        visited.Remove((start, Direction.SW));
-
-        var cycleStart = visited.First(x => x.Item1 == start);
-        var cycle = CyclePoints(
-            board,
-            cycleStart.Item1,
-            cycleStart.Item2);
+        var cycle = loop._cycle;
 
         var left = new HashSet<Point>();
         var right = new HashSet<Point>();
         var iterator = (
-            cycleStart.Item1.NeighborV(cycleStart.Item2),
-            (Direction)(((int)cycleStart.Item2 + 4) % 8));
+            start.NeighborV(loop.Start.Direction),
+            (Direction)(((int)loop.Start.Direction + 4) % 8));
         do
         {
             var p = iterator.Item1;
