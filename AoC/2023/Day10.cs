@@ -1,6 +1,8 @@
 using MathNet.Numerics.Distributions;
+using MathNet.Numerics.RootFinding;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Tools.Geometry;
 
@@ -194,6 +196,14 @@ public sealed class Day10 : Day
         }
         visited.Remove((start, Direction.SW));
 
+        var cycleStart = visited.First(x => x.Item1 == start);
+        var cycle = CyclePoints(
+            board,
+            cycleStart.Item1,
+            (Direction)(((int)cycleStart.Item2 + 4) % 8));
+
+
+
         var free = new HashSet<Point>();
         var enclosed = new HashSet<Point>();
         var visited1 = new HashSet<Point>();
@@ -202,7 +212,7 @@ public sealed class Day10 : Day
             for (int j = 0; j < board[0].Length; j++)
             {
                 var p = new Point(j, i);
-                if (board[p.Y][p.X] == '.' && !free.Contains(p) && !enclosed.Contains(p))
+                if (board[p.Y][p.X] != '*' && !cycle.Contains(p) && !free.Contains(p) && !enclosed.Contains(p))
                 {
                     var all = new HashSet<Point>() { };
                     var currs = new List<Point>() { p };
@@ -235,7 +245,6 @@ public sealed class Day10 : Day
         var starts = visited.Where(x => x.Item1 == start).ToList();
         var looping = visited.First(x => x.Item1 == start);
         looping = (looping.Item1.NeighborV(looping.Item2), (Direction)(((int)looping.Item2 + 4)  % 8));
-        var cycle = new HashSet<Point>() { looping.Item1 };
         do
         {
             var p = looping.Item1;
@@ -251,43 +260,29 @@ public sealed class Day10 : Day
             }
             //if (looping.Item1 == start) looping = (p.NeighborV(looping.Item2), looping.Item2); //first looping has arrived to start from looping.Item2 direction
             looping = Mapping(board[p.Y][p.X], looping.Item1, looping.Item2).First();
-            cycle.Add(looping.Item1);
         } while (looping.Item1 != start);
 
-        /*for (int i = 0; i < board.Length; i++)
-        {
-            for (int j = 0; j < board[0].Length; j++)
-            {
-                if (left.Contains(new Point(j,i)))
-                {
-                    Console.Write('O');
-                }
-                else if (right.Contains(new Point(j, i)))
-                { 
-                    Console.Write("I"); 
-                }
-                else
-                {
-                    Console.Write(" ");
-                    *//*Console.Write(board[i][j]);*//*
-                }
-            }
-            Console.WriteLine();
-        }
-        for (int i = 0; i < board.Length; i++)
-        {
-            for (int j = 0; j < board[0].Length; j++)
-            {
-                Console.Write(board[i][j]);
-            }
-            Console.WriteLine();
-        }*/
         PrintColor(board, [(free, ConsoleColor.Yellow), (enclosed, ConsoleColor.Green), (left, ConsoleColor.Red) , (right, ConsoleColor.Blue)]);
         PrintColor(board, [(cycle, ConsoleColor.Magenta), (left, ConsoleColor.Red), (right, ConsoleColor.Blue)]);
         var outsideBorder = Math.Max(left.Count, right.Count) == left.Count ? left : right;
         enclosed.ExceptWith(outsideBorder);
         return enclosed.Count;
     }
+
+
+    public HashSet<Point> CyclePoints(string[] board, Point start, Direction direction)
+    {
+        var iterator = (start.NeighborV(direction), (Direction)(((int)direction + 4) % 8));
+        var cycle = new HashSet<Point>();
+        do
+        {
+            var p = iterator.Item1;
+            iterator = Mapping(board[p.Y][p.X], iterator.Item1, iterator.Item2).First();
+            cycle.Add(iterator.Item1);
+        } while (iterator.Item1 != start);
+        return cycle;
+    }
+
 
     public Point Left(Point p, Direction incoming)
     {
