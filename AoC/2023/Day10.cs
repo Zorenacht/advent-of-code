@@ -3,7 +3,9 @@ using MathNet.Numerics.RootFinding;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Tools.Geometry;
 
 namespace AoC_2023;
@@ -26,13 +28,58 @@ public sealed class Day10 : Day
         Direction.SE,
         Direction.NE];
 
+    private class Loop : IEnumerable<Point>
+    {
+        public readonly string[] _board;
+        private readonly HashSet<Point> _cycle;
+        public PointDirection Start { get; private set; }
+
+        public Loop(string[] board)
+        {
+            _board = board.AddBorder('*');
+            var start = board
+                .SelectMany((line, row) => line
+                    .Select((ch, col) => (col, ch))
+                    .Where(comb => comb.ch == 'S')
+                    .Select(comb => new Point(comb.col, row)))
+                .First();
+            var dir = StartDirection(board, start);
+            _cycle = CyclePoints(board, start, dir);
+            Start = new PointDirection(start, dir);
+        }
+
+        public int Length => _cycle.Count;
+
+        public record PointDirection(Point Point, Direction Direction);
+
+        private Direction StartDirection(string[] board, Point start)
+        {
+            PointDirection[] nb = [
+                new(start.NeighborV(Direction.W), Direction.E),
+                new(start.NeighborV(Direction.N), Direction.S),
+                new(start.NeighborV(Direction.E), Direction.W),
+                new(start.NeighborV(Direction.S), Direction.N)];
+            var incomingDirection = nb.First(pd => Mapping(board[pd.Point.Y][pd.Point.X], pd.Point, pd.Direction).Any())
+                .Direction;
+            return (Direction)(((int)incomingDirection + 4) % 8);
+
+        }
+
+        public IEnumerator<Point> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
     private void PrintColor(string[] board, params (HashSet<Point> Set, ConsoleColor Color)[] highlight)
     {
         for (int i = 0; i < board.Length; i++)
         {
             for (int j = 0; j < board[0].Length; j++)
             {
-                if(highlight.Any(x => x.Set.Contains(new Point(j, i))))
+                if (highlight.Any(x => x.Set.Contains(new Point(j, i))))
                 {
                     foreach (var h in highlight)
                     {
@@ -67,61 +114,9 @@ public sealed class Day10 : Day
         Console.WriteLine();
     }
 
-    public int P1(string[] input)
-    {
-        var board = input.AddBorder('*');
-        Point start = Point.O;
-        for (int i = 0; i < board.Length; i++)
-        {
-            for (int j = 0; j < board[0].Length; j++)
-            {
-                if (board[i][j] == 'S')
-                {
-                    start = new Point(j, i);
-                    break;
-                }
-            }
-        }
+    public int P1(string[] input) => new Loop(input).Length / 2;
 
-        var current = new List<(Point, Direction)>() {
-            (start, Direction.SW),
-        };
-        var visited = new HashSet<(Point, Direction)>();
-        var dists = new Dictionary<Point, int>();
-        int count = 0;
-        while (current.Count > 0 && visited.Count(x => x.Item1 == start) < 3)
-        {
-            //PrintColor(board, current.Select(x => x.Item1).ToHashSet());
-            var next = new List<(Point, Direction)>();
-            foreach (var curr in current)
-            {
-                var ch = board[curr.Item1.Y][curr.Item1.X];
-                if (visited.Contains(curr) || ch == '*') continue;
-                next.AddRange(Mapping(ch, curr.Item1, curr.Item2));
-                visited.Add(curr);
-            }
-            current = next;
-            count++;
-        }
-
-        /*for (int i = 0; i < board.Length; i++)
-        {
-            for (int j = 0; j < board[0].Length; j++)
-            {
-                if (visited.Any(x => x.Item1 == new Point(j,i)))
-                {
-                    Console.Write(board[i][j]);
-                }
-                else { 
-                    Console.Write("."); 
-                }
-            }
-            Console.WriteLine(".");
-        }*/
-        return count / 2;
-    }
-
-    private IEnumerable<(Point, Direction)> Mapping(char ch, Point p, Direction dir)
+    private static IEnumerable<(Point, Direction)> Mapping(char ch, Point p, Direction dir)
     {
         return (ch, dir) switch
         {
@@ -159,19 +154,10 @@ public sealed class Day10 : Day
 
     public int Part2(string[] input)
     {
-        var board = input.AddBorder('*');
-        Point start = Point.O;
-        for (int i = 0; i < board.Length; i++)
-        {
-            for (int j = 0; j < board[0].Length; j++)
-            {
-                if (board[i][j] == 'S')
-                {
-                    start = new Point(j, i);
-                    break;
-                }
-            }
-        }
+        var loop = new Loop(input);
+        var start = loop.Start.Point;
+        var board = loop._board;
+
 
         var current = new List<(Point, Direction)>() {
             (start, Direction.SW),
@@ -203,62 +189,6 @@ public sealed class Day10 : Day
             cycleStart.Item1,
             cycleStart.Item2);
 
-        /*var free = new HashSet<Point>();
-        var enclosed = new HashSet<Point>();
-        var visited1 = new HashSet<Point>();
-        for (int i = 0; i < board.Length; i++)
-        {
-            for (int j = 0; j < board[0].Length; j++)
-            {
-                var p = new Point(j, i);
-                if (board[p.Y][p.X] != '*' && !cycle.Contains(p) && !free.Contains(p) && !enclosed.Contains(p))
-                {
-                    var all = new HashSet<Point>() { };
-                    var currs = new List<Point>() { p };
-                    while (currs.Count > 0)
-                    {
-                        var next = new List<Point>();
-                        foreach (var curr in currs)
-                        {
-                            if (all.Contains(curr)) continue;
-                            if (board[curr.Y][curr.X] == '*')
-                            {
-                                all.Add(curr);
-                                continue;
-                            }
-                            var nbs = Neighbors(curr);
-                            next.AddRange(Neighbors(curr).Where(poi => board[poi.Y][poi.X] == '.' || board[poi.Y][poi.X] == '*'));
-                            all.Add(curr);
-                        }
-                        currs = next;
-                    }
-                    if (all.Any(poi => board[poi.Y][poi.X] == '*')) free.UnionWith(all);
-                    else enclosed.UnionWith(all);
-                }
-            }
-        }*/
-
-        /*var left = new HashSet<Point>();
-        var right = new HashSet<Point>();
-        var first = visited.First(x => x.Item1 == start);
-        var looping = visited.First(x => x.Item1 == start);
-        looping = (looping.Item1.NeighborV(looping.Item2), (Direction)(((int)looping.Item2 + 4)  % 8));
-        do
-        {
-            var p = looping.Item1;
-            var l = Left(looping.Item1, looping.Item2);
-            var r = Right(looping.Item1, looping.Item2);
-            if (board[l.Y][l.X] == '.' && !left.Contains(r) && !right.Contains(r))
-            {
-                left.Add(l);
-            }
-            if (board[r.Y][r.X] == '.' && !left.Contains(r) && !right.Contains(r))
-            {
-                right.Add(r);
-            }
-            looping = Mapping(board[p.Y][p.X], looping.Item1, looping.Item2).First();
-        } while (looping.Item1 != start);*/
-
         var left = new HashSet<Point>();
         var right = new HashSet<Point>();
         var iterator = (
@@ -270,7 +200,7 @@ public sealed class Day10 : Day
             var dir = iterator.Item2;
             var lef = Left(p, dir, board[p.Y][p.X]);
             var rig = Right(p, dir, board[p.Y][p.X]);
-            foreach(var l in lef)
+            foreach (var l in lef)
             {
                 if (board[l.Y][l.X] != '*' && !cycle.Contains(l) && !left.Contains(l) && !right.Contains(l))
                 {
@@ -293,7 +223,7 @@ public sealed class Day10 : Day
         PrintColor(board, [(cycle, ConsoleColor.Magenta), (left, ConsoleColor.Red), (right, ConsoleColor.Blue)]);
 
 
-        FloodFill(board, left, right, cycle); 
+        FloodFill(board, left, right, cycle);
         PrintColor(board, [(cycle, ConsoleColor.Magenta), (left, ConsoleColor.Red), (right, ConsoleColor.Blue)]);
 
         //enclosed.ExceptWith(outsideBorder);
@@ -341,7 +271,7 @@ public sealed class Day10 : Day
         }
     }
 
-    public HashSet<Point> CyclePoints(string[] board, Point start, Direction direction)
+    public static HashSet<Point> CyclePoints(string[] board, Point start, Direction direction)
     {
         var iterator = (start.NeighborV(direction), (Direction)(((int)direction + 4) % 8));
         var cycle = new HashSet<Point>();
