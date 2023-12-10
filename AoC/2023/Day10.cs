@@ -1,5 +1,7 @@
 using MathNet.Numerics.Distributions;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Tools.Geometry;
 
 namespace AoC_2023;
@@ -22,26 +24,58 @@ public sealed class Day10 : Day
         Direction.SE,
         Direction.NE];
 
+    private void PrintColor(string[] board, params (HashSet<Point> Set, ConsoleColor Color)[] highlight)
+    {
+        for (int i = 0; i < board.Length; i++)
+        {
+            for (int j = 0; j < board[0].Length; j++)
+            {
+                if(highlight.Any(x => x.Set.Contains(new Point(j, i))))
+                {
+                    foreach (var h in highlight)
+                    {
+                        if (h.Set.Contains(new Point(j, i)))
+                        {
+                            Console.BackgroundColor = h.Color;
+                            Console.Write(board[i][j]);
+                            Console.ResetColor();
+                            break;
+                        }
+                    }
+                }
+                else if (board[i][j] == '.')
+                {
+                    Console.BackgroundColor = ConsoleColor.White;
+                    Console.Write(board[i][j]);
+                    Console.ResetColor();
+                }
+                else if (board[i][j] == '*')
+                {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write(board[i][j]);
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.Write(board[i][j]);
+                }
+            }
+            Console.WriteLine();
+        }
+        Console.WriteLine();
+    }
+
     public int P1(string[] input)
     {
-        int result = 0;
-        var parse = input.Select(x =>
-        {
-            var split1 = x.Split(" ", StringSplitOptions.None);
-            var split2 = x.Split(" ", StringSplitOptions.None);
-            var split3 = x.Split(" ", StringSplitOptions.None);
-            var kv = new KeyValuePair<string, string>(split1[0], split2[0]);
-            return x;
-        });
         var board = input.AddBorder('*');
         Point start = Point.O;
         for (int i = 0; i < board.Length; i++)
         {
             for (int j = 0; j < board[0].Length; j++)
             {
-                if (board[j][i] == 'S')
+                if (board[i][j] == 'S')
                 {
-                    start = new Point(i, j);
+                    start = new Point(j, i);
                     break;
                 }
             }
@@ -55,6 +89,7 @@ public sealed class Day10 : Day
         int count = 0;
         while (current.Count > 0 && visited.Count(x => x.Item1 == start) < 3)
         {
+            //PrintColor(board, current.Select(x => x.Item1).ToHashSet());
             var next = new List<(Point, Direction)>();
             foreach (var curr in current)
             {
@@ -114,29 +149,22 @@ public sealed class Day10 : Day
     [Puzzle(answer: 4)]
     public int Part2Example() => Part2(InputExample);
 
+    //lower probably than 547]
+    //not 479
     [Puzzle(answer: null)]
     public int Part2() => Part2(Input);
 
     public int Part2(string[] input)
     {
-        int result = 0;
-        var parse = input.Select(x =>
-        {
-            var split1 = x.Split(" ", StringSplitOptions.None);
-            var split2 = x.Split(" ", StringSplitOptions.None);
-            var split3 = x.Split(" ", StringSplitOptions.None);
-            var kv = new KeyValuePair<string, string>(split1[0], split2[0]);
-            return x;
-        });
         var board = input.AddBorder('*');
         Point start = Point.O;
-        for (int i = 0; i < board[0].Length; i++)
+        for (int i = 0; i < board.Length; i++)
         {
-            for (int j = 0; j < board.Length; j++)
+            for (int j = 0; j < board[0].Length; j++)
             {
-                if (board[j][i] == 'S')
+                if (board[i][j] == 'S')
                 {
-                    start = new Point(i, j);
+                    start = new Point(j, i);
                     break;
                 }
             }
@@ -151,6 +179,7 @@ public sealed class Day10 : Day
         int count = 0;
         while (current.Count > 0 && visited.Count(x => x.Item1 == start) < 3)
         {
+            //PrintColor(board, current.Select(x => x.Item1).ToHashSet());
             var next = new List<(Point, Direction)>();
             foreach (var curr in current)
             {
@@ -163,6 +192,7 @@ public sealed class Day10 : Day
             current = next;
             count++;
         }
+        visited.Remove((start, Direction.SW));
 
         var free = new HashSet<Point>();
         var enclosed = new HashSet<Point>();
@@ -171,8 +201,8 @@ public sealed class Day10 : Day
         {
             for (int j = 0; j < board[0].Length; j++)
             {
-                var p = new Point(i, j);
-                if (board[p.X][p.Y] == '.' && !free.Contains(p) && !enclosed.Contains(p))
+                var p = new Point(j, i);
+                if (board[p.Y][p.X] == '.' && !free.Contains(p) && !enclosed.Contains(p))
                 {
                     var all = new HashSet<Point>() { };
                     var currs = new List<Point>() { p };
@@ -182,39 +212,64 @@ public sealed class Day10 : Day
                         foreach (var curr in currs)
                         {
                             if (all.Contains(curr)) continue;
-                            if (board[curr.X][curr.Y] == '*')
+                            if (board[curr.Y][curr.X] == '*')
                             {
                                 all.Add(curr);
                                 continue;
                             }
                             var nbs = Neighbors(curr);
-                            next.AddRange(Neighbors(curr).Where(poi => board[poi.X][poi.Y] == '.' || board[poi.X][poi.Y] == '*'));
+                            next.AddRange(Neighbors(curr).Where(poi => board[poi.Y][poi.X] == '.' || board[poi.Y][poi.X] == '*'));
                             all.Add(curr);
                         }
                         currs = next;
                     }
-                    if (all.Any(poi => board[poi.X][poi.Y] == '*')) free.UnionWith(all);
+                    if (all.Any(poi => board[poi.Y][poi.X] == '*')) free.UnionWith(all);
                     else enclosed.UnionWith(all);
                 }
             }
         }
 
-        for (int i = 0; i < board.Length; i++)
+        var left = new HashSet<Point>();
+        var right = new HashSet<Point>();
+        var first = visited.First(x => x.Item1 == start);
+        var starts = visited.Where(x => x.Item1 == start).ToList();
+        var looping = visited.First(x => x.Item1 == start);
+        looping = (looping.Item1.NeighborV(looping.Item2), (Direction)(((int)looping.Item2 + 4)  % 8));
+        var cycle = new HashSet<Point>() { looping.Item1 };
+        do
+        {
+            var p = looping.Item1;
+            var l = Left(looping.Item1, looping.Item2);
+            var r = Right(looping.Item1, looping.Item2);
+            if (board[l.Y][l.X] == '.' && !left.Contains(r) && !right.Contains(r))
+            {
+                left.Add(l);
+            }
+            if (board[r.Y][r.X] == '.' && !left.Contains(r) && !right.Contains(r))
+            {
+                right.Add(r);
+            }
+            //if (looping.Item1 == start) looping = (p.NeighborV(looping.Item2), looping.Item2); //first looping has arrived to start from looping.Item2 direction
+            looping = Mapping(board[p.Y][p.X], looping.Item1, looping.Item2).First();
+            cycle.Add(looping.Item1);
+        } while (looping.Item1 != start);
+
+        /*for (int i = 0; i < board.Length; i++)
         {
             for (int j = 0; j < board[0].Length; j++)
             {
-                if (free.Contains(new Point(i,j)))
+                if (left.Contains(new Point(j,i)))
                 {
                     Console.Write('O');
                 }
-                else if (enclosed.Contains(new Point(i, j)))
+                else if (right.Contains(new Point(j, i)))
                 { 
                     Console.Write("I"); 
                 }
                 else
                 {
                     Console.Write(" ");
-                    /*Console.Write(board[i][j]);*/
+                    *//*Console.Write(board[i][j]);*//*
                 }
             }
             Console.WriteLine();
@@ -226,8 +281,24 @@ public sealed class Day10 : Day
                 Console.Write(board[i][j]);
             }
             Console.WriteLine();
-        }
+        }*/
+        PrintColor(board, [(free, ConsoleColor.Yellow), (enclosed, ConsoleColor.Green), (left, ConsoleColor.Red) , (right, ConsoleColor.Blue)]);
+        PrintColor(board, [(cycle, ConsoleColor.Magenta), (left, ConsoleColor.Red), (right, ConsoleColor.Blue)]);
+        var outsideBorder = Math.Max(left.Count, right.Count) == left.Count ? left : right;
+        enclosed.ExceptWith(outsideBorder);
         return enclosed.Count;
+    }
+
+    public Point Left(Point p, Direction incoming)
+    {
+        var left = (Direction)(((int)incoming + 2) % 8);
+        return p.NeighborV(left);
+    }
+
+    public Point Right(Point p, Direction incoming)
+    {
+        var right = (Direction)(((int)incoming + 6) % 8);
+        return p.NeighborV(right);
     }
 
     public Point[] Neighbors(Point p)
