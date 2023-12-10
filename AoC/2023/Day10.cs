@@ -10,7 +10,7 @@ namespace AoC_2023;
 
 public sealed class Day10 : Day
 {
-    [Puzzle(answer: 8)]
+    [Puzzle(answer: 80)]
     public int Part1Example() => P1(InputExample);
 
     [Puzzle(answer: 6717)]
@@ -148,13 +148,13 @@ public sealed class Day10 : Day
         };
     }
 
-    [Puzzle(answer: 4)]
+    [Puzzle(answer: 10)]
     public int Part2Example() => Part2(InputExample);
 
     //lower probably than 547]
     //not 479
     //not 382
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 381)]
     public int Part2() => Part2(Input);
 
     public int Part2(string[] input)
@@ -201,7 +201,7 @@ public sealed class Day10 : Day
         var cycle = CyclePoints(
             board,
             cycleStart.Item1,
-            (Direction)(((int)cycleStart.Item2 + 4) % 8));
+            cycleStart.Item2);
 
         /*var free = new HashSet<Point>();
         var enclosed = new HashSet<Point>();
@@ -262,8 +262,8 @@ public sealed class Day10 : Day
         var left = new HashSet<Point>();
         var right = new HashSet<Point>();
         var iterator = (
-            cycleStart.Item1.NeighborV((Direction)(((int)cycleStart.Item2 + 4) % 8)), 
-            cycleStart.Item2);
+            cycleStart.Item1.NeighborV(cycleStart.Item2),
+            (Direction)(((int)cycleStart.Item2 + 4) % 8));
         do
         {
             var p = iterator.Item1;
@@ -348,9 +348,10 @@ public sealed class Day10 : Day
         do
         {
             var p = iterator.Item1;
-            iterator = Mapping(board[p.Y][p.X], iterator.Item1, iterator.Item2).First();
             cycle.Add(iterator.Item1);
+            iterator = Mapping(board[p.Y][p.X], iterator.Item1, iterator.Item2).First();
         } while (iterator.Item1 != start);
+        cycle.Add(iterator.Item1);
         return cycle;
     }
 
