@@ -4,72 +4,71 @@ namespace AoC_2023;
 
 public sealed class Day11 : Day
 {
-    [Puzzle(answer: null)]
-    public int Part1Example() => P1(InputExample);
+    [Puzzle(answer: 374)]
+    public long Part1Example() => Part1(InputExample, 2);
 
-    [Puzzle(answer: null)]
-    public int Part1() => P1(Input);
+    [Puzzle(answer: 10231178)]
+    public long Part1() => Part1(Input, 2);
 
     Direction[] dirs = [
         Direction.N,
         Direction.S,
         Direction.W,
-        Direction.E,
-        Direction.NW,
-        Direction.SW,
-        Direction.SE,
-        Direction.NE];
+        Direction.E];
 
-    public int P1(string[] input)
+    public long Part1(string[] board, int expansion)
     {
-        int result = 0;
-        var parse = input.Select(x =>
-        {
-            var split1 = x.Split(" ", StringSplitOptions.None);
-            var split2 = x.Split(" ", StringSplitOptions.None);
-            var split3 = x.Split(" ", StringSplitOptions.None);
-            var kv = new KeyValuePair<string, string>(split1[0], split2[0]);
-            return x;
-        });
-        var board = input.AddBorder('*');
+        var galaxies = new List<Point>();
+        var rowHasGalaxy = new bool[board.Length];
+        var colHasGalaxy = new bool[board[0].Length];
         for (int i = 0; i < board.Length; i++)
         {
             for (int j = 0; j < board[0].Length; j++)
             {
+                if (board[i][j] == '#')
+                {
+                    galaxies.Add(new Point(i, j));
+                    rowHasGalaxy[i] = true;
+                    colHasGalaxy[j] = true;
+                }
             }
         }
-        var current = new List<Point>();
-        var visited = new HashSet<Point>();
-        while (current.Count > 0)
+
+        long sum = 0;
+        for(int fromIndex = 0; fromIndex < galaxies.Count; fromIndex++)
         {
-            var next = new List<Point>();
-            foreach (var curr in current)
+            for (int toIndex = fromIndex+1; toIndex < galaxies.Count; toIndex++)
             {
-                if (visited.Contains(curr)) continue;
-                next.AddRange(dirs.Select(x => curr.NeighborV(x)));
+                long dist = 0;
+                var from = galaxies[fromIndex];
+                var to = galaxies[toIndex];
+
+                //row walk
+                var row = from.X;
+                while (row < to.X)
+                {
+                    dist += rowHasGalaxy[row] ? 1 : expansion;
+                    row++;
+                }
+
+                //col walk
+                var sign = Math.Sign(to.Y - from.Y);
+                var col = from.Y;
+                while (Math.Abs(to.Y - col) > 0)
+                {
+                    dist += colHasGalaxy[col] ? 1 : expansion;
+                    if (Math.Abs(to.Y - col) == 0) break;
+                    col += sign;
+                }
+                sum += dist;
             }
         }
-        return result;
+        return sum;
     }
 
-    [Puzzle(answer: null)]
-    public int Part2Example() => P1(InputExample);
+    [Puzzle(answer: 8410)]
+    public long Part2Example() => Part1(InputExample, 100);
 
-    [Puzzle(answer: null)]
-    public int Part2() => P1(Input);
-
-    public int Part2(string[] input)
-    {
-        int result = 0;
-        var parse = input.Select(x =>
-        {
-            var split1 = x.Split(" ", StringSplitOptions.None);
-            var split2 = x.Split(" ", StringSplitOptions.None);
-            var split3 = x.Split(" ", StringSplitOptions.None);
-            var kv = new KeyValuePair<string, string>(split1[0], split2[0]);
-            return x;
-        });
-        return result;
-    }
-
+    [Puzzle(answer: 622120986954)]
+    public long Part2() => Part1(Input, 1_000_000);
 }
