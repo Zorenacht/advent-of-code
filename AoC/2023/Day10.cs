@@ -121,7 +121,6 @@ public sealed class Day10 : Day
 
         }
 
-
         public void FloodFill(string[] board, HashSet<Point> left, HashSet<Point> right, HashSet<Point> cycle)
         {
             for (int i = 0; i < board.Length; i++)
