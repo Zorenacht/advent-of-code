@@ -58,13 +58,83 @@ public sealed class Day12 : Day
         }
     }
 
-    private void Groups(string state, int seq, int stateI, int seqI, List<string> groups)
-    {
 
+    public class HotSprings
+    {
+        private string template;
+        private int[] sequence;
+
+        public HotSprings(string line, int repeat)
+        {
+            template = string.Join("?", Enumerable.Repeat(line.Split()[0], repeat));
+            sequence = line.Split()[1].Split(",").Select(x => int.Parse(x)).ToArray();
+            sequence = Enumerable.Repeat(sequence, repeat).SelectMany(x => x).ToArray();
+        }
+
+        public long Arrangements()
+        {
+            var states = sequence.Select(x => Enumerable.Repeat(0, x + 1).ToList()).ToList();
+            states.Add(new List<int>() { 0 });
+            //need to add another row to catch ending ....
+            states[0][0] = 1;
+            for(int templateIndex = 0; templateIndex < template.Length; templateIndex++)
+            {
+                var next = sequence.Select(x => Enumerable.Repeat(0, x + 1).ToList()).ToList();
+                next.Add(new List<int>() { 0 });
+                var ch = template[templateIndex];
+                if (ch == '.' || ch == '?')
+                {
+                    for(int i = 0; i < states.Count - 1; i++)
+                    {
+                        for(int j = 0; j < states[i].Count; j++)
+                        {
+                            if (j == 0) next[i][j] += states[i][j];
+                            else next[i + 1][0] += states[i][j];
+                        }
+                    }
+                }
+                if (ch == '#' || ch == '?')
+                {
+                    for (int i = 0; i < states.Count; i++)
+                    {
+                        for (int j = 0; j < states[i].Count - 1; j++)
+                        {
+                            next[i][j+1] += states[i][j];
+                        }
+                    }
+                }
+                states = next;
+            }
+            return states[^1][^1];
+        }
+
+        /*public IEnumerable<string[]> Splits(string line, int count)
+        {
+            for(int i=count; i < line.Length; i++)
+            {
+                if (Valid(line[..i],count))
+            }
+        }*/
+
+        private static bool Valid(string template, int count)
+        {
+            int leftTag = template.IndexOf('#');
+            int rightTag = template.LastIndexOf("#");
+            if (template[leftTag..(rightTag + 1)].Any(x => x == '.')) return false;
+            if (rightTag - leftTag + 1 > count) return false;
+            //not checking enough ?'s yet
+            return true;
+        }
     }
 
-    [Puzzle(answer: 8410)]
-    public long Part2Example() => Part2(InputExample);
+    [TestCase("???.### 1,1,3", ExpectedResult =  1)]
+    [TestCase(".??..??...?##. 1,1,3", ExpectedResult = 16384)]
+    [TestCase("?#?#?#?#?#?#?#? 1,3,1,6", ExpectedResult = 1)]
+    [TestCase("????.#...#... 4,1,1", ExpectedResult = 16)]
+    [TestCase("????.######..#####. 1,6,5", ExpectedResult = 2500)]
+    [TestCase("?###???????? 3,2,1", ExpectedResult = 506250)]
+    [TestCase(".###.##.#. 3,2,1", ExpectedResult = 1)]
+    public long Part2Example(string input) => new HotSprings(input, 5).Arrangements();
 
     [Puzzle(answer: 622120986954)]
     public long Part2() => Part2(Input);
@@ -84,11 +154,12 @@ public sealed class Day12 : Day
             var groups = new List<string[]>();
             Permutations2(sequence, 0, initialGroup, 0, groups);
 
-            int count = 0;
+            int count = 0; 
+            var a = groups.Select(group => String.Join("", group.Select(word => word.Length))).ToList();
             foreach (var group in groups)
             {
                 if(count % 1000 == 0) Console.WriteLine(count);
-                //var a = groups.Select(group => String.Join("",group.Select(word => word.Length))).ToList();
+                //
                 int prod = 1;
                 for (int i = 0; i < sequence.Length; i++)
                 {
@@ -131,7 +202,7 @@ public sealed class Day12 : Day
         int groupIndex,
         List<string[]> perms)
     {
-        if (groups.Count == sequence.Length && sequenceIndex == sequence.Length)
+        if (sequenceIndex == sequence.Length && groups.Count == sequence.Length)
         {
             perms.Add(groups.ToArray());
             return;
@@ -141,6 +212,7 @@ public sealed class Day12 : Day
 
         int tagsNeeded = sequence[sequenceIndex];
 
+        if (groups[groupIndex].Length < tagsNeeded) return;
         //!!! needs to be able to skip all ????
         if (groups.Count > sequence.Length && groups[groupIndex].All(x => x == '?'))
         {
@@ -153,7 +225,6 @@ public sealed class Day12 : Day
                 groupIndex,
                 perms);
         }
-        if (groups[groupIndex].Length < tagsNeeded) return;
         //till -1 because splitting the last has no effect
         int firstTag = groups[groupIndex].IndexOf('#');
         if (groups[groupIndex].LastIndexOf('#') - firstTag + 1 <= tagsNeeded)
