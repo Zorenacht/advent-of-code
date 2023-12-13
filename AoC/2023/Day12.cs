@@ -40,6 +40,8 @@ public sealed class Day12 : Day
             sequence = Enumerable.Repeat(singleSequence, repeat).SelectMany(x => x).ToArray();
         }
 
+        // Time complexity: O(template.Length * sequence.Max * sequence.Length)
+        // Space complexity: O(sequence.Max * sequence.Length)
         public long Arrangements()
         {
             var states = sequence.Select(x => Enumerable.Repeat(0L, x + 1).ToList()).ToList();
