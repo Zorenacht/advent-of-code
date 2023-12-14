@@ -24,7 +24,6 @@ public sealed class Day14 : Day
 
     public long P2(string[] input)
     {
-        int result = 0;
         var copy = input.Select(x => Enumerable.Repeat('.', x.Length).ToArray()).ToArray();
         var cache = new List<string[]>();
         int iteration = 0;
@@ -45,7 +44,6 @@ public sealed class Day14 : Day
             cache.Add(input);
             iteration++;
         }
-        return result;
     }
 
     public string[] MoveAllNorth(string[] input)
