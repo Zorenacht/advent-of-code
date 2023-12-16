@@ -1,13 +1,4 @@
-using AoC;
 using MathNet.Numerics;
-using NUnit.Framework.Constraints;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using Tools.Geometry;
-using Tools.Shapes;
 
 namespace AoC_2023;
 
@@ -19,41 +10,18 @@ public sealed class Day16 : Day
     [Puzzle(answer: 7728)]
     public int Part1() => P1(Input);
 
-    Direction[] dirs = [
-        Direction.N,
-        Direction.S,
-        Direction.W,
-        Direction.E,
-        Direction.NW,
-        Direction.SW,
-        Direction.SE,
-        Direction.NE];
-
     private IEnumerable<Complex32> Next(char ch, Complex32 dir)
     {
         if (ch == '.') yield return dir;
-        if (ch == '|' && (dir == 1 || dir == -1)) { yield return new Complex32(0, 1); yield return new Complex32(0, -1); }
-        if (ch == '|' && (dir.Imaginary == 1 || dir.Imaginary == -1)) yield return dir;
-        if (ch == '-' && (dir == 1 || dir == -1)) yield return dir;
-        if (ch == '-' && (dir.Imaginary == 1 || dir.Imaginary == -1)) { yield return new Complex32(1, 0); yield return new Complex32(-1, 0); }
-        if (ch == '/' && (dir == 1 || dir == -1)) yield return dir * new Complex32(0, 1);
-        if (ch == '/' && (dir.Imaginary == 1 || dir.Imaginary == -1)) yield return dir * new Complex32(0, -1);
-        if (ch == '\\' && (dir == 1|| dir == -1)) yield return dir * new Complex32(0, -1);
-        if (ch == '\\' && (dir.Imaginary == 1 || dir.Imaginary == -1)) yield return dir * new Complex32(0, 1);
+        else if (ch == '|' && dir.IsReal()) { yield return new Complex32(0, 1); yield return new Complex32(0, -1); }
+        else if(ch == '|' && !dir.IsReal()) yield return dir;
+        else if(ch == '-' && dir.IsReal()) yield return dir;
+        else if(ch == '-' && !dir.IsReal()) { yield return new Complex32(1, 0); yield return new Complex32(-1, 0); }
+        else if(ch == '/' && dir.IsReal()) yield return dir * new Complex32(0, 1);
+        else if(ch == '/' && !dir.IsReal()) yield return dir * new Complex32(0, -1);
+        else if(ch == '\\' && dir.IsReal()) yield return dir * new Complex32(0, -1);
+        else if(ch == '\\' && !dir.IsReal()) yield return dir * new Complex32(0, 1);
     }
-
-    /*private IEnumerable<(int, int)> Next(char ch, (int, int) dir)
-    {
-        if (ch == '.') yield return dir;
-        if (ch == '|' && dir == (1, 0) || dir == (-1, 0)) yield return (0, 1); yield return (0, -1);
-        if (ch == '|' && dir == (0, 1) || dir == (0, -1)) yield return dir;
-        if (ch == '-' && dir == (1, 0) || dir == (-1, 0)) yield return dir;
-        if (ch == '-' && dir == (0, 1) || dir == (0, -1)) yield return (1, 0); yield return (-1, 0);
-        if( ch == '/' && dir == (0, -1) || dir == (0, 1))
-        if( ch == '/')
-        if( ch == '\')
-        if( ch == '\')
-    }*/
 
     public int P1(string[] input)
     {
@@ -71,19 +39,13 @@ public sealed class Day16 : Day
             dir = next.Dir;
             var value = board[(int)current.Imaginary][(int)current.Real];
             if ("*".Contains(value) || visited.Contains((current,dir))) continue;
-            var newPoints = Next(value, dir).ToArray();
-            foreach(var p in newPoints.Select(d => (current + d, d)))
+            var newPoints = Next(value, dir).Select(d => (current + d, d));
+            foreach(var p in newPoints)
             {
                 nexts.Enqueue(p);
             }
             copy[(int)current.Imaginary][(int)current.Real] = '#';
             visited.Add((current, dir));
-
-            /*for(int i =0; i < copy.Length; i++)
-            {
-                Console.WriteLine(string.Join("", copy.Skip(copy.Length-i-1).First()));
-            }*/
-            
         }
         return copy.Sum(r => r.Count(ch => ch == '#'));
     }
