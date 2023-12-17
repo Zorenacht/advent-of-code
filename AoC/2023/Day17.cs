@@ -31,7 +31,7 @@ public sealed class Day17 : Day
     {
         var board = input.AddBorder('*').Reverse().ToArray();
         var start = new Complex(1, board.Length - 2);
-        var end = new Complex(board[0].Length/2 - 2, 1);
+        var end = new Complex(board[0].Length - 2, 1);
         var pq = new PriorityQueue<State, int>();
         pq.Enqueue(new State(start + new Complex(1, 0), new Complex(1, 0), 1), 0);
         pq.Enqueue(new State(start + new Complex(0, -1), new Complex(0, -1), 1), 0);
@@ -50,7 +50,7 @@ public sealed class Day17 : Day
                 return priority + cost;
             }
             if (boardValue == '*' || visited.Contains(state)) continue;
-            foreach (var next in state.Next(min,max)) pq.Enqueue(next, priority + cost);
+            foreach (var next in state.Next(min, max)) pq.Enqueue(next, priority + cost);
             visited.Add(state);
         }
         throw new Exception("Endpoint was not reached!");
