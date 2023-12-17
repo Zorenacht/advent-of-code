@@ -45,8 +45,6 @@ public sealed class Day17 : Day
             var cost = boardValue - '0';
             if (state.Point == end)
             {
-                Console.WriteLine(pq.Count);
-                Console.WriteLine(count);
                 return priority + cost;
             }
             if (boardValue == '*' || visited.Contains(state)) continue;
