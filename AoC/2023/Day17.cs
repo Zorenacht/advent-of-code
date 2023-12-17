@@ -25,31 +25,31 @@ public sealed class Day17 : Day
     public int Part2(string[] input, int min, int max)
     {
         var board = input.AddBorder('*').Reverse().ToArray();
-        var pq = new PriorityQueue<State, int>();
         var start = new Complex32(1, board.Length - 2);
+        var end = new Complex32(board[0].Length - 2, 1);
+
+        var pq = new PriorityQueue<State, int>();
         pq.Enqueue(new State(start + new Complex32(1, 0), new Complex32(1, 0), 1), 0);
         pq.Enqueue(new State(start + new Complex32(0, -1), new Complex32(0, -1), 1), 0);
-        var dict = new Dictionary<State, int>();
+        var visited = new HashSet<State>();
         while (pq.Count > 0)
         {
             pq.TryDequeue(out var state, out var priority);
-            //Console.WriteLine(string.Join("\n", board.Select(x => x)));
-            //Console.WriteLine();
-            //Print(board, state);
             var boardValue = board[(int)state!.Point.Imaginary][(int)state.Point.Real];
             var cost = boardValue - '0';
-            if (boardValue == '*' || dict.ContainsKey(state)) continue;
-            //if (state.Point == new Complex32(board[0].Length - 2, 1)) return state.Distance + cost;
-            if (state.Count >= min) pq.Enqueue(new State(state.Point + state.Dir * new Complex32(0, 1), state.Dir * new Complex32(0, 1), 1),
-                priority + cost);
-            if (state.Count >= min) pq.Enqueue(new State(state.Point + state.Dir * new Complex32(0, -1), state.Dir * new Complex32(0, -1), 1),
-                priority + cost);
-            if (state.Count < max) pq.Enqueue(new State(state.Point + state.Dir, state.Dir, state.Count + 1),
-                priority + cost);
-            dict.Add(state, priority + cost);
-        }
+            if (state.Point == end) return priority + cost;
+            if (boardValue == '*' || visited.Contains(state)) continue;
 
-        return dict.Where(x => x.Key.Point == new Complex32(board[0].Length - 2, 1) && x.Key.Count >= min).Min(x => x.Value);
+            if (state.Count < max) pq.Enqueue(new State(state.Point + state.Dir, state.Dir, state.Count + 1), priority + cost);
+            if (state.Count >= min)
+            {
+                pq.Enqueue(new State(state.Point + state.Dir * new Complex32(0, 1), state.Dir * new Complex32(0, 1), 1), priority + cost);
+                pq.Enqueue(new State(state.Point + state.Dir * new Complex32(0, -1), state.Dir * new Complex32(0, -1), 1), priority + cost);
+            }
+
+            visited.Add(state);
+        }
+        throw new Exception();
     }
 
 
