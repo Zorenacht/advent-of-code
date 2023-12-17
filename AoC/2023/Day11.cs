@@ -35,9 +35,9 @@ public sealed class Day11 : Day
         }
 
         long sum = 0;
-        for(int fromIndex = 0; fromIndex < galaxies.Count; fromIndex++)
+        for (int fromIndex = 0; fromIndex < galaxies.Count; fromIndex++)
         {
-            for (int toIndex = fromIndex+1; toIndex < galaxies.Count; toIndex++)
+            for (int toIndex = fromIndex + 1; toIndex < galaxies.Count; toIndex++)
             {
                 long dist = 0;
                 var from = galaxies[fromIndex];

@@ -1,5 +1,4 @@
 using System.Numerics;
-using static AoC_2023.Day17;
 
 namespace AoC_2023;
 
@@ -32,23 +31,18 @@ public sealed class Day17 : Day
         var board = input.AddBorder('*').Reverse().ToArray();
         var start = new Complex(1, board.Length - 2);
         var end = new Complex(board[0].Length - 2, 1);
+        var visited = new HashSet<State>();
         var pq = new PriorityQueue<State, int>();
         pq.Enqueue(new State(start + new Complex(1, 0), new Complex(1, 0), 1), 0);
         pq.Enqueue(new State(start + new Complex(0, -1), new Complex(0, -1), 1), 0);
-        var visited = new HashSet<State>();
-        int count = 0;
         while (pq.Count > 0)
         {
-            count++;
             pq.TryDequeue(out var state, out var priority);
             var boardValue = board[(int)state!.Point.Imaginary][(int)state.Point.Real];
-            var cost = boardValue - '0';
-            if (state.Point == end)
-            {
-                return priority + cost;
-            }
+            priority += boardValue - '0';
             if (boardValue == '*' || visited.Contains(state)) continue;
-            foreach (var next in state.Next(min, max)) pq.Enqueue(next, priority + cost);
+            if (state.Point == end) return priority;
+            foreach (var next in state.Next(min, max)) pq.Enqueue(next, priority);
             visited.Add(state);
         }
         throw new Exception("Endpoint was not reached!");

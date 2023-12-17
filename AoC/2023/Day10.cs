@@ -1,11 +1,4 @@
-using MathNet.Numerics.Distributions;
-using MathNet.Numerics.RootFinding;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Tools.Geometry;
 
 namespace AoC_2023;
@@ -80,7 +73,7 @@ public sealed class Day10 : Day
 
             FloodFill(_board, left, right, _cycle);
 
-            if(print) PrintColor(_board, [(_cycle, ConsoleColor.Blue), (left, ConsoleColor.Red), (right, ConsoleColor.Green)]);
+            if (print) PrintColor(_board, [(_cycle, ConsoleColor.Blue), (left, ConsoleColor.Red), (right, ConsoleColor.Green)]);
 
             return Math.Min(left.Count, right.Count);
         }

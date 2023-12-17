@@ -1,13 +1,3 @@
-using AoC;
-using MathNet.Numerics;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using Tools.Geometry;
-using Tools.Shapes;
-
 namespace AoC_2023;
 
 public sealed class Day15 : Day

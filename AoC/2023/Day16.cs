@@ -1,5 +1,4 @@
 using MathNet.Numerics;
-using System.Linq;
 
 namespace AoC_2023;
 

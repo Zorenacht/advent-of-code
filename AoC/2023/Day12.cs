@@ -1,11 +1,3 @@
-using AoC;
-using MathNet.Numerics;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using Tools.Geometry;
-using Tools.Shapes;
-
 namespace AoC_2023;
 
 public sealed class Day12 : Day
@@ -15,7 +7,7 @@ public sealed class Day12 : Day
         => InputExample.Select(line => new HotSprings(line, 1).Arrangements()).Sum();
 
     [Puzzle(answer: 7251)]
-    public long Part1() 
+    public long Part1()
         => Input.Select(line => new HotSprings(line, 1).Arrangements()).Sum();
 
 

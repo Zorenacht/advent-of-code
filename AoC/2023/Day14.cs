@@ -1,13 +1,3 @@
-using AoC;
-using MathNet.Numerics;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using Tools.Geometry;
-using Tools.Shapes;
-
 namespace AoC_2023;
 
 public sealed class Day14 : Day
@@ -27,7 +17,7 @@ public sealed class Day14 : Day
         var copy = input.Select(x => Enumerable.Repeat('.', x.Length).ToArray()).ToArray();
         var cache = new List<string[]>();
         int iteration = 0;
-        while(true)
+        while (true)
         {
             for (int turn = 0; turn < 4; turn++)
             {
