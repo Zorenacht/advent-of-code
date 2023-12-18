@@ -1,4 +1,4 @@
 using AoC_2023;
 
-var result = new Day17().Part1Example();
+var result = new Day18().Part1();
 Console.WriteLine(result);
