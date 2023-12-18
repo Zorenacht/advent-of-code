@@ -1,4 +1,6 @@
 using FluentAssertions.Equivalency.Steps;
+using MathNet.Numerics;
+using System.Net.Http.Headers;
 using System.Numerics;
 using static AoC_2023.Day17;
 
@@ -7,29 +9,12 @@ namespace AoC_2023;
 public sealed class Day18 : Day
 {
     [Puzzle(answer: 62)]
-    public int Part1Example() => Part2(InputExample);
+    public int Part1Example() => Part1(InputExample);
 
-    [Puzzle(answer: null)]
-    public int Part1() => Part2(Input);
+    [Puzzle(answer: 52055)]
+    public int Part1() => Part1(Input);
 
-    [Puzzle(answer: null)]
-    public int Part2Example() => Part2(InputExample);
-
-    [Puzzle(answer: null)]
-    public int Part2() => Part2(Input);
-
-
-    private Complex Dir(string c) => c switch
-    {
-        "U" => Complex.ImaginaryOne,
-        "R" => Complex.One,
-        "D" => -Complex.ImaginaryOne,
-        "L" => -Complex.One,
-        _ => throw new Exception()
-    };
-
-    //not 142705
-    public int Part2(string[] input)
+    public int Part1(string[] input)
     {
         var parse = input.Select(x =>
         {
@@ -52,7 +37,7 @@ public sealed class Day18 : Day
             }
         }
         var outside = new HashSet<Complex>() { Complex.Zero };
-        var inside = new HashSet<Complex>() {  };
+        var inside = new HashSet<Complex>() { };
         Print(grid);
         for (int i = 0; i < grid.Length; i++)
         {
@@ -63,15 +48,15 @@ public sealed class Day18 : Day
                 var que = new Queue<Complex>(); que.Enqueue(loc);
                 bool foundOutside = false;
                 var flood = new HashSet<Complex>();
-                while(que.Count > 0)
+                while (que.Count > 0)
                 {
                     var ele = que.Dequeue();
                     if (flood.Contains(ele)) continue;
-                    if(outside.Contains(ele)) foundOutside = true;
-                    foreach(var ch in "URDL")
+                    if (outside.Contains(ele)) foundOutside = true;
+                    foreach (var ch in "URDL")
                     {
-                        var temp = ele + Dir(new string(ch,1));
-                        if(!border.Contains(temp) && !flood.Contains(temp) && temp.Real >= 0 && temp.Real < grid[0].Length && temp.Imaginary >= 0 && temp.Imaginary < grid.Length)
+                        var temp = ele + Dir(new string(ch, 1));
+                        if (!border.Contains(temp) && !flood.Contains(temp) && temp.Real >= 0 && temp.Real < grid[0].Length && temp.Imaginary >= 0 && temp.Imaginary < grid.Length)
                         {
                             que.Enqueue(temp);
                         }
@@ -83,33 +68,87 @@ public sealed class Day18 : Day
             }
         }
 
-        /*for (int i=0; i<grid.Length; i++)
-        {
-            var cnt = 0;
-            var inside = false;
-            for (int j = 0; j < grid[0].Length; j++)
-            {
-                if (grid[i][j] == true) {
-                    insideCount += cnt;
-                    inside = !inside;
-                    while (grid[i][j]) j++;
-                }
-                if (inside)
-                {
-                    grid[i][j] = true;
-                    cnt++;
-                }
-            }
-        }*/
         Print(grid);
         return border.Count + inside.Count;
     }
 
+    [Puzzle(answer: null)]
+    public int Part2Example() => Part2(InputExample);
+
+    [Puzzle(answer: null)]
+    public int Part2() => Part2(Input);
+
+
+    private Complex Dir(string c) => c switch
+    {
+        "U" => Complex.ImaginaryOne,
+        "R" => Complex.One,
+        "D" => -Complex.ImaginaryOne,
+        "L" => -Complex.One,
+        _ => throw new Exception()
+    };
+
+    public int Part2(string[] input)
+    {
+        var parse = input.Select<string, (int Steps, Complex Dir)>(x =>
+        {
+            var split = x.Split()[2][1..^1];
+            Complex dir = Complex.One;
+            for (int i = 0; i < split[^1] - '0'; i++)
+            {
+                dir *= Complex.ImaginaryOne;
+            }
+            return (Convert.ToInt32(split[1..^1], 16), dir);
+        }).ToList();
+
+
+        var location = Complex.Zero;
+        var horizontal = new HashSet<int>() { 0 };
+        var vertical = new HashSet<int>() { 0 };
+        foreach (var cmd in parse)
+        {
+            location += cmd.Steps * cmd.Dir;
+            horizontal.Add((int)location.Real);
+            vertical.Add((int)location.Imaginary);
+        }
+        var hValues = horizontal.ToList().OrderBy(x => x).ToList();
+        var vValues = vertical.ToList().OrderBy(x => x).ToList();
+
+        var grid = Enumerable.Repeat(false, vValues.Count).Select(x => Enumerable.Repeat(false, hValues.Count).ToArray()).ToArray();
+
+        int rowIndex = 0;
+        int colIndex = 0;
+        foreach (var cmd in parse)
+        {
+            location += cmd.Steps * cmd.Dir;
+            if (cmd.Dir.Real != 0)
+            {
+                while (hValues[colIndex] != location.Real)
+                {
+                    colIndex += Math.Sign(cmd.Dir.Real);
+                    grid[rowIndex][colIndex] = true;
+                }
+            }
+            if (cmd.Dir.Imaginary != 0)
+            {
+                while (vValues[rowIndex] != location.Imaginary)
+                {
+                    rowIndex += Math.Sign(cmd.Dir.Imaginary);
+                    grid[rowIndex][colIndex] = true;
+                }
+            }
+        }
+
+        Print(grid);
+
+        return -100;
+    }
+
     private static void Print(bool[][] board)
     {
-        for (int i = 700; i >= 300; i--)
+        for (int i = board.Length-1; i >= 0; i--)
         {
-            for (int j = 480; j < 900; j++)
+            for (int j = 0; j < board[0].Length; j++)
             {
                 if (board[i][j])
                 {
