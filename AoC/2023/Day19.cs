@@ -143,6 +143,7 @@ public sealed class Day19 : Day
                 Add("s", s);
             }
         }
+
         private class Interval4D : Dictionary<string, Interval1D>
         {
             public record ValidInterval(Interval4D? Valid, Interval4D? Invalid);
