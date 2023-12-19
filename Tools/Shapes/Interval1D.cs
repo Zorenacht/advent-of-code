@@ -11,6 +11,9 @@ public record Interval1D(long Start, long End) : IEnumerable<long>
 
     public override string ToString() => $"({Start},{End})";
 
+    public long Length => Start - End + 1;
+
+
     public IEnumerable<Interval1D> Remove(Interval1D other)
     {
         if (Start < other.Start) yield return new Interval1D(Start, Math.Min(other.Start - 1, End));
