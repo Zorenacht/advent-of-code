@@ -11,7 +11,7 @@ public record Interval1D(long Start, long End) : IEnumerable<long>
 
     public override string ToString() => $"({Start},{End})";
 
-    public long Length => Start - End + 1;
+    public long Length => End-Start+ 1;
 
 
     public IEnumerable<Interval1D> Remove(Interval1D other)

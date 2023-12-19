@@ -18,83 +18,122 @@ public sealed class Day19 : Day
     [Puzzle(answer: 425811)]
     public long Part1() => new Day19Class().Part1(Input);
 
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 167409079868000)]
     public long Part2Example() => new Day19Class().Part2(InputExample);
 
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 131796824371749)]
     public long Part2() => new Day19Class().Part2(Input);
+
+    [Test]
+    public void IntervalTests()
+    {
+        Interval4D interval = new(new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        var result = interval.Split("x", ">", 3);
+
+        Interval4D valid = new(new Interval1D(4, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        Interval4D invalid = new(new Interval1D(1, 3), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        var expected = new ValidInterval(valid, invalid);
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Test]
+    public void IntervalTestsMin()
+    {
+        Interval4D interval = new(new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        var result = interval.Split("x", ">", 10);
+
+        Interval4D? valid = null;// new Interval4D(new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        Interval4D? invalid = new(new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        var expected = new ValidInterval(valid, invalid);
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Test]
+    public void IntervalTestsMax()
+    {
+        Interval4D interval = new(new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        var result = interval.Split("x", ">", 0);
+
+        Interval4D? valid = new(new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));// new Interval4D(new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10), new Interval1D(1, 10));
+        Interval4D? invalid = null;
+        var expected = new ValidInterval(valid, invalid);
+        result.Should().BeEquivalentTo(expected);
+    }
+
+
+    private record ValidInterval(Interval4D? Valid, Interval4D? Invalid);
+
+    private class Interval4D : Dictionary<string, Interval1D>
+    {
+
+        public Interval4D(Interval1D x, Interval1D m, Interval1D a, Interval1D s)
+        {
+            this["x"] = x;
+            this["m"] = m;
+            this["a"] = a;
+            this["s"] = s;
+        }
+
+        public Interval4D(IEnumerable<(string, Interval1D)> list)
+        {
+            foreach (var entry in list)
+            {
+                this[entry.Item1] = entry.Item2;
+            }
+        }
+
+
+        public ValidInterval Split(string coordinate, string symbol, long value)
+        {
+            var interval = this[coordinate];
+            //(0, 200) and <100  -> (0,99) valid, (100,200) invalid
+            if (symbol == "<")
+            {
+                if (value <= interval.Start) return new ValidInterval(null, this);
+                if (interval.End < value) return new ValidInterval(this, null);
+                else
+                {
+                    var lower = new Interval1D(interval.Start, value - 1);
+                    var lower4d = this.Select(x => (x.Key, x.Key == coordinate ? lower : x.Value));
+                    var upper = new Interval1D(value, interval.End);
+                    var upper4d = this.Select(x => (x.Key, x.Key == coordinate ? upper : x.Value));
+                    return new ValidInterval(new Interval4D(lower4d), new Interval4D(upper4d));
+                }
+            }
+            //(0, 200) and >100  -> (0,100) invalid, (101,200) valid
+            if (symbol == ">")
+            {
+                if (value < interval.Start) return new ValidInterval(this, null);
+                if (interval.End <= value) return new ValidInterval(null, this);
+                else
+                {
+                    var lower = new Interval1D(interval.Start, value);
+                    var lower4d = this.Select(x => (x.Key, x.Key == coordinate ? lower : x.Value));
+                    var upper = new Interval1D(value + 1, interval.End);
+                    var upper4d = this.Select(x => (x.Key, x.Key == coordinate ? upper : x.Value));
+                    return new ValidInterval(new Interval4D(upper4d), new Interval4D(lower4d));
+                }
+            }
+            throw new Exception();
+        }
+
+        public long Size => x.Length * m.Length * a.Length * s.Length;
+
+        public Interval1D x => this["x"];
+        public Interval1D m => this["m"];
+        public Interval1D a => this["a"];
+        public Interval1D s => this["s"];
+    };
+
 
 
     private class Day19Class
     {
-        private class Interval4D : Dictionary<string, Interval1D>
-        {
-
-            public Interval4D(Interval1D x, Interval1D m, Interval1D a, Interval1D s)
-            {
-                this["x"] = this.x;
-                this["m"] = this.m;
-                this["a"] = this.a;
-                this["s"] = this.s;
-            }
-
-            public Interval4D(IEnumerable<(string, Interval1D)> list)
-            {
-                foreach(var entry in list)
-                {
-                    this[entry.Item1] = entry.Item2;
-                }
-            }
-
-            public class ValidInterval(Interval4D Valid, Interval4D Invalid);
-
-            //using <
-            public IEnumerable<Interval4D> Split(string coordinate, string symbol, long value)
-            {
-                var interval = this[symbol];
-                //(0, 200) and <100  -> (0,99), (100,200)
-                if (symbol == "<")
-                {
-                    if (value < interval.Start || interval.End <= value) yield return this;
-                    else
-                    {
-                        var lower = new Interval1D(interval.Start, value);
-                        var lower4d = this.Select(x => (x.Key, x.Key == coordinate ? lower : x.Value));
-                        var upper = new Interval1D(value + 1, interval.End);
-                        var upper4d = this.Select(x => (x.Key, x.Key == coordinate ? lower : x.Value));
-                        yield return new Interval4D(lower4d);
-                        yield return new Interval4D(upper4d);
-                    }
-                }
-                //(0, 200) and >100  -> (0,100), (101,200)
-                /*if (symbol == ">")
-                {
-                    if (value < interval.Start || interval.End <= value) yield return this;
-                    else
-                    {
-                        var left = new Interval1D(interval.Start, value);
-                        var left4d = this.Select(x => (x.Key, x.Key == coordinate ? left : x.Value));
-                        var right = new Interval1D(value + 1, interval.End);
-                        var right4d = this.Select(x => (x.Key, x.Key == coordinate ? left : x.Value));
-                        yield return new Interval4D(left4d);
-                        yield return new Interval4D(right4d);
-
-                    }
-                }*/
-            }
-
-            public long Size => x.Length * m.Length * a.Length * s.Length;
-
-            public Interval1D x => this["x"];
-            public Interval1D m => this["m"];
-            public Interval1D a => this["a"];
-            public Interval1D s => this["s"];
-        };
 
         private record State
         {
             public string Name { get; init; }
-            public List<(string Variable, string Symbol, int Value, Func<int, string?> Condition)> Maps = new();
+            public List<(string Variable, string Symbol, int Value, string Destination, Func<int, string?> Condition)> Maps = new();
             public string Last { get; init; }
 
             public State(string line)
@@ -108,8 +147,8 @@ public sealed class Day19 : Day
                     var cond = split2[0];
                     var val = int.Parse(split2[1]);
                     var dest = split2[2];
-                    if (cmds[i].Contains('<')) Maps.Add((cond, "<", val, (int v) => v < val ? dest : null));
-                    else Maps.Add((cond, ">", val, (int v) => v > val ? dest : null));
+                    if (cmds[i].Contains('<')) Maps.Add((cond, "<", val, dest, (int v) => v < val ? dest : null));
+                    else Maps.Add((cond, ">", val, dest, (int v) => v > val ? dest : null));
                 }
                 Last = cmds[^1];
 
@@ -183,7 +222,6 @@ public sealed class Day19 : Day
 
         internal long Part2(string[] input)
         {
-            long result = 0;
             var maps = new Dictionary<string, State>();
             int i = 0;
             for (; i < input.Length; i++)
@@ -193,42 +231,25 @@ public sealed class Day19 : Day
                 var state = new State(line);
                 maps.Add(state.Name, state);
             }
-            for (++i; i < input.Length; i++)
-            {
-                var line = input[i];
-                var split = line.Split("{,=}".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                var values = new Values(int.Parse(split[1]), int.Parse(split[3]), int.Parse(split[5]), int.Parse(split[7]));
-                var name = "in";
-                var interval = new Interval4D(new Interval1D(1, 4000), new Interval1D(1, 4000), new Interval1D(1, 4000), new Interval1D(1, 4000));
-                while (true)
-                {
-                    if (name == "A")
-                    {
-                        result += values.Sum;
-                        break;
-                    }
-                    if (name == "R") break;
-                    name = Loop(maps, values, name!);
-                }
-            }
-            return result;
+            Interval4D interval = new Interval4D(new Interval1D(1, 4000), new Interval1D(1, 4000), new Interval1D(1, 4000), new Interval1D(1, 4000));
+            return Accepted("in", interval, maps);
         }
 
-        internal long Accepted(string name, Interval4D interval, Dictionary<string, State> maps)
+        private long Accepted(string name, Interval4D interval, Dictionary<string, State> maps)
         {
             if (name == "A") return interval.Size;
             if (name == "R") return 0;
             long sum = 0;
-            foreach(var map in maps[name].Maps)
+            foreach (var map in maps[name].Maps)
             {
-                var intervals = interval.Split(map.Variable, map.Symbol, map.Value).ToArray();
-                if (intervals.Length == 1)
-                {
-
-                }
+                var intervals = interval.Split(map.Variable, map.Symbol, map.Value);
+                if (intervals.Valid is { } valid) sum += Accepted(map.Destination, valid, maps);
+                if (intervals.Invalid is null) break;
+                interval = intervals.Invalid;
             }
+            if (interval is { }) sum += Accepted(maps[name].Last, interval, maps);
 
-            return Accepted(name, interval, maps);
+            return sum;
         }
     }
 }
