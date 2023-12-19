@@ -24,8 +24,6 @@ public sealed partial class Day21 : Day
 
     public long FindHumanNumber(string[] lines)
     {
-        long step = 1;
-        //long result = -1;
         long current = 0;
         long zeroResult = Simulate(lines, 0);
         long result;

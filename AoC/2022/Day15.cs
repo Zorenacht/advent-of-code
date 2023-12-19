@@ -92,7 +92,7 @@ public sealed partial class Day15 : Day
 
         public record Line(Point from, Point to)
         {
-            public Line ExcludeMeasurement(Measurement m)
+            public Line? ExcludeMeasurement(Measurement m)
             {
                 /*if (m.LiesInside(from) && m.LiesInside(to)) return null;
                 if (!m.LiesInside(from) && !m.LiesInside(to)) return null;*/

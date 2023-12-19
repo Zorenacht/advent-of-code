@@ -119,7 +119,7 @@ public sealed partial class Day22 : Day
             return block;
         }
 
-        public static CubeMaze Parse(string[] lines)
+        public static new CubeMaze Parse(string[] lines)
         {
             var mazeLines = lines.Take(lines.Length - 2).ToArray();
             var pathLine = lines.Last();
