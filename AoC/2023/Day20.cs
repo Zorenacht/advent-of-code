@@ -74,26 +74,49 @@ public sealed class Day20 : Day
             return (long)result[0] * result[1];
         }
 
+        internal long Part2(string[] input)
+        {
+            var dict = Dictionary(input);
+
+            var button = new Node() { Name = "button", Nexts = [dict["broadcaster"]] };
+            var queue = new Queue<Pulse>();
+            var periods = new Dictionary<string, int>();
+            for (int i = 1; i < 10_000; i++)
+            {
+                queue.Enqueue(new Pulse(button, false, dict["broadcaster"]));
+                while (queue.Count > 0)
+                {
+                    var current = queue.Dequeue();
+                    if (current.To.Name == "zr" && current.High && !periods.ContainsKey(current.From.Name))
+                    {
+                        periods[current.From.Name] = i;
+                    }
+                    foreach (var enq in current.To.Propagate(current.From.Name, current.High))
+                    {
+                        queue.Enqueue(enq);
+                    }
+                }
+            }
+            return (long)periods
+                .Select(x => new BigInteger(x.Value))
+                .Aggregate((x, y) => x * y / BigInteger.GreatestCommonDivisor(x, y));
+        }
+
         private record Pulse(Node From, bool High, Node To)
         {
-            public override string ToString()
-            {
-                return $"{From.Name} -{(High ? "high" : "low")}-> {To.Name}";
-            }
+            public override string ToString() => $"{From.Name} -{(High ? "high" : "low")}-> {To.Name}";
         };
 
 
         private class Node
         {
-            public string Name { get; init; }
+            public string Name { get; init; } = string.Empty;
             //0 = normal, 1 = flipflop, 2 = conjunction, 3 = nothing
             public int Type { get; init; }
             public Dictionary<string, bool> MostRecent { get; set; } = new();
             public bool High { get; set; } = false;
-            public override string ToString()
-            {
-                return $"Name: {Name}, Type: {Type}";
-            }
+            public IEnumerable<Node> Nexts { get; set; } = Array.Empty<Node>();
+            public override string ToString() => $"Name: {Name}, Type: {Type}";
 
             public IEnumerable<Pulse> Propagate(string from, bool high)
             {
@@ -123,42 +146,6 @@ public sealed class Day20 : Day
                 }
                 throw new Exception();
             }
-            public IEnumerable<Node> Nexts { get; set; }
         }
-
-        internal long Part2(string[] input)
-        {
-            var dict = Dictionary(input);
-
-            long[] result = [0, 0];
-            var button = new Node() { Name = "button", Nexts = [dict["broadcaster"]] };
-            var queue = new Queue<Pulse>();
-            var periods = new Dictionary<string, int>();
-            for (int i = 1; i < 10_000; i++)
-            {
-                long[] count = [0, 0];
-                queue.Enqueue(new Pulse(button, false, dict["broadcaster"]));
-                while (queue.Count > 0)
-                {
-                    var current = queue.Dequeue();
-                    if (current.To.Name == "zr" && current.High)
-                    {
-                        if (!periods.ContainsKey(current.From.Name)) 
-                            periods[current.From.Name] = i;
-                    }
-                    foreach (var enq in current.To.Propagate(current.From.Name, current.High))
-                    {
-                        queue.Enqueue(enq);
-                    }
-                    count[current.High ? 1 : 0]++;
-                }
-                result[0] += count[0];
-                result[1] += count[1];
-            }
-            return (long)periods
-                .Select(x => new BigInteger(x.Value))
-                .Aggregate((x, y) => x * y / BigInteger.GreatestCommonDivisor(x, y));
-        }
-
     }
 }
