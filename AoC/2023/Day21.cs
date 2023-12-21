@@ -15,29 +15,46 @@ namespace AoC_2023;
 public sealed class Day21 : Day
 {
     [Puzzle(answer: 16)]
-    public long Part1Example() => new Airship().Part1(InputExample, 6);
+    public long Part1Example() => new Airship().Part1(InputExample, 6, 3);
+
+    public int Copies = 1 + 0 * 2;
 
     [Puzzle(answer: 3677)]
-    public long Part1() => new Airship().Part1(Input, 65);
+    public long Part1() => new Airship().Part1(Input, 65, 1);
 
     [Puzzle(answer: null)]
     public long Part2Example() => new Airship().Part2(InputExample, 5000);
 
-    //??? 605697286043784
-    //??? 605697286043616
+    [Puzzle(answer: 609585229256084)]
+    public long Part2() => new Airship().Part2(Input, 26501365);
 
-    //not 605697286043784
-    //not 610690196104277 too high
-    //not 1221380392212445
-    [Puzzle(answer: null)]
-    public long Part2() => new Airship().Part2(Input, 65);
+    [Test]
+    public void OriginalSequenceTest()
+    {
+        long[] input = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23];
+        long[] expectedEven = [1, 1, 9, 9, 25, 25, 49, 49, 81, 81, 121, 121];
+        long[] expectedUneven = [0, 4, 4, 16, 16, 36, 36, 64, 64, 100, 100, 144];
+
+        var obj = new Airship();
+        input.Select(x => obj.EvenOriginal(x)).Should().BeEquivalentTo(expectedEven);
+        input.Select(x => obj.UnevenOriginal(x)).Should().BeEquivalentTo(expectedUneven);
+    }
 
     private class Airship
     {
-        internal long Part1(string[] input, long steps)
+        internal long Part1(string[] input, long steps, int copies)
         {
-            int row = -1;
-            int col = -1;
+            var temp = input.Select(x => string.Join("", Enumerable.Repeat(x, copies))).ToArray();
+            input = new string[input.Length * copies];
+            for (int i = 0; i < input.Length; i++)
+            {
+                input[i] = temp[i % temp.Length].Replace('S', '.');
+            }
+            int row = input.Length / 2;
+            int col = input[0].Length / 2;
+            var replaced = input[row].ToCharArray();
+            replaced[col] = 'S';
+            input[row] = new string(replaced);
             var firstStepReached = new int[input.Length][];
             for (int i = 0; i < input.Length; i++)
             {
@@ -45,11 +62,6 @@ public sealed class Day21 : Day
                 for (int j = 0; j < input[0].Length; j++)
                 {
                     firstStepReached[i][j] = -1;
-                    if (input[i][j] == 'S')
-                    {
-                        row = i;
-                        col = j;
-                    }
                 }
             }
 
@@ -110,6 +122,7 @@ public sealed class Day21 : Day
             {
                 for (int j = 0; j < input[0].Length; j++)
                 {
+                    //Console.Write($"{input[i][j]}");
                     Console.Write($"{(firstStepReached[i][j] % 2 == steps % 2 ? $"{firstStepReached[i][j] % 10:0}" : input[i][j])}");
                 }
                 Console.WriteLine();
@@ -215,9 +228,30 @@ public sealed class Day21 : Day
             long toEdge = (steps - (input.Length - 1) / 2) / input.Length;
             long blocksDiagonal = ((steps - (input.Length - 1) / 2) / input.Length) * 2 + 1;
             long blocks = blocksDiagonal * blocksDiagonal;
-            return (blocks / 2) * uneven[1] + (blocks / 2 + 1) * uneven[0];
+
+
+            /*long a = (blocks / 2) * uneven[1];
+            long b = (blocks / 2 + 1) * uneven[0];*/
+            return steps % 2 == 1
+                ? EvenOriginal(blocksDiagonal) * uneven[0] + UnevenOriginal(blocksDiagonal) * even[0]
+                    + blocks / 4 * (even[1] + uneven[1]) - toEdge
+                : EvenOriginal(blocksDiagonal) * even[0] + UnevenOriginal(blocksDiagonal) * uneven[0]
+                    + blocks / 4 * (even[1] + uneven[1]) - toEdge;
         }
 
+        public long EvenOriginal(long length)
+        {
+            if ((length - 1) % 4 == 0) return ((length + 1) / 2) * ((length + 1) / 2);
+            else if ((length - 1) % 4 == 2) return (length / 2) * (length / 2);
+            else throw new NotSupportedException();
+        }
+
+        public long UnevenOriginal(long length)
+        {
+            if ((length - 1) % 4 == 0) return (length / 2) * (length / 2);
+            else if ((length - 1) % 4 == 2) return ((length + 1) / 2) * ((length + 1) / 2);
+            else throw new NotSupportedException();
+        }
 
     }
 }
