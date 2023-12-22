@@ -20,10 +20,7 @@ public sealed class Day21 : Day
     public int Copies = 1 + 0 * 2;
 
     [Puzzle(answer: 3677)]
-    public long Part1() => new Airship().Part1(Input, 65, 1);
-
-    [Puzzle(answer: null)]
-    public long Part2Example() => new Airship().Part2(InputExample, 5000);
+    public long Part1() => new Airship().Part1(Input, 64, 1);
 
     [Puzzle(answer: 609585229256084)]
     public long Part2() => new Airship().Part2(Input, 26501365);
