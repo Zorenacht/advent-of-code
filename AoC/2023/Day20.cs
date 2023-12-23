@@ -1,15 +1,4 @@
-using FluentAssertions.Equivalency.Steps;
-using MathNet.Numerics;
-using Newtonsoft.Json.Linq;
-using NUnit.Framework.Constraints;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Net.Http.Headers;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using Tools.Shapes;
-using static AoC_2023.Day17;
 
 namespace AoC_2023;
 
@@ -37,7 +26,8 @@ public sealed class Day20 : Day
             var dict = new Dictionary<string, Node>(parsed.Select(x => new KeyValuePair<string, Node>(x.Name, new Node() { Name = x.Name, Type = x.Type })));
             foreach (var entry in parsed)
             {
-                dict[entry.Name].Nexts = entry.Nexts.Select(str => {
+                dict[entry.Name].Nexts = entry.Nexts.Select(str =>
+                {
                     if (!dict.ContainsKey(str)) dict[str] = new Node() { Name = str, Type = 3 };
                     return dict[str];
                 });

@@ -1,35 +1,21 @@
-using FluentAssertions.Equivalency.Steps;
-using MathNet.Numerics;
-using Newtonsoft.Json.Linq;
-using NUnit.Framework.Constraints;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Tools.Shapes;
-using static System.Net.Mime.MediaTypeNames;
-
 namespace AoC_2023;
 
 public sealed class Day23 : Day
 {
+    private Algorithm Algo = Algorithm.DFS;
+
     [Puzzle(answer: 94)]
-    public long Part1Example() => new AClass(false, Algorithm.DFS).Part1(InputExample);
+    public long Part1Example() => new AClass(false, Algo).Part1(InputExample);
 
     //2274 too low
     [Puzzle(answer: 2442)]
-    public long Part1() => new AClass(false, Algorithm.DFS).Part1(Input);
+    public long Part1() => new AClass(false, Algo).Part1(Input);
 
     [Puzzle(answer: 154)]
-    public long Part2Example() => new AClass(true, Algorithm.DFS).Part1(InputExample);
+    public long Part2Example() => new AClass(true, Algo).Part1(InputExample);
 
     [Puzzle(answer: 6898)]
-    public long Part2() => new AClass(true, Algorithm.DFS).Part1(Input);
+    public long Part2() => new AClass(true, Algo).Part1(Input);
 
     private enum Algorithm
     {
@@ -112,7 +98,7 @@ public sealed class Day23 : Day
 
                 }
                 var endpoints = currentIteration.Where(x => x.Key.Item1 == End);
-                if(endpoints.Any()) max = Math.Max(max, endpoints.Max(x => x.Value));
+                if (endpoints.Any()) max = Math.Max(max, endpoints.Max(x => x.Value));
                 currentIteration = nextIteration;
             }
             return max;

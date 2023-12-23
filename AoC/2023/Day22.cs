@@ -1,16 +1,3 @@
-using FluentAssertions.Equivalency.Steps;
-using MathNet.Numerics;
-using Newtonsoft.Json.Linq;
-using NUnit.Framework.Constraints;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using Tools.Shapes;
-
 namespace AoC_2023;
 
 public sealed class Day22 : Day
@@ -163,6 +150,6 @@ public sealed class Day22 : Day
             }
             return p1 ? sortedBricks2.Count - needed.Count : sum;
         }
-        
+
     }
 }

@@ -1,14 +1,4 @@
-using FluentAssertions.Equivalency.Steps;
-using MathNet.Numerics;
-using Newtonsoft.Json.Linq;
-using NUnit.Framework.Constraints;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Net.Http.Headers;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using Tools.Shapes;
 
 namespace AoC_2023;
 
