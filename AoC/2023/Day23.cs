@@ -12,48 +12,57 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Tools.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AoC_2023;
 
 public sealed class Day23 : Day
 {
     [Puzzle(answer: 94)]
-    public long Part1Example() => new AClass(false).Part1(InputExample);
+    public long Part1Example() => new AClass(false, Algorithm.DFS).Part1(InputExample);
 
     //2274 too low
     [Puzzle(answer: 2442)]
-    public long Part1() => new AClass(false).Part1(Input);
+    public long Part1() => new AClass(false, Algorithm.DFS).Part1(Input);
 
     [Puzzle(answer: 154)]
-    public long Part2Example() => new AClass(true).Part1(InputExample);
+    public long Part2Example() => new AClass(true, Algorithm.DFS).Part1(InputExample);
 
     [Puzzle(answer: 6898)]
-    public long Part2() => new AClass(true).Part1(Input);
+    public long Part2() => new AClass(true, Algorithm.DFS).Part1(Input);
 
+    private enum Algorithm
+    {
+        DFS,
+        BFS
+    }
 
     private class AClass
     {
         private int[] XDir = [0, -1, 0, 1];
         private int[] YDir = [1, 0, -1, 0];
+        private readonly Algorithm Algorithm;
         private readonly bool Part2;
         private List<(int, int)> Vertices = new();
         private Dictionary<(int, int), Dictionary<(int, int), int>> Edges = new();
+        private (int, int) End = new();
 
-        public AClass(bool part2)
+        public AClass(bool part2, Algorithm algorithm)
         {
             Part2 = part2;
+            Algorithm = algorithm;
         }
 
         internal long Part1(string[] input)
         {
             input = input.Reverse().ToArray();
             var start = (1, input.Length - 1);
-            var end = (input[0].Length - 2, 0);
+            End = (input[0].Length - 2, 0);
 
             //reduce graph
             Vertices = FindVertices(input);
             Vertices.Insert(0, start);
-            Vertices.Add(end);
+            Vertices.Add(End);
 
             //find all edges in graph
             foreach (var vertex in Vertices)
@@ -64,27 +73,67 @@ public sealed class Day23 : Day
             }
 
             //find all paths
-            var distances = new List<int>();
-            Paths(start, 0, 1L, distances, end);
-            return distances.Count;
+            return Algorithm == Algorithm.DFS
+                ? DfsPaths(start, 0, 1L)
+                : BfsPaths(start);
         }
 
-        void Paths(
+        int BfsPaths(
+            (int, int) current)
+        {
+            int max = 0;
+            var dict = new Dictionary<((int, int), long), int>();
+            var currentIteration = new Dictionary<((int, int), long), int>()
+            {
+                { (current, 1L), 0 }
+            };
+            while (currentIteration.Count > 0)
+            {
+                var nextIteration = new Dictionary<((int, int), long), int>();
+                foreach (var state in currentIteration.Keys)
+                {
+                    //all next vertices for current state
+                    foreach (var next in Edges[state.Item1])
+                    {
+                        var index = Vertices.IndexOf(next.Key);
+                        if (((state.Item2 >> index) & 1) == 0)
+                        {
+                            var nextState = (next.Key, state.Item2 + (1L << index));
+                            if (!nextIteration.ContainsKey(nextState))
+                            {
+                                nextIteration[nextState] = currentIteration[state] + next.Value;
+                            }
+                            else
+                            {
+                                nextIteration[nextState] = Math.Max(nextIteration[nextState], currentIteration[state] + next.Value);
+                            }
+                        }
+                    }
+
+                }
+                var endpoints = currentIteration.Where(x => x.Key.Item1 == End);
+                if(endpoints.Any()) max = Math.Max(max, endpoints.Max(x => x.Value));
+                currentIteration = nextIteration;
+            }
+            return max;
+        }
+
+        int DfsPaths(
             (int, int) current,
             int distance,
-            long visited,
-            List<int> distances,
-            (int, int) to)
+            long visited)
         {
-            if (current == to) distances.Add(distance);
+            if (current == End) return distance;
+            int max = 0;
             foreach (var next in Edges[current])
             {
                 var index = Vertices.IndexOf(next.Key);
                 if (((visited >> index) & 1) == 0)
                 {
-                    Paths(next.Key, distance + next.Value, visited + (1L << index), distances, to);
+                    max = Math.Max(max, DfsPaths(next.Key, distance + next.Value, visited + (1L << index)));
                 }
             }
+            return max;
         }
 
         void Nexts((int, int) current, (int, int) lastDir, int distance, string[] input, Dictionary<(int, int), int> toDistances)
