@@ -16,52 +16,53 @@ namespace AoC_2023;
 
 public sealed class Day23 : Day
 {
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 94)]
     public long Part1Example() => new AClass().Part1(InputExample);
 
     //2274 too low
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 2442)]
     public long Part1() => new AClass().Part1(Input);
 
-    [Puzzle(answer: null)]
-    public long Part2Example() => new AClass().Part1(InputExample);
+    [Puzzle(answer: 154)]
+    public long Part2Example() => new AClass().Part1(InputExample, true);
 
-    [Puzzle(answer: null)]
-    public long Part2() => new AClass().Part1(Input);
+    [Puzzle(answer: 6898)]
+    public long Part2() => new AClass().Part1(Input, true);
 
 
     private class AClass
     {
         private int[] XDir = [0, -1, 0, 1];
         private int[] YDir = [1, 0, -1, 0];
+        private bool _part2 = false;
 
-        internal long Part1(string[] input)
+        internal long Part1(string[] input, bool p2 = false)
         {
+            _part2 = p2;
             input = input.Reverse().ToArray();
             var start = (1, input.Length - 1);
             var end = (input[0].Length - 2, 0);
 
-            var crosspoints = FindCrosspoints(input);
-            crosspoints.Insert(0, start);
-            crosspoints.Add(end);
-            var connections = new Dictionary<(int, int), Dictionary<(int, int), int>>();
+            //reduce graph
+            var vertices = FindCrosspoints(input);
+            vertices.Insert(0, start);
+            vertices.Add(end);
 
+            //find all edges in graph
+            var connections = new Dictionary<(int, int), Dictionary<(int, int), int>>();
+            var enqueued = new HashSet<(int, int)>();
             var queue = new Queue<(int, int)>();
             queue.Enqueue(start);
-            while (queue.TryDequeue(out var from))
+            foreach(var vertex in vertices)
             {
-                var toDistances = new Dictionary<(int, int), int>();
-                Nexts(from, (0, -1), 0, crosspoints, input, toDistances);
-                connections[from] = toDistances;
-                foreach (var pair in toDistances.Keys.Except(connections.Keys))
-                {
-                    queue.Enqueue(pair);
-                }
+                var dict = new Dictionary<(int, int), int>();
+                Nexts(vertex, (0, 0), 0, vertices, input, dict);
+                connections[vertex] = dict;
             }
 
+            //find all paths
             var distances = new List<int>();
-            Paths(start, 0, 0, end, connections, distances);
-            distances.Sort();
+            Paths(start, 0, 1L, end, connections, distances);
             return distances.Max();
         }
 
@@ -77,13 +78,47 @@ public sealed class Day23 : Day
             var list = connections.Select(x => x.Key).ToList();
             foreach (var next in connections[current])
             {
-                var index = list.IndexOf(current);
-                if(((visited >> index) & 1) == 0)
+                var index = list.IndexOf(next.Key);
+                if (((visited >> index) & 1) == 0)
                 {
-                    Paths(next.Key, distance + next.Value, visited + (1 << index), to, connections, distances);
+                    Paths(next.Key, distance + next.Value, visited + (1L << index), to, connections, distances);
                 }
             }
         }
+/*
+        Dictionary<(int, int), int> Nexts2(
+            (int, int) current,
+            (int, int) lastDir,
+            List<(int, int)> crosspoints,
+            string[] input)
+        {
+            var dict = new Dictionary<(int, int), int>();
+            var queue = new Queue<((int, int), (int, int), int)>();
+            queue.Enqueue((current, lastDir, 0));
+            while (queue.TryDequeue(out var result))
+            {
+                var point = result.Item1;
+                lastDir = result.Item2;
+                var distance = result.Item3;
+                if (crosspoints.Contains(point) && distance > 0) { 
+                    dict.Add(point, distance);
+                    continue;
+                }
+                for (int k = 0; k < 4; k++)
+                {
+                    var dir = (XDir[k], YDir[k]);
+                    var next = (point.Item1 + dir.Item1, point.Item2 + dir.Item2);
+                    if (next.Item1 >= 0 && next.Item1 <= input[0].Length - 1
+                        && next.Item2 >= 0 && next.Item2 <= input.Length - 1
+                        && lastDir != (-dir.Item1, -dir.Item2)
+                        && input[next.Item2][next.Item1] != '#' && (Allowed(dir, input[next.Item2][next.Item1]) || _part2))
+                    {
+                        queue.Enqueue((next, dir, distance + 1));
+                    }
+                }
+            }
+            return dict;
+        }*/
 
         void Nexts((int, int) current, (int, int) lastDir, int distance,
             List<(int, int)> crosspoints, string[] input, Dictionary<(int, int), int> toDistances)
@@ -96,13 +131,14 @@ public sealed class Day23 : Day
 
             for (int k = 0; k < 4; k++)
             {
-                var next = (current.Item1 + XDir[k], current.Item2 + YDir[k]);
+                var dir = (XDir[k], YDir[k]);
+                var next = (current.Item1 + dir.Item1, current.Item2 + dir.Item2);
                 if (next.Item1 >= 0 && next.Item1 <= input[0].Length - 1
                  && next.Item2 >= 0 && next.Item2 <= input.Length - 1
-                 && lastDir != (-XDir[k], -YDir[k])
-                 && input[next.Item2][next.Item1] != '#' && Allowed((XDir[k], YDir[k]), input[next.Item2][next.Item1]))
+                 && lastDir != (-dir.Item1, -dir.Item2)
+                 && input[next.Item2][next.Item1] != '#' && (Allowed(dir, input[next.Item2][next.Item1]) || _part2))
                 {
-                    Nexts(next, (XDir[k], YDir[k]), distance + 1, crosspoints, input, toDistances);
+                    Nexts(next, dir, distance + 1, crosspoints, input, toDistances);
                 }
             }
         }
@@ -129,30 +165,12 @@ public sealed class Day23 : Day
                 {
                     if (input[i][j] == '.')
                     {
-                        bool cross = true;
                         int sum = Enumerable.Range(0, 4).Count(k => input[i + YDir[k]][j + XDir[k]] != '#');
-                        for (int k = 0; k < 4; k++)
-                        {
-                            if (".".Contains(input[i + YDir[k]][j + XDir[k]]))
-                            {
-                                cross = false;
-                            }
-                        }
                         if (sum > 2) kruispunten.Add((j, i));
-                        //if (cross) kruispunten.Add((j, i));
                     }
                 }
             }
             return kruispunten;
-        }
-
-        internal long Part2(string[] input)
-        {
-            var parsed = input.Select(x =>
-            {
-                return x;
-            });
-            return 0;
         }
     }
 }
