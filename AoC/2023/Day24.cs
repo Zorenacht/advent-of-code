@@ -39,10 +39,16 @@ public sealed class Day24 : Day
                     var intersection = parsed[i].Intersect(parsed[j]);
                     if (intersection is null)
                     {
-                        continue; //parallel
+                        if (parsed[i].SameLine(parsed[j]) && parsed[i].LiesInsideBlock(min,max) is { } t1 && t1 >= 0
+                            && parsed[j].LiesInsideBlock(min, max) is { } t2 && t2 >= 0)
+                        {
+                            count++;
+                            continue;
+                        }
+                        continue; //parallel and not on same line
                     }
-                    var time1 = parsed[i].IntersectionTime(intersection.Value);
-                    var time2 = parsed[j].IntersectionTime(intersection.Value);
+                    var time1 = parsed[i].IntersectionTime(parsed[j], intersection.Value);
+                    var time2 = parsed[j].IntersectionTime(parsed[i], intersection.Value);
                     if (time1 is null || time2 is null)
                     {
                         continue; //should not happen
@@ -51,7 +57,7 @@ public sealed class Day24 : Day
                     {
                         continue; //in past
                     }
-                    if (min <= intersection.Value.X && intersection.Value.X <= max 
+                    if (min <= intersection.Value.X && intersection.Value.X <= max
                         && min <= intersection.Value.Y && intersection.Value.Y <= max)
                     {
                         count++;
@@ -73,8 +79,16 @@ public sealed class Day24 : Day
                 Y = y;
             }
 
-            public override string ToString() => $"({X},{Y})";
+            public override string ToString() => $"({X},{Y})"; 
+            
+            public bool Approximate(Point2D other)
+            {
+                return Math.Abs(other.X - this.X) == 0 && Math.Abs(other.Y - this.Y) == 0;
+                //return Math.Abs(other.X - this.X) < 0.00000000001d && Math.Abs(other.Y - this.Y) < 0.00000000001d;
+            }
 
+            public static bool operator ==(Point2D left, Point2D right) => left.X == right.X && left.Y == right.Y;
+            public static bool operator !=(Point2D left, Point2D right) => !(left == right);
             public static Point2D operator +(Point2D left, Point2D right) => new Point2D(left.X + right.X, left.Y + right.Y);
             public static Point2D operator -(Point2D left, Point2D right) => new Point2D(left.X - right.X, left.Y - right.Y);
             public static Point2D operator *(double left, Point2D right) => new Point2D(left * right.X, left * right.Y);
@@ -86,6 +100,9 @@ public sealed class Day24 : Day
                 var y = left.Y / right.Y;
                 return Math.Abs(y - x) < 0.00000000001 ? x : null;
             }
+
+            public bool InsideBounds(long min, long max) => 
+                min <= X && X <= max && min <= Y && Y <= max;
         }
 
         private record Line2D(Point2D Point, Point2D Dir)
@@ -106,7 +123,28 @@ public sealed class Day24 : Day
                 return new Point2D(xNumerator / denom, yNumerator / denom);
             }
 
-            public double? IntersectionTime(Point2D point) => (point - Point) / Dir;
+            public bool SameLine(Line2D line)
+            {
+                var dir = (line.Point - Point);
+                return (dir / dir.X).Approximate(UDir) || (dir / dir.X).Approximate(line.UDir);
+            }
+
+            public double? LiesInsideBlock(long min, long max)
+            {
+                double time = 0;
+                if (Dir.X != 0) time = (min - Point.X) / Dir.X;
+                if (Dir.Y != 0) time = (min - Point.Y) / Dir.Y;
+                return (Point + time * UDir).InsideBounds(min, max)
+                    ? time
+                    : null;
+            }
+
+            public double? IntersectionTime(Line2D line, Point2D point)
+            {
+                return !UDir.Approximate(line.UDir)
+                    ? (point - Point).X / Dir.X
+                    : null;
+            }
         }
     }
 }
