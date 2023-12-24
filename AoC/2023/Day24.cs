@@ -1,7 +1,8 @@
-
+using System.Linq;
 using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
+using System.Xml;
 using Tools.Geometry;
 
 namespace AoC_2023;
@@ -14,17 +15,17 @@ public sealed class Day24 : Day
     [Puzzle(answer: 14046)]
     public long Part1() => new Collision().Part1(Input, 200_000_000_000_000L, 400_000_000_000_000L);
 
-    [Puzzle(answer: null)]
-    public long Part2Example() => new Collision().Part1(InputExample, 7, 27);
+    [Puzzle(answer: 47)]
+    public long Part2Example() => new Collision().Part2(InputExample);
 
     [Puzzle(answer: null)]
-    public long Part2() => new Collision().Part1(Input, 7, 27);
+    public long Part2() => new Collision().Part2(Input);
 
     private class Collision
     {
         internal long Part1(string[] input, long min, long max)
         {
-            var parsed = input.Select(x =>
+            var lines = input.Select(x =>
             {
                 var split = x.Split("@,".ToCharArray(), StringSplitOptions.TrimEntries);
                 return new Line2D(
@@ -33,23 +34,23 @@ public sealed class Day24 : Day
             }).ToList();
 
             int count = 0;
-            for (int i = 0; i < parsed.Count; i++)
+            for (int i = 0; i < lines.Count; i++)
             {
-                for (int j = i + 1; j < parsed.Count; j++)
+                for (int j = i + 1; j < lines.Count; j++)
                 {
-                    var intersection = parsed[i].Intersect(parsed[j]);
+                    var intersection = lines[i].Intersect(lines[j]);
                     if (intersection is null)
                     {
-                        if (parsed[i].SameLine(parsed[j]) && parsed[i].LiesInsideBlock(min, max) is { } t1 && t1 >= 0
-                            && parsed[j].LiesInsideBlock(min, max) is { } t2 && t2 >= 0)
+                        if (lines[i].SameLine(lines[j]) && lines[i].LiesInsideBlock(min, max) is { } t1 && t1 >= 0
+                            && lines[j].LiesInsideBlock(min, max) is { } t2 && t2 >= 0)
                         {
                             count++;
                             continue;
                         }
                         continue; //parallel and not on same line
                     }
-                    var time1 = parsed[i].IntersectionTime(parsed[j], intersection.Value);
-                    var time2 = parsed[j].IntersectionTime(parsed[i], intersection.Value);
+                    var time1 = lines[i].IntersectionTime(lines[j], intersection.Value);
+                    var time2 = lines[j].IntersectionTime(lines[i], intersection.Value);
                     if (time1 is null || time2 is null)
                     {
                         continue; //should not happen
@@ -69,91 +70,105 @@ public sealed class Day24 : Day
             return count;
         }
 
-        private struct Point2D
+        internal long Part2(string[] input)
         {
-            internal double X;
-            internal double Y;
-
-            public Point2D(double x, double y)
+            var lines = input.Select<string, ((double X, double Y, double Z) P, (double X, double Y, double Z) D)>(x =>
             {
-                X = x;
-                Y = y;
-            }
+                var split = x.Split("@,".ToCharArray(), StringSplitOptions.TrimEntries);
+                return (
+                    (double.Parse(split[0]), double.Parse(split[1]), double.Parse(split[2])),
+                    (double.Parse(split[3]), double.Parse(split[4]), double.Parse(split[5]))
+                    );
+            }).ToList();
 
-            public override string ToString() => $"({X},{Y})";
+            return 0;
+        }
+    }
 
-            public bool Approximate(Point2D other)
-            {
-                return Math.Abs(other.X - this.X) == 0 && Math.Abs(other.Y - this.Y) == 0;
-                //return Math.Abs(other.X - this.X) < 0.00000000001d && Math.Abs(other.Y - this.Y) < 0.00000000001d;
-            }
+    private struct Point2D
+    {
+        internal double X;
+        internal double Y;
 
-            public static bool operator ==(Point2D left, Point2D right) => left.X == right.X && left.Y == right.Y;
-            public static bool operator !=(Point2D left, Point2D right) => !(left == right);
-            public static Point2D operator +(Point2D left, Point2D right) => new Point2D(left.X + right.X, left.Y + right.Y);
-            public static Point2D operator -(Point2D left, Point2D right) => new Point2D(left.X - right.X, left.Y - right.Y);
-            public static Point2D operator *(double left, Point2D right) => new Point2D(left * right.X, left * right.Y);
-            public static Point2D operator *(Point2D left, double right) => right * left;
-            public static Point2D operator /(Point2D left, double right) => new Point2D(left.X / right, left.Y / right);
-            public static double? operator /(Point2D left, Point2D right)
-            {
-                var x = left.X / right.X;
-                var y = left.Y / right.Y;
-                return Math.Abs(y - x) < 0.00000000001 ? x : null;
-            }
-
-            public bool InsideBounds(long min, long max) =>
-                min <= X && X <= max && min <= Y && Y <= max;
+        public Point2D(double x, double y)
+        {
+            X = x;
+            Y = y;
         }
 
-        private record Line2D(Point2D Point, Point2D Dir)
+        public override string ToString() => $"({X},{Y})";
+
+        public bool Approximate(Point2D other)
         {
-            public Point2D UDir = Dir / Dir.X;
+            return Math.Abs(other.X - this.X) == 0 && Math.Abs(other.Y - this.Y) == 0;
+            //return Math.Abs(other.X - this.X) < 0.00000000001d && Math.Abs(other.Y - this.Y) < 0.00000000001d;
+        }
 
-            public Point2D? Intersect(Line2D line)
-            {
-                var p1 = Point;
-                var p2 = Point + Dir;
-                var p3 = line.Point;
-                var p4 = line.Point + line.Dir;
-                var x1 = (BigInteger)p1.X;
-                var y1 = (BigInteger)p1.Y;
-                var x2 = (BigInteger)p2.X;
-                var y2 = (BigInteger)p2.Y;
-                var x3 = (BigInteger)p3.X;
-                var y3 = (BigInteger)p3.Y;
-                var x4 = (BigInteger)p4.X;
-                var y4 = (BigInteger)p4.Y;
-                var xNumerator = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4);
-                var yNumerator = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4);
-                var denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        public static bool operator ==(Point2D left, Point2D right) => left.X == right.X && left.Y == right.Y;
+        public static bool operator !=(Point2D left, Point2D right) => !(left == right);
+        public static Point2D operator +(Point2D left, Point2D right) => new Point2D(left.X + right.X, left.Y + right.Y);
+        public static Point2D operator -(Point2D left, Point2D right) => new Point2D(left.X - right.X, left.Y - right.Y);
+        public static Point2D operator *(double left, Point2D right) => new Point2D(left * right.X, left * right.Y);
+        public static Point2D operator *(Point2D left, double right) => right * left;
+        public static Point2D operator /(Point2D left, double right) => new Point2D(left.X / right, left.Y / right);
+        public static double? operator /(Point2D left, Point2D right)
+        {
+            var x = left.X / right.X;
+            var y = left.Y / right.Y;
+            return Math.Abs(y - x) < 0.00000000001 ? x : null;
+        }
 
-                if (denom == 0) return null;
-                return new Point2D((double)xNumerator / (double)denom, (double)yNumerator / (double)denom);
-            }
+        public bool InsideBounds(long min, long max) =>
+            min <= X && X <= max && min <= Y && Y <= max;
+    }
 
-            public bool SameLine(Line2D line)
-            {
-                var dir = (line.Point - Point);
-                return (dir / dir.X).Approximate(UDir) || (dir / dir.X).Approximate(line.UDir);
-            }
+    private record Line2D(Point2D Point, Point2D Dir)
+    {
+        public Point2D UDir = Dir / Dir.X;
 
-            public double? LiesInsideBlock(long min, long max)
-            {
-                double time = 0;
-                if (Dir.X != 0) time = (min - Point.X) / Dir.X;
-                if (Dir.Y != 0) time = (min - Point.Y) / Dir.Y;
-                return (Point + time * UDir).InsideBounds(min, max)
-                    ? time
-                    : null;
-            }
+        public Point2D? Intersect(Line2D line)
+        {
+            var p1 = Point;
+            var p2 = Point + Dir;
+            var p3 = line.Point;
+            var p4 = line.Point + line.Dir;
+            var x1 = (BigInteger)p1.X;
+            var y1 = (BigInteger)p1.Y;
+            var x2 = (BigInteger)p2.X;
+            var y2 = (BigInteger)p2.Y;
+            var x3 = (BigInteger)p3.X;
+            var y3 = (BigInteger)p3.Y;
+            var x4 = (BigInteger)p4.X;
+            var y4 = (BigInteger)p4.Y;
+            var denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            if (denom == 0) return null;
 
-            public double? IntersectionTime(Line2D line, Point2D point)
-            {
-                return !UDir.Approximate(line.UDir)
-                    ? (point - Point).X / Dir.X
-                    : null;
-            }
+            var xNumerator = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4));
+            var yNumerator = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4));
+            return new Point2D((double)xNumerator / (double)denom, (double)yNumerator / (double)denom);
+        }
+
+        public bool SameLine(Line2D line)
+        {
+            var dir = (line.Point - Point);
+            return (dir / dir.X).Approximate(UDir) || (dir / dir.X).Approximate(line.UDir);
+        }
+
+        public double? LiesInsideBlock(long min, long max)
+        {
+            double time = 0;
+            if (Dir.X != 0) time = (min - Point.X) / Dir.X;
+            if (Dir.Y != 0) time = (min - Point.Y) / Dir.Y;
+            return (Point + time * UDir).InsideBounds(min, max)
+                ? time
+                : null;
+        }
+
+        public double? IntersectionTime(Line2D line, Point2D point)
+        {
+            return !UDir.Approximate(line.UDir)
+                ? (point - Point).X / Dir.X
+                : null;
         }
     }
 }
