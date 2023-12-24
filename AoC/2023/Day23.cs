@@ -7,7 +7,6 @@ public sealed class Day23 : Day
     [Puzzle(answer: 94)]
     public long Part1Example() => new AClass(false, Algo).Part1(InputExample);
 
-    //2274 too low
     [Puzzle(answer: 2442)]
     public long Part1() => new AClass(false, Algo).Part1(Input);
 
@@ -73,6 +72,7 @@ public sealed class Day23 : Day
             {
                 { (current, 1L), 0 }
             };
+            int count = 0;
             while (currentIteration.Count > 0)
             {
                 var nextIteration = new Dictionary<((int, int), long), int>();
@@ -91,6 +91,7 @@ public sealed class Day23 : Day
                             }
                             else
                             {
+                                count++;
                                 nextIteration[nextState] = Math.Max(nextIteration[nextState], currentIteration[state] + next.Value);
                             }
                         }
