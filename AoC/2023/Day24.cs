@@ -1,4 +1,5 @@
 
+using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using Tools.Geometry;
@@ -7,10 +8,10 @@ namespace AoC_2023;
 
 public sealed class Day24 : Day
 {
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 2)]
     public long Part1Example() => new Collision().Part1(InputExample, 7, 27);
 
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 14046)]
     public long Part1() => new Collision().Part1(Input, 200_000_000_000_000L, 400_000_000_000_000L);
 
     [Puzzle(answer: null)]
@@ -39,7 +40,7 @@ public sealed class Day24 : Day
                     var intersection = parsed[i].Intersect(parsed[j]);
                     if (intersection is null)
                     {
-                        if (parsed[i].SameLine(parsed[j]) && parsed[i].LiesInsideBlock(min,max) is { } t1 && t1 >= 0
+                        if (parsed[i].SameLine(parsed[j]) && parsed[i].LiesInsideBlock(min, max) is { } t1 && t1 >= 0
                             && parsed[j].LiesInsideBlock(min, max) is { } t2 && t2 >= 0)
                         {
                             count++;
@@ -79,8 +80,8 @@ public sealed class Day24 : Day
                 Y = y;
             }
 
-            public override string ToString() => $"({X},{Y})"; 
-            
+            public override string ToString() => $"({X},{Y})";
+
             public bool Approximate(Point2D other)
             {
                 return Math.Abs(other.X - this.X) == 0 && Math.Abs(other.Y - this.Y) == 0;
@@ -101,7 +102,7 @@ public sealed class Day24 : Day
                 return Math.Abs(y - x) < 0.00000000001 ? x : null;
             }
 
-            public bool InsideBounds(long min, long max) => 
+            public bool InsideBounds(long min, long max) =>
                 min <= X && X <= max && min <= Y && Y <= max;
         }
 
@@ -115,12 +116,20 @@ public sealed class Day24 : Day
                 var p2 = Point + Dir;
                 var p3 = line.Point;
                 var p4 = line.Point + line.Dir;
-                var xNumerator = (p1.X * p2.Y - p1.Y * p2.X) * (p3.X - p4.X) - (p1.X - p2.X) * (p3.X * p4.Y - p3.Y * p4.X);
-                var yNumerator = (p1.X * p2.Y - p1.Y * p2.X) * (p3.Y - p4.Y) - (p1.Y - p2.Y) * (p3.X * p4.Y - p3.Y * p4.X);
-                var denom = (p1.X - p2.X) * (p3.Y - p4.Y) - (p1.Y - p2.Y) * (p3.X - p4.X);
+                var x1 = (BigInteger)p1.X;
+                var y1 = (BigInteger)p1.Y;
+                var x2 = (BigInteger)p2.X;
+                var y2 = (BigInteger)p2.Y;
+                var x3 = (BigInteger)p3.X;
+                var y3 = (BigInteger)p3.Y;
+                var x4 = (BigInteger)p4.X;
+                var y4 = (BigInteger)p4.Y;
+                var xNumerator = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4);
+                var yNumerator = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4);
+                var denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 
                 if (denom == 0) return null;
-                return new Point2D(xNumerator / denom, yNumerator / denom);
+                return new Point2D((double)xNumerator / (double)denom, (double)yNumerator / (double)denom);
             }
 
             public bool SameLine(Line2D line)
