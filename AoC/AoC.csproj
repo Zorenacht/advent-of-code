@@ -29,7 +29,6 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="QuickGraph" Version="3.6.61119.7" />
     </ItemGroup>
 
     <ItemGroup>

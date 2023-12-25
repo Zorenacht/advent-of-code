@@ -38,7 +38,8 @@ public sealed class Day24 : Day
             {
                 for (int j = i + 1; j < lines.Count; j++)
                 {
-                    var intersection = lines[i].Intersect(lines[j]);
+                    var intersection = lines[i].IntersectS(lines[j]);
+                    var intersectionS = lines[i].IntersectS(lines[j]);
                     if (intersection is null)
                     {
                         if (lines[i].SameLine(lines[j]) && lines[i].LiesInsideBlock(min, max) is { } t1 && t1 >= 0
@@ -81,6 +82,10 @@ public sealed class Day24 : Day
                     );
             }).ToList();
 
+            foreach(var line in lines.Skip(1))
+            {
+
+            }
             return 0;
         }
     }
@@ -125,6 +130,14 @@ public sealed class Day24 : Day
     private record Line2D(Point2D Point, Point2D Dir)
     {
         public Point2D UDir = Dir / Dir.X;
+
+        public double A => Dir.Y / Dir.X;
+        public double B => Point.Y - A * Point.X;
+
+        public Point2D? IntersectS(Line2D line)
+        {
+            return new Point2D((line.B - B) / (A - line.A), A * (line.B - B) / (A - line.A) + B);
+        }
 
         public Point2D? Intersect(Line2D line)
         {
