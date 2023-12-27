@@ -10,6 +10,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="2023\Day24.py" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.26.0">
             <PrivateAssets>all</PrivateAssets>
