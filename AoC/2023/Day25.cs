@@ -1,4 +1,8 @@
+using MathNet.Numerics.LinearAlgebra;
 using System.Data;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AoC_2023;
 
@@ -14,6 +18,7 @@ public sealed class Day25 : Day
     {
         internal long Part1(string[] input)
         {
+            //parse
             var split = input.Select(x => x.Split(" :".ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
             var edges = new Dictionary<string, HashSet<string>>();
             foreach (var line in split)
@@ -27,30 +32,35 @@ public sealed class Day25 : Day
                 }
             }
 
-            var first = edges.First().Key;
+            //fix the first edge as START, try any other edge as END till there can only be 3 shortest paths from START to END without common edges
+            //as they are the shortest paths, apparently removing all edges in the paths creates two disconnected graphs
+            var start = edges.First().Key;
             foreach (var end in edges.Skip(1).ToDictionary().Keys)
             {
                 var copy = edges
                     .Select(x => new KeyValuePair<string, HashSet<string>>(x.Key, x.Value.ToHashSet()))
                     .ToDictionary();
                 var paths = new List<List<string>>();
-                while(FindPathAndRemoveEdges(first, end, new HashSet<string>() { first }, paths, copy));
+                while (ShortestPath(start, end, copy, out var path))
+                {
+                    paths.Add(path);
+                    for (int i = 0; i < paths[^1].Count - 1; i++)
+                    {
+                        copy[paths[^1][i]].Remove(paths[^1][i + 1]);
+                        copy[paths[^1][i + 1]].Remove(paths[^1][i]);
+                    }
+                };
                 if (paths.Count == 3)
                 {
-
-                    for (int i = 0; i < paths[0].Count - 1; i++) copy[paths[0][i + 1]].Add(paths[0][i]);
-                    for (int j = 0; j < paths[1].Count - 1; j++) copy[paths[1][j + 1]].Add(paths[1][j]);
-                    for (int k = 0; k < paths[2].Count - 1; k++) copy[paths[2][k + 1]].Add(paths[2][k]);
-
-                    var reachable = Reachable(first, copy);
-                    if (reachable < edges.Count && reachable > 0) return reachable * (edges.Count - reachable);
+                    var reachable = ReachableVertices(start, copy);
+                    return reachable * (edges.Count - reachable);
                 }
             }
             throw new Exception("No solution found.");
         }
 
-        private int Reachable(
-            string start, 
+        private int ReachableVertices(
+            string start,
             Dictionary<string, HashSet<string>> edges)
         {
             var queue = new Queue<string>();
@@ -67,29 +77,32 @@ public sealed class Day25 : Day
             return reachable.Count;
         }
 
-        private bool FindPathAndRemoveEdges(string from, string to, 
-            HashSet<string> visited,
-            List<List<string>> paths, 
-            Dictionary<string, HashSet<string>> edges)
+        private bool ShortestPath(
+            string from,
+            string to,
+            Dictionary<string, HashSet<string>> edges,
+            out List<string> path)
         {
-            if (from == to)
+            path = new List<string>();
+            var dictionary = new Dictionary<string, (string Previous, int Distance)>();
+            var pq = new PriorityQueue<(string Previous, string Current), int>();
+            pq.Enqueue((string.Empty, from), 0);
+            while (pq.Count > 0)
             {
-                paths.Add(new List<string>() { from });
-                return true;
-            }
-            foreach (var next in edges[from])
-            {
-                if (visited.Contains(next)) continue;
-                visited.Add(next);
-                var res = FindPathAndRemoveEdges(next, to, visited, paths, edges);
-                //visited.Remove(next);
-                if (res) 
+                pq.TryDequeue(out var vertex, out int priority);
+                if (dictionary.ContainsKey(vertex.Current!)) continue;
+                dictionary[vertex.Current] = (vertex.Previous, priority);
+                if (vertex.Current == to)
                 {
-                    edges[from].Remove(next);
-                    edges[next].Remove(from);
-                    paths[^1].Insert(0, from);
+                    var current = vertex.Current;
+                    while (current != string.Empty)
+                    {
+                        path.Insert(0, current);
+                        current = dictionary[current].Previous;
+                    }
                     return true;
                 }
+                foreach (var next in edges[vertex.Current]) pq.Enqueue((vertex.Current, next), priority + 1);
             }
             return false;
         }

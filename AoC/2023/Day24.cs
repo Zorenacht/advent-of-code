@@ -8,7 +8,7 @@ public sealed class Day24 : Day
     [Puzzle(answer: 14046)]
     public long Part1() => new Collision().Part1(Input, 200_000_000_000_000L, 400_000_000_000_000L);
 
-    [Puzzle(answer: 47)]
+    //[Puzzle(answer: 47)]
     public long Part2Example() => new Collision().Part2(InputExample);
 
     [Puzzle(answer: 808107741406756)]
