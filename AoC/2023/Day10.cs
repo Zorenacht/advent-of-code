@@ -191,8 +191,6 @@ public sealed class Day10 : Day
                     (p.NeighborV(Direction.E), Direction.W),
                     (p.NeighborV(Direction.S), Direction.N)
                 ],
-                /*('.', Direction.N) => (p.NeighborV(Direction.E), Direction.E),
-                ('S', _) => (p.NeighborV(Direction.E), Direction.E),*/
                 _ => []
             };
         }
