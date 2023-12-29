@@ -1,8 +1,4 @@
-using FluentAssertions.Equivalency.Steps;
-using MathNet.Numerics;
-using System.Net.Http.Headers;
 using System.Numerics;
-using static AoC_2023.Day17;
 
 namespace AoC_2023;
 
@@ -24,7 +20,7 @@ public sealed class Day18 : Day
     private class LavaDigger
     {
         private readonly List<Command> Part1Commands;
-        private readonly List<Command> Part2Commands;    
+        private readonly List<Command> Part2Commands;
 
         public LavaDigger(string[] input)
         {
