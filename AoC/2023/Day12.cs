@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
+
 namespace AoC_2023;
 
 public sealed class Day12 : Day
@@ -32,32 +35,52 @@ public sealed class Day12 : Day
             sequence = Enumerable.Repeat(singleSequence, repeat).SelectMany(x => x).ToArray();
         }
 
+        private record State(int Length)
+        {
+            private long[] States = new long[Length];
+
+            public long this[int i]
+            {
+                get { return States[i]; }
+                set { States[i] = value; }
+            }
+        }
+
+        private State[] States(int length)
+        {
+            var states = new State[length + 1];
+            for (int i = 0; i < length; i++)
+            {
+                states[i] = new State(sequence[i] + 1);
+            }
+            states[^1] = new State(1);
+            return states;
+        }
+
         // Time complexity: O(template.Length * sequence.Max * sequence.Length)
         // Space complexity: O(sequence.Max * sequence.Length)
         public long Arrangements()
         {
-            var states = sequence.Select(x => Enumerable.Repeat(0L, x + 1).ToList()).ToList();
-            states.Add(new List<long>() { 0 });
-
+            var states = States(sequence.Length);
             states[0][0] = 1;
+
             for (int templateIndex = 0; templateIndex < template.Length; templateIndex++)
             {
-                var next = sequence.Select(x => Enumerable.Repeat(0L, x + 1).ToList()).ToList();
-                next.Add(new List<long>() { 0 });
+                var next = States(sequence.Length);
                 var ch = template[templateIndex];
                 if (ch == '.' || ch == '?')
                 {
-                    for (int i = 0; i < states.Count; i++)
+                    for (int i = 0; i < states.Length; i++)
                     {
                         next[i][0] += states[i][0];
-                        if (i < states.Count - 1) next[i + 1][0] += states[i][^1];
+                        if (i < states.Length - 1) next[i + 1][0] += states[i][^1];
                     }
                 }
                 if (ch == '#' || ch == '?')
                 {
-                    for (int i = 0; i < states.Count; i++)
+                    for (int i = 0; i < states.Length; i++)
                     {
-                        for (int j = 0; j < states[i].Count - 1; j++)
+                        for (int j = 0; j < states[i].Length - 1; j++)
                         {
                             next[i][j + 1] += states[i][j];
                         }
