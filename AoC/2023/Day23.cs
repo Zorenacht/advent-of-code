@@ -28,8 +28,9 @@ public sealed class Day23 : Day
         private int[] YDir = [1, 0, -1, 0];
         private readonly Algorithm Algorithm;
         private bool Part2;
+        private HashSet<int> VerticesInt = new();
         private Dictionary<(int, int), int> Vertices = new();
-        private Dictionary<(int, int), Dictionary<(int, int), int>> Edges = new();
+        private Dictionary<int, Dictionary<int, int>> Edges = new();
         private (int, int) End = new();
 
         public AClass(Algorithm algorithm)
@@ -48,37 +49,38 @@ public sealed class Day23 : Day
             Vertices = FindVertices(input);
             Vertices.Add(start,0);
             Vertices.Add(End, Vertices.Count);
+            VerticesInt = Vertices.Select(x => x.Value).ToHashSet();
 
             //find all edges in graph
             foreach (var vertex in Vertices.Keys)
             {
-                var dict = new Dictionary<(int, int), int>();
+                var dict = new Dictionary<int, int>();
                 Nexts(vertex, (0, 0), 0, input, dict);
-                Edges[vertex] = dict;
+                Edges[Vertices[vertex]] = dict;
             }
             return Algorithm == Algorithm.DFS
-                ? DfsPaths(start, 0, 1L)
-                : BfsPaths(start);
+                ? DfsPaths(current: 0, distance: 0, visited: 1L)
+                : BfsPaths(current: 0);
         }
 
-        int BfsPaths((int, int) current)
+        int BfsPaths(int current)
         {
             int max = 0;
-            var dict = new Dictionary<((int, int), long), int>(3_000_000);
-            var currentIteration = new Dictionary<((int, int), long), int>()
+            var dict = new Dictionary<(int, long), int>(3_000_000);
+            var currentIteration = new Dictionary<(int, long), int>()
             {
                 { (current, 1L), 0 }
             };
             int count = 0;
             while (currentIteration.Count > 0)
             {
-                var nextIteration = new Dictionary<((int, int), long), int>(3_000_000);
+                var nextIteration = new Dictionary<(int, long), int>(3_000_000);
                 foreach (var state in currentIteration.Keys)
                 {
                     //all next vertices for current state
                     foreach (var next in Edges[state.Item1])
                     {
-                        var index = Vertices[next.Key];
+                        var index = next.Key;
                         if (((state.Item2 >> index) & 1) == 0)
                         {
                             var nextState = (next.Key, state.Item2 + (1L << index));
@@ -95,7 +97,7 @@ public sealed class Day23 : Day
                     }
 
                 }
-                var endpoints = currentIteration.Where(x => x.Key.Item1 == End);
+                var endpoints = currentIteration.Where(x => x.Key.Item1 == VerticesInt.Count-1);
                 if (endpoints.Any()) max = Math.Max(max, endpoints.Max(x => x.Value));
                 currentIteration = nextIteration;
             }
@@ -103,15 +105,15 @@ public sealed class Day23 : Day
         }
 
         int DfsPaths(
-            (int, int) current,
+            int current,
             int distance,
             long visited)
         {
-            if (current == End) return distance;
+            if (current == VerticesInt.Count - 1) return distance;
             int max = 0;
             foreach (var next in Edges[current])
             {
-                var index = Vertices[next.Key];
+                var index = next.Key;
                 if (((visited >> index) & 1) == 0)
                 {
                     max = Math.Max(max, DfsPaths(next.Key, distance + next.Value, visited + (1L << index)));
@@ -120,11 +122,11 @@ public sealed class Day23 : Day
             return max;
         }
 
-        void Nexts((int, int) current, (int, int) lastDir, int distance, string[] input, Dictionary<(int, int), int> toDistances)
+        void Nexts((int, int) current, (int, int) lastDir, int distance, string[] input, Dictionary<int, int> toDistances)
         {
             if (distance > 0 && Vertices.ContainsKey(current))
             {
-                toDistances.Add(current, distance);
+                toDistances.Add(Vertices[current], distance);
                 return;
             }
 
