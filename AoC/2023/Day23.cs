@@ -24,11 +24,11 @@ public sealed class Day23 : Day
 
     private class AClass
     {
-        private int[] XDir = [0, -1, 0, 1];
-        private int[] YDir = [1, 0, -1, 0];
         private readonly Algorithm Algorithm;
         private bool Part2;
-        private HashSet<int> VerticesInt = new();
+        private int[] XDir = [0, -1, 0, 1];
+        private int[] YDir = [1, 0, -1, 0];
+        private int[] VerticesInt = Array.Empty<int>();
         private Dictionary<(int, int), int> Vertices = new();
         private Dictionary<int, Dictionary<int, int>> Edges = new();
         private (int, int) End = new();
@@ -47,9 +47,9 @@ public sealed class Day23 : Day
 
             //reduce graph
             Vertices = FindVertices(input);
-            Vertices.Add(start,0);
+            Vertices.Add(start, 0);
             Vertices.Add(End, Vertices.Count);
-            VerticesInt = Vertices.Select(x => x.Value).ToHashSet();
+            VerticesInt = Vertices.Select(x => x.Value).ToArray();
 
             //find all edges in graph
             foreach (var vertex in Vertices.Keys)
@@ -97,7 +97,7 @@ public sealed class Day23 : Day
                     }
 
                 }
-                var endpoints = currentIteration.Where(x => x.Key.Item1 == VerticesInt.Count-1);
+                var endpoints = currentIteration.Where(x => x.Key.Item1 == VerticesInt.Length - 1);
                 if (endpoints.Any()) max = Math.Max(max, endpoints.Max(x => x.Value));
                 currentIteration = nextIteration;
             }
@@ -109,7 +109,7 @@ public sealed class Day23 : Day
             int distance,
             long visited)
         {
-            if (current == VerticesInt.Count - 1) return distance;
+            if (current == VerticesInt.Length - 1) return distance;
             int max = 0;
             foreach (var next in Edges[current])
             {
