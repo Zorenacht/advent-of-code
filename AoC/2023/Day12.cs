@@ -1,5 +1,8 @@
+using NUnit.Framework.Constraints;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using System.Text;
+using static AoC_2023.Day17;
 
 namespace AoC_2023;
 
@@ -44,6 +47,11 @@ public sealed class Day12 : Day
                 get { return States[i]; }
                 set { States[i] = value; }
             }
+
+            public override string ToString()
+            { 
+                return string.Join(",", States);
+            }
         }
 
         private State[] States(int length)
@@ -63,7 +71,7 @@ public sealed class Day12 : Day
         {
             var states = States(sequence.Length);
             states[0][0] = 1;
-
+            Print(states);
             for (int templateIndex = 0; templateIndex < template.Length; templateIndex++)
             {
                 var next = States(sequence.Length);
@@ -87,8 +95,18 @@ public sealed class Day12 : Day
                     }
                 }
                 states = next;
+                Print(states);
             }
             return states[^2][^1] + states[^1][^1];
+        }
+
+        private void Print(State[] states)
+        {
+            Console.WriteLine("-----------------------");
+            foreach (var state in states)
+            {
+                Console.WriteLine(state.ToString());
+            }
         }
     }
 }
