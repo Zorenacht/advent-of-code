@@ -69,6 +69,7 @@ public sealed class Day12 : Day
         // Space complexity: O(sequence.Max * sequence.Length)
         public long Arrangements()
         {
+            Console.WriteLine($"Line length: {template.Length}");
             var states = States(sequence.Length);
             states[0][0] = 1;
             Print(states);
@@ -95,14 +96,14 @@ public sealed class Day12 : Day
                     }
                 }
                 states = next;
-                Print(states);
+                Print(states, $"After applying:{ch}");
             }
             return states[^2][^1] + states[^1][^1];
         }
 
-        private void Print(State[] states)
+        private void Print(State[] states, string title = "---------")
         {
-            Console.WriteLine("-----------------------");
+            Console.WriteLine($"-------{title}-------");
             foreach (var state in states)
             {
                 Console.WriteLine(state.ToString());
