@@ -116,7 +116,7 @@ public sealed class OrderedSet<T> : ICollection<T> where T : notnull
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
-    /// Creates an reverse iterator.
+    /// Creates a reverse iterator.
     /// </summary>
     /// <returns> The reverse iterator. </returns>
     [Pure]
