@@ -10,6 +10,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="2021\**" />
+      <EmbeddedResource Remove="2021\**" />
+      <None Remove="2021\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <None Remove="2023\Day24.py" />
     </ItemGroup>
 
