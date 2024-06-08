@@ -10,9 +10,57 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="2021\**" />
-      <EmbeddedResource Remove="2021\**" />
-      <None Remove="2021\**" />
+      <Compile Remove="2021\01\**" />
+      <Compile Remove="2021\02\**" />
+      <Compile Remove="2021\03\**" />
+      <Compile Remove="2021\04\**" />
+      <Compile Remove="2021\05\**" />
+      <Compile Remove="2021\06\**" />
+      <Compile Remove="2021\07\**" />
+      <Compile Remove="2021\08\**" />
+      <Compile Remove="2021\09\**" />
+      <Compile Remove="2021\10\**" />
+      <Compile Remove="2021\11\**" />
+      <Compile Remove="2021\12\**" />
+      <Compile Remove="2021\13\**" />
+      <Compile Remove="2021\20\**" />
+      <Compile Remove="2021\21\**" />
+      <Compile Remove="2021\22\**" />
+      <Compile Remove="2021\25\**" />
+      <EmbeddedResource Remove="2021\01\**" />
+      <EmbeddedResource Remove="2021\02\**" />
+      <EmbeddedResource Remove="2021\03\**" />
+      <EmbeddedResource Remove="2021\04\**" />
+      <EmbeddedResource Remove="2021\05\**" />
+      <EmbeddedResource Remove="2021\06\**" />
+      <EmbeddedResource Remove="2021\07\**" />
+      <EmbeddedResource Remove="2021\08\**" />
+      <EmbeddedResource Remove="2021\09\**" />
+      <EmbeddedResource Remove="2021\10\**" />
+      <EmbeddedResource Remove="2021\11\**" />
+      <EmbeddedResource Remove="2021\12\**" />
+      <EmbeddedResource Remove="2021\13\**" />
+      <EmbeddedResource Remove="2021\20\**" />
+      <EmbeddedResource Remove="2021\21\**" />
+      <EmbeddedResource Remove="2021\22\**" />
+      <EmbeddedResource Remove="2021\25\**" />
+      <None Remove="2021\01\**" />
+      <None Remove="2021\02\**" />
+      <None Remove="2021\03\**" />
+      <None Remove="2021\04\**" />
+      <None Remove="2021\05\**" />
+      <None Remove="2021\06\**" />
+      <None Remove="2021\07\**" />
+      <None Remove="2021\08\**" />
+      <None Remove="2021\09\**" />
+      <None Remove="2021\10\**" />
+      <None Remove="2021\11\**" />
+      <None Remove="2021\12\**" />
+      <None Remove="2021\13\**" />
+      <None Remove="2021\20\**" />
+      <None Remove="2021\21\**" />
+      <None Remove="2021\22\**" />
+      <None Remove="2021\25\**" />
     </ItemGroup>
 
     <ItemGroup>
