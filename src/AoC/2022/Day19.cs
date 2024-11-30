@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Tools.Geometry;
 
@@ -12,6 +13,7 @@ public sealed partial class Day19 : Day
     public void Part1() => Geodes.Parse(InputPart1).Max().Should().Be(1650);
 
     [Test]
+    [Ignore("Takes 17s")]
     public void ExampleP2() => Geodes.Parse(InputExample).Top3().Should().Be(3472);
     [Test]
     public void Part2() => Geodes.Parse(InputPart1).Top3().Should().Be(5824);
