@@ -86,7 +86,7 @@ try:
   config = dotenv_values(".env")
   year, day = get_args()
   aoc_dir = "../src/AoC"
-  mock_input = True
+  mock_input = False
   # Create input files
   print_step("Creating input files")
   input_dir = f"{aoc_dir}/{year}/Input"
