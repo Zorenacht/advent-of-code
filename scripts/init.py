@@ -2,35 +2,46 @@ import os
 import sys
 import posixpath
 import requests
+import inspect
 from dotenv import dotenv_values
 
 
-def get_input(year: str, day: str, session: str) -> str:
+def print_step(str: str, last=False):
+  if not last:
+    print("│  " * (len(inspect.stack()) - 2) + "├─ " + str)
+  else:
+    print("│  " * (len(inspect.stack()) - 2) + "└─ " + str)
+
+
+def get_input(year: str, day: str, session: str, mock: bool) -> str:
   cookie = {"session": session}
-  print("│  ├─ Retrieving input")
-  input = requests.get(
-    f"https://adventofcode.com/{year}/day/{day}/input",
-    cookies=cookie,
-    headers={
-      "User-Agent": "Manual input retrieval script, https://github.com/renzo-baasdam/advent-of-code/blob/main/init.py"
-    },
-  ).text
+  print_step("Retrieving input")
+  if not mock:
+    input = requests.get(
+      f"https://adventofcode.com/{year}/day/{day}/input",
+      cookies=cookie,
+      headers={
+        "User-Agent": "Manual input retrieval script, https://github.com/renzo-baasdam/advent-of-code/blob/main/init.py"
+      },
+    ).text
+  else:
+    input = "Mock input"
   return input
 
 
 def file_exists(dir: str, filename: str) -> bool:
   file_path = posixpath.join(dir, filename)
   if os.path.exists(file_path):
-    print(f"│  └─ File already exists: {file_path}")
+    print_step(f"File already exists: {file_path}")
     return True
   else:
-    print("│  ├─ File does not exist, continuing step")
+    print_step("File does not exist, continuing step")
     return False
 
 
 def get_file_content(dir: str, filename: str, year: str, day: str) -> str:
   file_path = posixpath.join(dir, filename)
-  print(f"│  ├─ Retrieving template: {file_path}")
+  print_step(f"Retrieving template: {file_path}")
   if os.path.exists(file_path):
     with open(file_path, "r") as template_file:
       return (
@@ -39,20 +50,20 @@ def get_file_content(dir: str, filename: str, year: str, day: str) -> str:
         .replace("DayPlaceholder", day.zfill(2))
       )
   else:
-    print(f"│  └─ File does not exist: {file_path}")
+    print_step(f"File does not exist: {file_path}")
     sys.exit(1)
 
 
 def create_file(dir: str, filename: str, content: str, overwrite=False):
   file_path = posixpath.join(dir, filename)
-  print(f"│  ├─ Creating new file: {file_path}")
+  print_step(f"Creating new file: {file_path}")
   os.makedirs(dir, exist_ok=True)
   if overwrite or not os.path.exists(file_path):
     with open(file_path, "w") as f:
       f.write(content)
-    print("│  │  └─ Succeeded")
+    print_step("Succeeded")
   else:
-    print("│  │  └─ Failed: File already exists")
+    print_step("Failed: File already exists")
 
 
 def get_args():
@@ -74,27 +85,27 @@ def get_args():
 try:
   config = dotenv_values(".env")
   year, day = get_args()
-  aoc_dir = "./src/AoC"
-
+  aoc_dir = "../src/AoC"
+  mock_input = True
   # Create input files
-  print("├─ Creating input files")
+  print_step("Creating input files")
   input_dir = f"{aoc_dir}/{year}/Input"
   input_filename = f"Day{day.zfill(2)}.txt"
   input_example_filename = f"Day{day.zfill(2)}-example.txt"
   if not file_exists(input_dir, input_filename):
-    content = get_input(year, day, config.get("session"))
+    content = get_input(year, day, config.get("session"), mock_input)
     create_file(input_dir, input_filename, content)
     create_file(input_dir, input_example_filename, "")
 
   # Create .cs file
-  print("├─ Creating .cs file")
+  print_step("Creating .cs file")
   template_dir = aoc_dir
   template_filename = "DayTemplate.cs"
   cs_dir = f"{aoc_dir}/{year}/"
   cs_filename = f"Day{day.zfill(2)}.cs"
   content = get_file_content(template_dir, template_filename, year, day)
   create_file(cs_dir, cs_filename, content)
-  print("└─ Completed successfully")
+  print_step("Completed successfully", last=True)
 except Exception as e:
   print(f"Error: {e}")
   sys.exit(1)
