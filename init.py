@@ -12,7 +12,7 @@ def get_input(year: str, day: str, session: str) -> str:
     f"https://adventofcode.com/{year}/day/{day}/input",
     cookies=cookie,
     headers={
-      "User-Agent": "Manual input retrieval script, https://github.com/renzo-baasdam/advent-of-code/init.py"
+      "User-Agent": "Manual input retrieval script, https://github.com/renzo-baasdam/advent-of-code/blob/main/init.py"
     },
   ).text
   return input
