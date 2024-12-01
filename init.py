@@ -1,55 +1,100 @@
 import os
 import sys
 import posixpath
+import requests
+from dotenv import dotenv_values
 
-# Verify arguments
-if len(sys.argv) != 3:
-  print("Error: Expected arguments [year] [day of month]")
-  sys.exit(1)
-year_str = sys.argv[1]
-day_str = sys.argv[2]
-if not year_str.isdigit():
-  print(f"Error: Year {year_str} must be number.")
-  sys.exit(1)
-if not day_str.isdigit():
-  print(f"Error: Day {day_str} must be a number.")
-  sys.exit(1)
-year = int(year_str)
-day = int(day_str)
 
-# Define the directory and file paths
-aoc_dir = posixpath.join("./src/AoC")
-year_dir = posixpath.join(aoc_dir, year_str)
+def get_input(year: str, day: str, session: str) -> str:
+  cookie = {"session": session}
+  print("│  ├─ Retrieving input")
+  input = requests.get(
+    f"https://adventofcode.com/{year}/day/{day}/input",
+    cookies=cookie,
+    headers={
+      "User-Agent": "Manual input retrieval script, https://github.com/renzo-baasdam/advent-of-code/init.py"
+    },
+  ).text
+  return input
 
-template_name = "DayTemplate.cs"
-template_path = posixpath.join(aoc_dir, template_name)
-file_name = f"Day{day_str.zfill(2)}.cs"
-file_path = posixpath.join(aoc_dir, year_str, file_name)
 
-# Create the file
-try:
-  # Retrieve template
-  print(f"├─ Retrieving template: {template_path}")
-  if os.path.exists(template_path):
-    with open(template_path, "r") as template_file:
-      template = (
+def file_exists(dir: str, filename: str) -> bool:
+  file_path = posixpath.join(dir, filename)
+  if os.path.exists(file_path):
+    print(f"│  └─ File already exists: {file_path}")
+    return True
+  else:
+    print("│  ├─ File does not exist, continuing step")
+    return False
+
+
+def get_file_content(dir: str, filename: str, year: str, day: str) -> str:
+  file_path = posixpath.join(dir, filename)
+  print(f"│  ├─ Retrieving template: {file_path}")
+  if os.path.exists(file_path):
+    with open(file_path, "r") as template_file:
+      return (
         template_file.read()
-        .replace("YearPlaceholder", year_str)
-        .replace("DayPlaceholder", day_str)
+        .replace("YearPlaceholder", year)
+        .replace("DayPlaceholder", day.zfill(2))
       )
   else:
-    print(f"│  └─ File does not exist: {template_path}")
+    print(f"│  └─ File does not exist: {file_path}")
     sys.exit(1)
 
-  # Create the new file (and directories if needed)
-  print(f"└─ Creating new file: {file_path}")
-  os.makedirs(year_dir, exist_ok=True)
-  if not os.path.exists(file_path):
+
+def create_file(dir: str, filename: str, content: str, overwrite=False):
+  file_path = posixpath.join(dir, filename)
+  print(f"│  ├─ Creating new file: {file_path}")
+  os.makedirs(dir, exist_ok=True)
+  if overwrite or not os.path.exists(file_path):
     with open(file_path, "w") as f:
-      f.write(template)
-    print(f"   └─ File created: {file_path}")
+      f.write(content)
+    print("│  │  └─ Succeeded")
   else:
-    print(f"   └─ File already exists: {file_path}")
+    print("│  │  └─ Failed: File already exists")
+
+
+def get_args():
+  # Verify arguments
+  if len(sys.argv) != 3:
+    print("Error: Expected arguments [year] [day of month]")
+    sys.exit(1)
+  year = sys.argv[1]
+  day = sys.argv[2]
+  if not year.isdigit():
+    print(f"Error: Year {year} must be number.")
+    sys.exit(1)
+  if not day.isdigit():
+    print(f"Error: Day {day} must be a number.")
+    sys.exit(1)
+  return year, day
+
+
+try:
+  config = dotenv_values(".env")
+  year, day = get_args()
+  aoc_dir = "./src/AoC"
+
+  # Create input files
+  print("├─ Creating input files")
+  input_dir = f"{aoc_dir}/{year}/Input"
+  input_filename = f"Day{day.zfill(2)}.txt"
+  input_example_filename = f"Day{day.zfill(2)}-example.txt"
+  if not file_exists(input_dir, input_filename):
+    content = get_input(year, day, config.get("session"))
+    create_file(input_dir, input_filename, content)
+    create_file(input_dir, input_example_filename, "")
+
+  # Create .cs file
+  print("├─ Creating .cs file")
+  template_dir = aoc_dir
+  template_filename = "DayTemplate.cs"
+  cs_dir = f"{aoc_dir}/{year}/"
+  cs_filename = f"Day{day.zfill(2)}.cs"
+  content = get_file_content(template_dir, template_filename, year, day)
+  create_file(cs_dir, cs_filename, content)
+  print("└─ Completed successfully")
 except Exception as e:
   print(f"Error: {e}")
   sys.exit(1)
