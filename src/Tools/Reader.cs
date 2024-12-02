@@ -28,7 +28,7 @@ public static class Reader
 
     public static bool TryReadLines(string filename, out string[] lines)
     {
-        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\", filename);
+        string fileLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"../../../", filename);
         if (File.Exists(fileLocation))
         {
             lines = ReadLines(fileLocation);
