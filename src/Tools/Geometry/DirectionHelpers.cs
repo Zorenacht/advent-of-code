@@ -1,7 +1,41 @@
 ﻿namespace Tools.Geometry;
 
-public static class DirHelpers
+public static class Directions
 {
+    public static Direction[] All = [
+        Direction.E,
+        Direction.NE,
+        Direction.N,
+        Direction.NW,
+        Direction.W,
+        Direction.SW,
+        Direction.S,
+        Direction.SE,
+    ];
+    
+    public static Direction[] Cardinal = [
+        Direction.E,
+        Direction.N,
+        Direction.W,
+        Direction.S,
+    ];
+    
+    public static Direction[] Ordinal = [
+        Direction.NE,
+        Direction.NW,
+        Direction.SW,
+        Direction.SE,
+    ];
+    
+    public static Direction Left(Direction dir)
+        => (Direction)(((int)dir + 2) % 8);
+    
+    public static Direction Right(Direction dir)
+        => (Direction)(((int)dir + 6) % 8);
+    
+    public static Direction Backwards(Direction dir)
+        => (Direction)(((int)dir + 4) % 8);
+    
     public static bool RightAngle(Direction dir1, Direction dir2)
     {
         return BasicMath.Modulo((int)dir1 - (int)dir2, 2) == 0

@@ -1,5 +1,8 @@
-﻿namespace Tools.Geometry;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Tools.Geometry;
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum Direction
 {
     E = 0,

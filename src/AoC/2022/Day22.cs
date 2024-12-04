@@ -45,11 +45,11 @@ public sealed partial class Day22 : Day
                         var nbBorder = BlockChange(new BlockBorder(block, dir));
 
                         Point border;
-                        if (DirHelpers.RightAngle(dir, nbBorder.Direction))
+                        if (Tools.Geometry.Directions.RightAngle(dir, nbBorder.Direction))
                         {
                             border = new Point(rel.Y, rel.X);
                         }
-                        else if (DirHelpers.OppositeAngle(dir, nbBorder.Direction))
+                        else if (Tools.Geometry.Directions.OppositeAngle(dir, nbBorder.Direction))
                         {
                             border = new Point(rel.X, 51 - rel.Y);
                         }
