@@ -7,11 +7,11 @@ public sealed class Day05 : Day
     [Puzzle(answer: 4637)]
     public int Part1()
     {
-        int result = 0;
         var grouped = Input.GroupBy(string.Empty);
         var rules = grouped[0];
         var updates = grouped[1];
         var ordering = new Dictionary<int, HashSet<int>>();
+        int result = 0;
         
         foreach (string t in rules)
         {
@@ -24,23 +24,12 @@ public sealed class Day05 : Day
         
         foreach (string t in updates)
         {
-            var splitted = t.Split(',').Select(int.Parse).ToArray();
-            var before = new HashSet<int>();
-            var valid = true;
-            foreach (int val in splitted)
-            {
-                foreach (int bf in before)
-                {
-                    if (ordering.TryGetValue(val, out var reqs) && reqs.Contains(bf))
-                    {
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid) before.Add(val);
-                else break;
-            }
-            if (valid) result += splitted[splitted.Length / 2];
+            var splitted = t.Split(',').Select(int.Parse).ToList();
+            var sorted = splitted.ToList();
+            sorted.Sort((x, y) => Compare(x,y,ordering));
+            
+            if (splitted.Zip(sorted).All(pair => pair.First == pair.Second))
+                result += splitted[splitted.Count / 2];
         }
         return result;
     }
@@ -48,11 +37,11 @@ public sealed class Day05 : Day
     [Puzzle(answer: 6370)]
     public int Part2()
     {
-        int result = 0;
         var grouped = Input.GroupBy(string.Empty);
         var rules = grouped[0];
         var updates = grouped[1];
         var ordering = new Dictionary<int, HashSet<int>>();
+        int result = 0;
         
         foreach (string t in rules)
         {
@@ -65,29 +54,18 @@ public sealed class Day05 : Day
         
         foreach (string t in updates)
         {
-            var splitted = t.Split(',').Select(int.Parse).ToArray();
-            var newOrdering = new List<int>();
+            var splitted = t.Split(',').Select(int.Parse).ToList();
+            var sorted = splitted.ToList();
+            sorted.Sort((x, y) => Compare(x,y,ordering));
             
-            var valid = true;
-            foreach (int val in splitted)
-            {
-                var modified = false;
-                foreach (int bf in newOrdering)
-                {
-                    if (ordering.TryGetValue(val, out var reqs) && reqs.Contains(bf))
-                    {
-                        valid = false;
-                        modified = true;
-                        newOrdering.Insert(newOrdering.IndexOf(bf), val);
-                        break;
-                    }
-                }
-                
-                if (!modified) newOrdering.Add(val);
-            }
-            if (!valid)
-                result += newOrdering[splitted.Length / 2];
+            if (splitted.Zip(sorted).Any(pair => pair.First != pair.Second))
+                result += sorted[splitted.Count / 2];
         }
         return result;
     }
+    
+    private int Compare(int x, int y, Dictionary<int, HashSet<int>> rules)
+        => rules.TryGetValue(x, out var set) && set.Contains(y)
+            ? -1
+            : 1;
 };
