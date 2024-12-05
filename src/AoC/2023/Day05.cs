@@ -31,18 +31,17 @@ public sealed class Day05 : Day
         return min;
     }
 
-    public record Fertilizer(long[][][] Maps)
+    private record Fertilizer(long[][][] Maps)
     {
         public long Min(IEnumerable<Interval1D> seeds)
         {
-            var locations = new List<Interval1D>();
             var current = seeds;
             foreach (var maps in Maps)
             {
-                var next = new List<Interval1D>() { };
+                var next = new List<Interval1D>();
                 foreach (var curr in current)
                 {
-                    var mappedToItself = new List<Interval1D>() { curr };
+                    var mappedToItself = new List<Interval1D> { curr };
                     foreach (var map in maps)
                     {
                         var range = new Interval1D(map[1], map[1] + map[2] - 1);
@@ -71,7 +70,8 @@ public sealed class Day05 : Day
         {
             var seedsInput = line.Split(": ")[1]
                 .Split(" ")
-                .Select(x => long.Parse(x));
+                .Select(long.Parse)
+                .ToArray();
 
             return seedsInput
                 .Zip(seedsInput.Skip(1), (first, second) => new Interval1D(first, first + second - 1))
@@ -86,7 +86,7 @@ public sealed class Day05 : Day
                 .Select(group => group
                     .Select(line => line
                         .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                        .Select(x => long.Parse(x)).ToArray())
+                        .Select(long.Parse).ToArray())
                     .ToArray())
                 .ToArray();
     }
