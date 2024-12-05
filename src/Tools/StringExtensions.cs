@@ -11,13 +11,12 @@ public static class StringExtensions
             Environment.NewLine,
             StringSplitOptions.None);
 
-    public static string[][] GroupBy(this IEnumerable<string> lines, string line)
+    public static string[][] GroupBy(this IEnumerable<string> lines, string separator)
     {
-        var groups = new List<List<string>>();
-        groups.Add(new List<string>());
+        var groups = new List<List<string>> { new() };
         foreach (var l in lines)
         {
-            if (l == line)
+            if (l == separator)
             {
                 groups.Add(new List<string>());
                 continue;

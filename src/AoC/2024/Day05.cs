@@ -8,98 +8,85 @@ public sealed class Day05 : Day
     public int Part1()
     {
         int result = 0;
-        var reqsLine = true;
-        var notAllowed = new Dictionary<int, HashSet<int>>();
-        var lines = Input;
+        var grouped = Input.GroupBy(string.Empty);
+        var rules = grouped[0];
+        var updates = grouped[1];
+        var ordering = new Dictionary<int, HashSet<int>>();
         
-        for (int i = 0; i < lines.Length; ++i)
+        foreach (string t in rules)
         {
-            if (lines[i] == string.Empty)
+            var splitted = t.Split('|');
+            var x = int.Parse(splitted[0]);
+            var y = int.Parse(splitted[1]);
+            if (!ordering.TryGetValue(x, out var set)) ordering[x] = [y];
+            else set.Add(y);
+        }
+        
+        foreach (string t in updates)
+        {
+            var splitted = t.Split(',').Select(int.Parse).ToArray();
+            var before = new HashSet<int>();
+            var valid = true;
+            foreach (int val in splitted)
             {
-                reqsLine = false;
-                continue;
-            }
-            if (reqsLine)
-            {
-                var splitted = lines[i].Split('|');
-                var x = int.Parse(splitted[0]);
-                var y = int.Parse(splitted[1]);
-                if (!notAllowed.TryGetValue(x, out var set)) notAllowed[x] = [y];
-                else set.Add(y);
-            }
-            else
-            {
-                var splitted = lines[i].Split(',').Select(int.Parse).ToArray();
-                var before = new HashSet<int>();
-                var valid = true;
-                foreach (int val in splitted)
+                foreach (int bf in before)
                 {
-                    foreach (int bf in before)
+                    if (ordering.TryGetValue(val, out var reqs) && reqs.Contains(bf))
                     {
-                        if (notAllowed.TryGetValue(val, out var reqs) && reqs.Contains(bf))
-                        {
-                            valid = false;
-                            break;
-                        }
+                        valid = false;
+                        break;
                     }
-                    if (valid) before.Add(val);
-                    else break;
                 }
-                if (valid) result += splitted[splitted.Length / 2];
+                if (valid) before.Add(val);
+                else break;
             }
+            if (valid) result += splitted[splitted.Length / 2];
         }
         return result;
     }
     
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 6370)]
     public int Part2()
     {
         int result = 0;
-        var reqsLine = true;
-        var notAllowed = new Dictionary<int, HashSet<int>>();
-        var lines = Input;
+        var grouped = Input.GroupBy(string.Empty);
+        var rules = grouped[0];
+        var updates = grouped[1];
+        var ordering = new Dictionary<int, HashSet<int>>();
         
-        for (int i = 0; i < lines.Length; ++i)
+        foreach (string t in rules)
         {
-            if (lines[i] == string.Empty)
+            var splitted = t.Split('|');
+            var x = int.Parse(splitted[0]);
+            var y = int.Parse(splitted[1]);
+            if (!ordering.TryGetValue(x, out var set)) ordering[x] = [y];
+            else set.Add(y);
+        }
+        
+        foreach (string t in updates)
+        {
+            var splitted = t.Split(',').Select(int.Parse).ToArray();
+            var newOrdering = new List<int>();
+            
+            var valid = true;
+            foreach (int val in splitted)
             {
-                reqsLine = false;
-                continue;
-            }
-            if (reqsLine)
-            {
-                var splitted = lines[i].Split('|');
-                var x = int.Parse(splitted[0]);
-                var y = int.Parse(splitted[1]);
-                if (!notAllowed.TryGetValue(x, out var set)) notAllowed[x] = [y];
-                else set.Add(y);
-            }
-            else
-            {
-                var splitted = lines[i].Split(',').Select(int.Parse).ToArray();
-                var newOrdering = new List<int>();
-                
-                var valid = true;
                 var modified = false;
-                foreach (int val in splitted)
+                foreach (int bf in newOrdering)
                 {
-                    modified = false;
-                    foreach (int bf in newOrdering)
+                    if (ordering.TryGetValue(val, out var reqs) && reqs.Contains(bf))
                     {
-                        if (notAllowed.TryGetValue(val, out var reqs) && reqs.Contains(bf))
-                        {
-                            valid = false;
-                            modified = true;
-                            newOrdering.Insert(newOrdering.IndexOf(bf), val);
-                            break;
-                        }
+                        valid = false;
+                        modified = true;
+                        newOrdering.Insert(newOrdering.IndexOf(bf), val);
+                        break;
                     }
-                    
-                    if(!modified) newOrdering.Add(val);
                 }
-                if (!valid)
-                    result += newOrdering[splitted.Length / 2];
+                
+                if (!modified) newOrdering.Add(val);
             }
+            if (!valid)
+                result += newOrdering[splitted.Length / 2];
         }
         return result;
     }
