@@ -1,10 +1,13 @@
 ﻿using System.Text;
+using Tools.Geometry;
 
 namespace Tools;
 
 public static class StringExtensions
 {
     private static string[] Linebreaks = ["\r\n", "\r", "\n"];
+    
+    public static Grid<char> ToGrid(this string[] lines) => new(lines.Select(x => x.ToCharArray()).ToArray());
 
     public static string[] Lines(this string str)
         => str.Split(
@@ -27,14 +30,14 @@ public static class StringExtensions
         return groups.Select(group => group.ToArray()).ToArray();
     }
 
-    public static string[] AddBorder(this string[] strings, char symbol)
+    public static string[] AddBorder(this string[] lines, char symbol)
     {
         var modified = new List<string>();
-        var first = new string(symbol, strings[0].Length + 2);
-        var last = new string(symbol, strings[^1].Length + 2);
+        var first = new string(symbol, lines[0].Length + 2);
+        var last = new string(symbol, lines[^1].Length + 2);
 
         modified.Add(first);
-        foreach (var str in strings)
+        foreach (var str in lines)
         {
             var sb = new StringBuilder(str);
             sb.Insert(0, symbol);

@@ -3,12 +3,24 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Tools.Geometry;
 
-public class Index2DIterator<T>(
-    Index2D Start, 
-    Func<Index2D, Index2D> Next,
+[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
+public class Path<T>(
+    Index2D Start,
+    Func<Index2D, Grid<T>, Index2D> Next,
     Grid<T> Grid,
     int Count) : IEnumerable<(Index2D Index, T Value)> where T : struct
 {
+    public HashSet<Index2D> Points = [];
+    
+    public Path<T> Determine()
+    {
+        foreach ((Index2D index, T value) in this)
+        {
+            Points.Add(index);
+        }
+        return this;
+    }
+    
     public IEnumerator<(Index2D Index, T Value)> GetEnumerator()
     {
         var index = Start;
@@ -16,7 +28,7 @@ public class Index2DIterator<T>(
         {
             if(Grid.ValueOrDefault(index) is {} value)
                 yield return (index, value);
-            index = Next(index);
+            index = Next(index, Grid);
         }
     }
     

@@ -111,6 +111,14 @@ public class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
         }
     }
     
+    public IEnumerable<Index2D> FindIndexes(T value)
+    {
+        foreach (var (index, val) in EnumerableWithIndex())
+        {
+            if (val.Equals(value)) yield return index;
+        }
+    }
+    
     IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {
         for (int i = 0; i < Lattice.Length; i++)

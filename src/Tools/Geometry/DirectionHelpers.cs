@@ -27,13 +27,13 @@ public static class Directions
         Direction.SE,
     ];
     
-    public static Direction Left(Direction dir)
+    public static Direction Left(this Direction dir)
         => (Direction)(((int)dir + 2) % 8);
     
-    public static Direction Right(Direction dir)
+    public static Direction Right(this Direction dir)
         => (Direction)(((int)dir + 6) % 8);
     
-    public static Direction Backwards(Direction dir)
+    public static Direction Backwards(this Direction dir)
         => (Direction)(((int)dir + 4) % 8);
     
     public static bool RightAngle(Direction dir1, Direction dir2)

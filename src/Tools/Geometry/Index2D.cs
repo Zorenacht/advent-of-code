@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 namespace Tools.Geometry;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
 {
     public static readonly Index2D O = new(0, 0);
@@ -20,7 +22,7 @@ public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
     public int Row { get; } = row;
     public int Col { get; } = col;
     
-    public Index2D Neighbor(Direction dir)
+    public Index2D Nb(Direction dir)
         => dir switch
         {
             Direction.N => this + N,
@@ -31,7 +33,7 @@ public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
             Direction.SW => this + SW,
             Direction.SE => this + SE,
             Direction.NE => this + NE,
-            _ => throw new NotSupportedException()
+            _  => throw new NotSupportedException()
         };
     
     public int Norm => Row * Row + Col * Col;
