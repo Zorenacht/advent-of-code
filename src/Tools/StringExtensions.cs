@@ -5,7 +5,7 @@ namespace Tools;
 
 public static class StringExtensions
 {
-    private static string[] Linebreaks = ["\r\n", "\r", "\n"];
+    public static string[] Linebreaks = ["\r\n", "\r", "\n"];
     
     public static Grid<char> ToGrid(this string[] lines) => new(lines.Select(x => x.ToCharArray()).ToArray());
 

@@ -1,5 +1,7 @@
 using FluentAssertions;
 using System.Collections;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices.JavaScript;
 using Tools.Geometry;
 
 namespace AoC_2024;
@@ -7,85 +9,81 @@ namespace AoC_2024;
 public sealed class Day06 : Day
 {
     [Puzzle(answer: 4559)]
-    public int Part1()
+    public int Part1() => Path(Input).GroupBy(x => x.Index).Count();
+    
+    private HashSet<IndexDir> Path(string[] lines)
     {
-        int result = 0;
-        var lines = Input;
-        //var grouped = lines.GroupBy(string.Empty);
         var grid = lines.ToGrid();
-        Index2D? start = grid.FindIndexes('^').FirstOrDefault();
+        var start = grid.FindIndexes('^').First();
         var dir = Direction.N;
-        var set = new HashSet<Index2D>();
-        while (start != null)
+        var set = new HashSet<IndexDir>();
+        while (true)
         {
-            grid.ValueOrDefault(start.Value);
-            set.Add(start.Value);
+            if (grid.ValueOrDefault(start) == null) break;
+            set.Add(new IndexDir(start, dir));
             
-            //next
-            var attempt = start.Value.Neighbor(dir);
-            while (grid.ValueOrDefault(attempt) == '#' && attempt != start)
+            var attempt = start.Neighbor(dir);
+            while (grid.ValueOrDefault(attempt) == '#')
             {
                 dir = dir.Right();
-                attempt = start.Value.Neighbor(dir);
+                attempt = start.Neighbor(dir);
             }
-            //if (set.Contains(start.Value)) break;
-            if (grid.ValueOrDefault(attempt) == null) break;
             start = attempt;
         }
-        return set.Count;
+        return set;
     }
+    
+    
+    //not 551 or 550 or 3965 or 3964 or 1658 or 1646 or 1656 or 1623
+    [Puzzle(answer: 1604)]
+    public int Part2() => Loop(Input);
+    
+    [Puzzle(answer: 6)]
+    public int Part2Example() => Loop(InputExample);
     
     private record IndexDir(Index2D Index, Direction Direction);
     
-    private void ReverseWalk(IndexDir indexDir, HashSet<IndexDir> cycleIndices, Grid<char> grid)
+    private int Loop(string[] lines)
     {
-        var queue = new Queue<IndexDir>();
-        queue.Enqueue(indexDir);
-        while (queue.Any())
+        var grid = lines.ToGrid();
+        int count = 0;
+        foreach (var pair in Path(lines)
+                     .SelectMany(x => new List<(IndexDir Path, Index2D Blockade)>
+                     {
+                         (x, x.Index.Neighbor(x.Direction)),
+                         (x, x.Index.Neighbor(x.Direction.Right()))
+                     })
+                     .Where(pair => grid.ValueOrDefault(pair.Blockade) is '.')
+                     .GroupBy(pair => pair.Blockade)
+                     .Select(x => x.First()))
         {
-            var current = queue.Dequeue();
-            if (grid.ValueOrDefault(current.Index) is null || !cycleIndices.Add(current)) continue;
-            
-            var left = current.Direction.Left();
-            if(grid.ValueOrDefault(current.Index.Neighbor(left)) == '#')
-                queue.Enqueue(new IndexDir(
-                    current.Index.Neighbor(left.Backwards()), 
-                    left));
-            queue.Enqueue(current with { Index = current.Index.Neighbor(current.Direction.Backwards()) });
+            if (HasCycle(pair.Path, pair.Blockade, grid))
+                ++count;
         }
+        return count;
     }
     
-    //not 551 or 550 or 3965 or 3964
-    [Puzzle(answer: null)]
-    public int Part2()
+    private static bool HasCycle(IndexDir indexDir, Index2D blockCandidate, Grid<char> grid)
     {
-        var lines = InputExample;
-        var grid = lines.ToGrid();
-        Index2D? start = grid.FindIndexes('^').FirstOrDefault();
-        var dir = Direction.N;
-        var set = new HashSet<IndexDir>();
-        var cycleIndices = new HashSet<IndexDir>();
-        var blockades = new HashSet<Index2D>();
-        while (start != null)
+        var simulated = new HashSet<IndexDir>();
+        var start = indexDir.Index;
+        var dir = indexDir.Direction;
+        while (true)
         {
-            grid.ValueOrDefault(start.Value);
-            set.Add(new IndexDir(start.Value, dir));
-            ReverseWalk(new IndexDir(start.Value, dir), cycleIndices, grid);
+            if (grid.ValueOrDefault(start) == null) break;
             
-            var attempt = start.Value.Neighbor(dir);
-            while (grid.ValueOrDefault(attempt) == '#' && attempt != start)
+            if (simulated.Contains(new IndexDir(start, dir)))
+                return true;
+            simulated.Add(new IndexDir(start, dir));
+            
+            var next = start.Neighbor(dir);
+            while (grid.ValueOrDefault(next) == '#' || next == blockCandidate)
             {
                 dir = dir.Right();
-                attempt = start.Value.Neighbor(dir);
+                next = start.Neighbor(dir);
             }
-            if (cycleIndices.Contains(new IndexDir(attempt, dir.Right())) 
-                && grid.ValueOrDefault(attempt.Neighbor(dir)) is not '#' and not null)
-            {
-                blockades.Add(attempt.Neighbor(dir));
-            }
-            if (grid.ValueOrDefault(attempt) == null) break;
-            start = attempt;
+            start = next;
         }
-        return blockades.Count;
+        return false;
     }
-};
+}
