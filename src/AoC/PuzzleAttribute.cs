@@ -5,22 +5,20 @@ using NUnit.Framework.Internal.Builders;
 namespace AoC;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public class PuzzleAttribute(object? answer) : NUnitAttribute, ITestBuilder, IImplyFixture
+public class PuzzleAttribute(object? answer) : TestAttribute, ITestBuilder
 {
-    private readonly object? _answer = answer;
-
-    public IEnumerable<TestMethod> BuildFrom(IMethodInfo method, Test? suite)
+    public new IEnumerable<TestMethod> BuildFrom(IMethodInfo method, Test? suite)
     {
         var parameters = new TestCaseParameters()
         {
-            ExpectedResult = _answer,
+            ExpectedResult = answer,
         };
         var test = new NUnitTestCaseBuilder()
             .BuildTestMethod(method, suite, parameters);
-        test.Name = TestName(method, _answer);
+        test.Name = TestName(method, answer);
         yield return test;
     }
 
     private static string TestName(IMethodInfo method, object? input)
-        => $"{method.Name[..4]} {method.Name[4..]}: {(input is { } ? $"Answer is {input}" : "Calculating answer")}";
+        => $"{method.Name[..4]} {method.Name[4..]}: {(input is null ? "Calculating answer" : $"Answer is {input}")}";
 }
