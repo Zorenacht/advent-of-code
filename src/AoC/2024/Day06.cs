@@ -1,5 +1,6 @@
 using FluentAssertions;
 using System.Collections;
+using System.ComponentModel.Design;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices.JavaScript;
 using Tools.Geometry;
@@ -46,19 +47,17 @@ public sealed class Day06 : Day
     private int Loop(string[] lines)
     {
         var grid = lines.ToGrid();
+        var start = grid.FindIndexes('^').FirstOrDefault();
+        var dir = Direction.N;
         int count = 0;
-        foreach (var pair in Path(lines)
-                     .SelectMany(x => new List<(IndexDir Path, Index2D Blockade)>
-                     {
-                         (x, x.Index.Neighbor(x.Direction)),
-                         (x, x.Index.Neighbor(x.Direction.Right()))
-                     })
-                     .Where(pair => grid.ValueOrDefault(pair.Blockade) is '.')
-                     .GroupBy(pair => pair.Blockade)
+        var path = Path(lines);
+        foreach (var pair in path.Zip(path.Skip(1))
+                     .Where(pair => grid.ValueOrDefault(pair.Second.Index) is '.')
+                     .GroupBy(pair => pair.Second.Index)
                      .Select(x => x.First()))
         {
-            if (HasCycle(pair.Path, pair.Blockade, grid))
-                ++count;
+            if (HasCycle(pair.First, pair.Second.Index, grid))
+                count++;
         }
         return count;
     }
