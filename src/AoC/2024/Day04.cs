@@ -28,7 +28,7 @@ public sealed class Day04 : Day
             sb.Append("X");
             for (int c = 1; c < 4; ++c)
             {
-                index = index.Neighbors(dir);
+                index = index.Neighbor(dir);
                 if (index.Row >= 0 && index.Row < input.RowLength && index.Col >= 0 && index.Col < input.ColLength)
                     sb.Append(input[index.Row][index.Col]);
             }
@@ -51,7 +51,7 @@ public sealed class Day04 : Day
         bool CountXMas(Index2D p, Grid<char> grid)
         {
             var values = Directions.Ordinal
-                .Select(dir => grid.ValueOrDefault(p.Neighbors(dir)))
+                .Select(dir => grid.ValueOrDefault(p.Neighbor(dir)))
                 .ToArray();
             return values.Count(x => x == 'M') == 2
                    && values.Count(c => c == 'S') == 2

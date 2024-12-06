@@ -79,7 +79,14 @@ public class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
     {
         if (IsValid(point.Row, point.Col))
             return Lattice[point.Row][point.Col];
-        return new T();
+        return null;
+    }
+    
+    public T? ValueOrDefault(int row, int col)
+    {
+        if (IsValid(row, col))
+            return Lattice[row][col];
+        return null;
     }
     
     public bool UpdateAt(int row, int col, T value)

@@ -22,7 +22,7 @@ public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
     public int Row { get; } = row;
     public int Col { get; } = col;
     
-    public Index2D Neighbors(Direction dir)
+    public Index2D Neighbor(Direction dir)
         => dir switch
         {
             Direction.N => this + N,

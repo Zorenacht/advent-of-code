@@ -40,7 +40,7 @@ public sealed class Day10 : Day
             var left = new HashSet<Index2D>();
             var right = new HashSet<Index2D>();
             var iterator = new IndexDirection(
-                start.Neighbors(Start.Direction),
+                start.Neighbor(Start.Direction),
                 (Direction)(((int)Start.Direction + 4) % 8));
             do
             {
@@ -77,21 +77,21 @@ public sealed class Day10 : Day
         public IEnumerable<Index2D> Left(Index2D p, Direction incoming, char ch)
         {
             var left = (Direction)(((int)incoming + 2) % 8);
-            yield return p.Neighbors(left);
+            yield return p.Neighbor(left);
             var nextIncomingDir = Mapping(ch, new IndexDirection(p, incoming)).First().Direction;
             var diff = ((int)nextIncomingDir - (int)incoming + 8) % 8;
             var straight = (Direction)(((int)incoming + 4) % 8);
-            if (diff == 2) yield return p.Neighbors(straight);
+            if (diff == 2) yield return p.Neighbor(straight);
         }
         
         public IEnumerable<Index2D> Right(Index2D p, Direction incoming, char ch)
         {
             var right = (Direction)(((int)incoming + 6) % 8);
-            yield return p.Neighbors(right);
+            yield return p.Neighbor(right);
             var nextIncomingDir = Mapping(ch, new IndexDirection(p, incoming)).First().Direction;
             var diff = ((int)nextIncomingDir - (int)incoming + 8) % 8;
             var straight = (Direction)(((int)incoming + 4) % 8);
-            if (diff == 6) yield return p.Neighbors(straight);
+            if (diff == 6) yield return p.Neighbor(straight);
         }
         
         public record IndexDirection(Index2D Index, Direction Direction);
@@ -100,10 +100,10 @@ public sealed class Day10 : Day
         {
             IndexDirection[] nb =
             [
-                new IndexDirection(start.Neighbors(Direction.W), Direction.E),
-                new IndexDirection(start.Neighbors(Direction.N), Direction.S),
-                new IndexDirection(start.Neighbors(Direction.E), Direction.W),
-                new IndexDirection(start.Neighbors(Direction.S), Direction.N)
+                new IndexDirection(start.Neighbor(Direction.W), Direction.E),
+                new IndexDirection(start.Neighbor(Direction.N), Direction.S),
+                new IndexDirection(start.Neighbor(Direction.E), Direction.W),
+                new IndexDirection(start.Neighbor(Direction.S), Direction.N)
             ];
             var incomingDirection = nb.First(pd => Mapping(board[pd.Index.Row][pd.Index.Col], pd).Any())
                 .Direction;
@@ -146,7 +146,7 @@ public sealed class Day10 : Day
         
         public static HashSet<Index2D> CyclePoints(Grid<char> board, Index2D start, Direction direction)
         {
-            var iterator = new IndexDirection(start.Neighbors(direction), direction.Backwards());
+            var iterator = new IndexDirection(start.Neighbor(direction), direction.Backwards());
             var cycle = new HashSet<Index2D>();
             do
             {
@@ -171,24 +171,24 @@ public sealed class Day10 : Day
         {
             return (ch, indexDir.Direction) switch
             {
-                ('|', Direction.S) => [new IndexDirection(indexDir.Index.Neighbors(Direction.N), Direction.S)],
-                ('|', Direction.N) => [new IndexDirection(indexDir.Index.Neighbors(Direction.S), Direction.N)],
-                ('-', Direction.W) => [new IndexDirection(indexDir.Index.Neighbors(Direction.E), Direction.W)],
-                ('-', Direction.E) => [new IndexDirection(indexDir.Index.Neighbors(Direction.W), Direction.E)],
-                ('L', Direction.N) => [new IndexDirection(indexDir.Index.Neighbors(Direction.E), Direction.W)],
-                ('L', Direction.E) => [new IndexDirection(indexDir.Index.Neighbors(Direction.N), Direction.S)],
-                ('J', Direction.N) => [new IndexDirection(indexDir.Index.Neighbors(Direction.W), Direction.E)],
-                ('J', Direction.W) => [new IndexDirection(indexDir.Index.Neighbors(Direction.N), Direction.S)],
-                ('7', Direction.S) => [new IndexDirection(indexDir.Index.Neighbors(Direction.W), Direction.E)],
-                ('7', Direction.W) => [new IndexDirection(indexDir.Index.Neighbors(Direction.S), Direction.N)],
-                ('F', Direction.S) => [new IndexDirection(indexDir.Index.Neighbors(Direction.E), Direction.W)],
-                ('F', Direction.E) => [new IndexDirection(indexDir.Index.Neighbors(Direction.S), Direction.N)],
+                ('|', Direction.S) => [new IndexDirection(indexDir.Index.Neighbor(Direction.N), Direction.S)],
+                ('|', Direction.N) => [new IndexDirection(indexDir.Index.Neighbor(Direction.S), Direction.N)],
+                ('-', Direction.W) => [new IndexDirection(indexDir.Index.Neighbor(Direction.E), Direction.W)],
+                ('-', Direction.E) => [new IndexDirection(indexDir.Index.Neighbor(Direction.W), Direction.E)],
+                ('L', Direction.N) => [new IndexDirection(indexDir.Index.Neighbor(Direction.E), Direction.W)],
+                ('L', Direction.E) => [new IndexDirection(indexDir.Index.Neighbor(Direction.N), Direction.S)],
+                ('J', Direction.N) => [new IndexDirection(indexDir.Index.Neighbor(Direction.W), Direction.E)],
+                ('J', Direction.W) => [new IndexDirection(indexDir.Index.Neighbor(Direction.N), Direction.S)],
+                ('7', Direction.S) => [new IndexDirection(indexDir.Index.Neighbor(Direction.W), Direction.E)],
+                ('7', Direction.W) => [new IndexDirection(indexDir.Index.Neighbor(Direction.S), Direction.N)],
+                ('F', Direction.S) => [new IndexDirection(indexDir.Index.Neighbor(Direction.E), Direction.W)],
+                ('F', Direction.E) => [new IndexDirection(indexDir.Index.Neighbor(Direction.S), Direction.N)],
                 ('S', _) =>
                 [
-                    new IndexDirection(indexDir.Index.Neighbors(Direction.W), Direction.E),
-                    new IndexDirection(indexDir.Index.Neighbors(Direction.N), Direction.S),
-                    new IndexDirection(indexDir.Index.Neighbors(Direction.E), Direction.W),
-                    new IndexDirection(indexDir.Index.Neighbors(Direction.S), Direction.N)
+                    new IndexDirection(indexDir.Index.Neighbor(Direction.W), Direction.E),
+                    new IndexDirection(indexDir.Index.Neighbor(Direction.N), Direction.S),
+                    new IndexDirection(indexDir.Index.Neighbor(Direction.E), Direction.W),
+                    new IndexDirection(indexDir.Index.Neighbor(Direction.S), Direction.N)
                 ],
                 _ => []
             };
