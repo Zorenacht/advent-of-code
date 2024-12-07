@@ -61,7 +61,9 @@ public class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
                             && point.Col >= 0 && point.Col < Lattice[0].Length;
     }
 
-    public T? ValueOrDefault(Index2D point) => ValueOrDefault(point.Row, point.Col);
+    public T ValueAt(int row, int col) => Lattice[row][col];
+
+    public T ValueAt(Index2D point) => ValueAt(point.Row, point.Col);
 
     public T? ValueOrDefault(int row, int col)
     {
@@ -69,6 +71,8 @@ public class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             return Lattice[row][col];
         return null;
     }
+
+    public T? ValueOrDefault(Index2D point) => ValueOrDefault(point.Row, point.Col);
 
     public bool UpdateAt(int row, int col, T value)
     {

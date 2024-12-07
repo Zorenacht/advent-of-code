@@ -9,6 +9,8 @@ public static class StringExtensions
 
     public static Grid<char> ToGrid(this string text) => text.Lines().ToGrid();
     public static Grid<char> ToGrid(this string[] lines) => new(lines.Select(x => x.ToCharArray()).ToArray());
+    public static Grid<int> ToIntGrid(this string[] lines) => new(lines.Select(x => x.Select(x => x - '0').ToArray()).ToArray());
+
 
     public static string[] Lines(this string str)
         => str.Split(

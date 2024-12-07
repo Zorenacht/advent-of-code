@@ -16,16 +16,16 @@ public sealed class Day11(bool withAnimation = false) : Day
 
         for (int i = 1; i <= 100; i++)
         {
-            Grid hasFlashed = new Grid(grid.RowLength, grid.ColumnLength);
-            foreach (var (point, val) in grid.EnumerableWithIndex())
+            var hasFlashed = new Grid<int>(grid.RowLength, grid.ColLength);
+            foreach (var (index, val) in grid.EnumerableWithIndex())
             {
-                grid.UpdateAt(point, val == 9 ? 0 : val + 1);
+                grid.UpdateAt(index, val == 9 ? 0 : val + 1);
             }
-            foreach (var (point, val) in grid.EnumerableWithIndex())
+            foreach (var (index, val) in grid.EnumerableWithIndex())
             {
-                if (grid.ValueAt(point) == 0 && hasFlashed.Lattice[point.X][point.Y] == 0)
+                if (grid.ValueAt(index) == 0 && hasFlashed.Lattice[index.Row][index.Col] == 0)
                 {
-                    giveNeighborsEnergy(point, grid, hasFlashed, ref count, i, withAnimation);
+                    giveNeighborsEnergy(index, grid, hasFlashed, ref count, i, withAnimation);
                 }
             }
         }
@@ -39,22 +39,22 @@ public sealed class Day11(bool withAnimation = false) : Day
         if (withAnimation) Console.Clear();
 
         var grid = new FlashingOctopusGrid(Input);
-        Grid hasFlashed = new Grid(grid.RowLength, grid.ColumnLength);
+        var hasFlashed = new Grid<int>(grid.RowLength, grid.ColLength);
         int countIterations = 0;
         int count = 0;//needed so that function runs
 
-        while (hasFlashed.As1D().Where(x => x == 1).Count() != hasFlashed.ColumnLength * hasFlashed.RowLength)
+        while (hasFlashed.As1D().Where(x => x == 1).Count() != hasFlashed.RowLength * hasFlashed.ColLength)
         {
             hasFlashed.Reset();
-            foreach (var (point, val) in grid.EnumerableWithIndex())
+            foreach (var (index, val) in grid.EnumerableWithIndex())
             {
-                grid.UpdateAt(point, val == 9 ? 0 : val + 1);
+                grid.UpdateAt(index, val == 9 ? 0 : val + 1);
             }
-            foreach (var (point, val) in grid.EnumerableWithIndex())
+            foreach (var (index, val) in grid.EnumerableWithIndex())
             {
-                if (grid.ValueAt(point) == 0 && hasFlashed.Lattice[point.X][point.Y] == 0)
+                if (grid.ValueAt(index) == 0 && hasFlashed.Lattice[index.Row][index.Col] == 0)
                 {
-                    giveNeighborsEnergy(point, grid, hasFlashed, ref count, countIterations, withAnimation);
+                    giveNeighborsEnergy(index, grid, hasFlashed, ref count, countIterations, withAnimation);
                 }
             }
             countIterations++;
@@ -63,18 +63,18 @@ public sealed class Day11(bool withAnimation = false) : Day
         return countIterations;
     }
 
-    void giveNeighborsEnergy(Point point, FlashingOctopusGrid grid, Grid hasFlashed, ref int count, int iteration, bool withAnimation)
+    void giveNeighborsEnergy(Index2D index, FlashingOctopusGrid grid, Grid<int> hasFlashed, ref int count, int iteration, bool withAnimation)
     {
-        if (grid.ValueAt(point) != 0)
+        if (grid.ValueAt(index) != 0)
         {
             return;
         }
-        hasFlashed.UpdateAt(point, 1);
+        hasFlashed.UpdateAt(index, 1);
         count++;
 
         for (int j = 0; j < 8; j++)
         {
-            Point neighbor = point.Neighbor((Direction)j);
+            var neighbor = index.Neighbor((Direction)j);
             if (grid.IsValid(neighbor))
             {
                 int value = grid.ValueAt(neighbor);
@@ -100,9 +100,14 @@ public sealed class Day11(bool withAnimation = false) : Day
         Thread.Sleep(delay);
     }
 
-    internal class FlashingOctopusGrid : Grid
+    internal class FlashingOctopusGrid : Grid<int>
     {
-        public FlashingOctopusGrid(string[] text) : base(text) { }
+        public FlashingOctopusGrid(string[] text) : base(
+            text
+                .Select(x => x
+                    .Select(x => x - '0')
+                    .ToArray())
+                .ToArray()) { }
 
         public void Print(int step, int count, bool withAnimation = false)
         {

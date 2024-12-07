@@ -17,24 +17,24 @@ public sealed partial class Day14 : Day
 
     public class Cave
     {
-        Grid CaveGrid { get; set; }
-        readonly Point Sand = new(0, 500);
+        Grid<int> CaveGrid { get; set; }
+        readonly Index2D Sand = new(0, 500);
         int HighestRock => CaveGrid.Lattice.Select(x => x.Contains(1)).ToList().FindLastIndex(val => val == true);
 
         public int SandCount => CaveGrid.Enumerable().Count(val => val == 2);
 
-        public Cave(Grid cave) => CaveGrid = cave;
+        public Cave(Grid<int> cave) => CaveGrid = cave;
 
 
         public int Simulate()
         {
-            Point current = Sand;
+            Index2D current = Sand;
             int count = 0;
-            while (current.X < CaveGrid.RowLength - 1)
+            while (current.Row < CaveGrid.RowLength - 1)
             {
-                if (CaveGrid.ValueAt(current.Neighbor2(Direction.S)) == 0) current = current.Neighbor2(Direction.S);
-                else if (CaveGrid.ValueAt(current.Neighbor2(Direction.SW)) == 0) current = current.Neighbor2(Direction.SW);
-                else if (CaveGrid.ValueAt(current.Neighbor2(Direction.SE)) == 0) current = current.Neighbor2(Direction.SE);
+                if (CaveGrid.ValueAt(current.Neighbor(Direction.S)) == 0) current = current.Neighbor(Direction.S);
+                else if (CaveGrid.ValueAt(current.Neighbor(Direction.SW)) == 0) current = current.Neighbor(Direction.SW);
+                else if (CaveGrid.ValueAt(current.Neighbor(Direction.SE)) == 0) current = current.Neighbor(Direction.SE);
                 else
                 {
                     CaveGrid.UpdateAt(current, 2);
@@ -42,19 +42,18 @@ public sealed partial class Day14 : Day
                 }
                 count++;
             }
-            CaveGrid.Print();
             return SandCount;
         }
 
         public int Simulate2()
         {
-            Point current = Sand;
+            Index2D current = Sand;
             int count = 0;
             while (CaveGrid.ValueAt(Sand) == 0)
             {
-                if (CaveGrid.ValueAt(current.Neighbor2(Direction.S)) == 0) current = current.Neighbor2(Direction.S);
-                else if (CaveGrid.ValueAt(current.Neighbor2(Direction.SW)) == 0) current = current.Neighbor2(Direction.SW);
-                else if (CaveGrid.ValueAt(current.Neighbor2(Direction.SE)) == 0) current = current.Neighbor2(Direction.SE);
+                if (CaveGrid.ValueAt(current.Neighbor(Direction.S)) == 0) current = current.Neighbor(Direction.S);
+                else if (CaveGrid.ValueAt(current.Neighbor(Direction.SW)) == 0) current = current.Neighbor(Direction.SW);
+                else if (CaveGrid.ValueAt(current.Neighbor(Direction.SE)) == 0) current = current.Neighbor(Direction.SE);
                 else
                 {
                     CaveGrid.UpdateAt(current, 2);
@@ -62,13 +61,12 @@ public sealed partial class Day14 : Day
                 }
                 count++;
             }
-            CaveGrid.Print();
             return SandCount;
         }
 
         public static Cave Parse(string[] lines)
         {
-            Grid grid = new Grid(200, 1000);
+            var grid = new Grid<int>(200, 1000);
             foreach (var line in lines)
             {
                 //parse input
@@ -76,7 +74,7 @@ public sealed partial class Day14 : Day
                     .Select(pair =>
                     {
                         var splittedPair = pair.Split(',');
-                        return new Point(int.Parse(splittedPair[1]), int.Parse(splittedPair[0]));
+                        return new Index2D(int.Parse(splittedPair[1]), int.Parse(splittedPair[0]));
                     }).ToList();
 
                 //set rocks
@@ -92,7 +90,7 @@ public sealed partial class Day14 : Day
 
         public Cave AddFloor()
         {
-            CaveGrid.ApplyRange(new Point(HighestRock + 2, 0), new Point(HighestRock + 2, CaveGrid.ColumnLength - 1), 1);
+            CaveGrid.ApplyRange(new Index2D(HighestRock + 2, 0), new Index2D(HighestRock + 2, CaveGrid.ColLength - 1), 1);
             return this;
         }
     }

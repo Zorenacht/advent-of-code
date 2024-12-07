@@ -17,15 +17,15 @@ public sealed partial class Day12 : Day
 
     private int Simulate(string[] lines)
     {
-        var grid = new Grid(lines.Length, lines[0].Length);
-        var start = Point.O;
-        var end = Point.O;
+        var grid = new Grid<int>(lines.Length, lines[0].Length);
+        var start = Index2D.O;
+        var end = Index2D.O;
         for (int i = 0; i < lines.Length; i++)
         {
             for (int j = 0; j < lines[i].Length; j++)
             {
-                if (lines[i][j] == 'S') start = new Point(i, j);
-                if (lines[i][j] == 'E') end = new Point(i, j);
+                if (lines[i][j] == 'S') start = new Index2D(i, j);
+                if (lines[i][j] == 'E') end = new Index2D(i, j);
                 int value = lines[i][j] switch
                 {
                     'S' => 1,
@@ -42,13 +42,13 @@ public sealed partial class Day12 : Day
 
     private class HillFinder
     {
-        Grid Grid { get; set; }
-        IEnumerable<Point> StartPoints { get; set; }
-        Point End { get; set; }
+        Grid<int> Grid { get; set; }
+        IEnumerable<Index2D> StartPoints { get; set; }
+        Index2D End { get; set; }
 
         public HillFinder(string[] lines)
         {
-            Grid = new Grid(lines.Length, lines[0].Length);
+            Grid = new Grid<int>(lines.Length, lines[0].Length);
             StartPoints = Parse(lines);
         }
 
@@ -67,9 +67,9 @@ public sealed partial class Day12 : Day
             return max;
         }
 
-        private IEnumerable<Point> Parse(string[] lines)
+        private IEnumerable<Index2D> Parse(string[] lines)
         {
-            var list = new List<Point>();
+            var list = new List<Index2D>();
             for (int i = 0; i < lines.Length; i++)
             {
                 for (int j = 0; j < lines[i].Length; j++)
@@ -81,22 +81,21 @@ public sealed partial class Day12 : Day
                         _ => lines[i][j] - 'a' + 1
                     };
                     Grid.UpdateAt(i, j, value);
-                    if (lines[i][j] == 'E') End = new Point(i, j);
-                    if (lines[i][j] == 'S' || lines[i][j] == 'a') list.Add(new Point(i, j));
+                    if (lines[i][j] == 'E') End = new Index2D(i, j);
+                    if (lines[i][j] == 'S' || lines[i][j] == 'a') list.Add(new Index2D(i, j));
                 }
             }
             return list;
         }
     }
 
-
     public class Hill : IState<Hill>
     {
-        public readonly Point Current;
-        public readonly Point Goal;
-        public readonly Grid Hills;
+        public readonly Index2D Current;
+        public readonly Index2D Goal;
+        public readonly Grid<int> Hills;
 
-        public Hill(Grid hills, Point current, Point goal)
+        public Hill(Grid<int> hills, Index2D current, Index2D goal)
         {
             Hills = hills;
             Current = current;
@@ -116,7 +115,7 @@ public sealed partial class Day12 : Day
             if (Hills.IsValid(w) && Hills.ValueAt(w) - c <= 1) yield return new Node<Hill>(new(Hills, w, Goal), initialDistance + 1);
         }
 
-        public int Heuristic() => Math.Abs(Goal.X - Current.X) + Math.Abs(Goal.Y - Current.Y);
+        public int Heuristic() => Math.Abs(Goal.Row - Current.Row) + Math.Abs(Goal.Col - Current.Col);
         public bool Equals(Hill? other) => Current == other?.Current;
         public override int GetHashCode() => Current.GetHashCode();
     }

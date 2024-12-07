@@ -8,7 +8,7 @@ public sealed partial class Day08 : Day
     public void Example()
     {
         var result = 0;
-        Trees(InputExample, out Grid grid, out Grid counter);
+        Trees(InputExample, out var grid, out var counter);
         foreach (var count in counter.Enumerable())
         {
             result += count;
@@ -19,12 +19,12 @@ public sealed partial class Day08 : Day
     [Test]
     public void ExamplePart2()
     {
-        Trees(InputExample, out Grid grid, out Grid counter);
-        TreeView2(grid, out Grid left, out Grid right, out Grid up, out Grid down);
+        Trees(InputExample, out var grid, out var counter);
+        TreeView2(grid, out var left, out var right, out var up, out var down);
         int max = 0;
         for (int i = 0; i < grid.RowLength; i++)
         {
-            for (int j = 0; j < grid.ColumnLength; j++)
+            for (int j = 0; j < grid.ColLength; j++)
             {
                 var prod = left.Lattice[i][j] * right.Lattice[i][j] * up.Lattice[i][j] * down.Lattice[i][j];
                 if (prod > max)
@@ -40,7 +40,7 @@ public sealed partial class Day08 : Day
     public void Part1()
     {
         var result = 0;
-        Trees(InputPart1, out Grid grid, out Grid counter);
+        Trees(InputPart1, out var grid, out var counter);
         foreach (var count in counter.Enumerable())
         {
             result += count;
@@ -51,12 +51,12 @@ public sealed partial class Day08 : Day
     [Test]
     public void Part2()
     {
-        Trees(InputPart2, out Grid grid, out Grid counter);
-        TreeView2(grid, out Grid left, out Grid right, out Grid up, out Grid down);
+        Trees(InputPart2, out var grid, out var counter);
+        TreeView2(grid, out var left, out var right, out var up, out var down);
         int max = 0;
         for (int i = 0; i < grid.RowLength; i++)
         {
-            for (int j = 0; j < grid.ColumnLength; j++)
+            for (int j = 0; j < grid.ColLength; j++)
             {
                 var prod = left.Lattice[i][j] * right.Lattice[i][j] * up.Lattice[i][j] * down.Lattice[i][j];
                 if (prod > max)
@@ -68,20 +68,20 @@ public sealed partial class Day08 : Day
         max.Should().Be(504000);
     }
 
-    private void Trees(string[] input, out Grid grid, out Grid counter)
+    private void Trees(string[] input, out Grid<int> grid, out Grid<int> counter)
     {
-        grid = new Grid(input);
-        counter = new Grid(grid.RowLength, grid.ColumnLength);
+        grid = input.ToIntGrid();
+        counter = new Grid<int>(grid.RowLength, grid.ColLength);
         var rowMin = Enumerable.Repeat(-1, grid.RowLength).ToArray();
         var rowMinRev = Enumerable.Repeat(-1, grid.RowLength).ToArray();
-        var colMin = Enumerable.Repeat(-1, grid.ColumnLength).ToArray();
-        var colMinRev = Enumerable.Repeat(-1, grid.ColumnLength).ToArray();
+        var colMin = Enumerable.Repeat(-1, grid.ColLength).ToArray();
+        var colMinRev = Enumerable.Repeat(-1, grid.ColLength).ToArray();
         for (int i = 0; i < grid.RowLength; i++)
         {
-            for (int j = 0; j < grid.ColumnLength; j++)
+            for (int j = 0; j < grid.ColLength; j++)
             {
                 int iReverse = grid.RowLength - i - 1;
-                int jReverse = grid.ColumnLength - j - 1;
+                int jReverse = grid.ColLength - j - 1;
                 if (rowMin[i] < grid.Lattice[i][j])
                 {
                     counter.Lattice[i][j] = 1;
@@ -107,15 +107,15 @@ public sealed partial class Day08 : Day
     }
 
     //nlog(n) (n=total input digits)
-    private void TreeView2(Grid grid, out Grid left, out Grid right, out Grid up, out Grid down)
+    private void TreeView2(Grid<int> grid, out Grid<int> left, out Grid<int> right, out Grid<int> up, out Grid<int> down)
     {
-        left = new Grid(grid.RowLength, grid.ColumnLength);
-        right = new Grid(grid.RowLength, grid.ColumnLength);
-        up = new Grid(grid.RowLength, grid.ColumnLength);
-        down = new Grid(grid.RowLength, grid.ColumnLength);
+        left = new Grid<int>(grid.RowLength, grid.ColLength);
+        right = new Grid<int>(grid.RowLength, grid.ColLength);
+        up = new Grid<int>(grid.RowLength, grid.ColLength);
+        down = new Grid<int>(grid.RowLength, grid.ColLength);
         for (int i = 0; i < grid.RowLength; i++)
         {
-            for (int j = 0; j < grid.ColumnLength; j++)
+            for (int j = 0; j < grid.ColLength; j++)
             {
                 var counter = new int[4];
                 for (int k = i - 1; k >= 0; k--)
@@ -142,7 +142,7 @@ public sealed partial class Day08 : Day
                         break;
                     }
                 }
-                for (int k = j + 1; k < grid.ColumnLength; k++)
+                for (int k = j + 1; k < grid.ColLength; k++)
                 {
                     counter[3]++;
                     if (grid.Lattice[i][j] <= grid.Lattice[i][k])
@@ -156,10 +156,5 @@ public sealed partial class Day08 : Day
                 right.Lattice[i][j] = counter[3];
             }
         }
-        grid.Print();
-        left.Print();
-        right.Print();
-        up.Print();
-        down.Print();
     }
 }
