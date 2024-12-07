@@ -6,13 +6,14 @@ namespace Tools;
 public static class StringExtensions
 {
     public static string[] Linebreaks = ["\r\n", "\r", "\n"];
-    
+
+    public static Grid<char> ToGrid(this string text) => text.Lines().ToGrid();
     public static Grid<char> ToGrid(this string[] lines) => new(lines.Select(x => x.ToCharArray()).ToArray());
 
     public static string[] Lines(this string str)
         => str.Split(
             Environment.NewLine,
-            StringSplitOptions.None);
+            StringSplitOptions.RemoveEmptyEntries);
 
     public static string[][] GroupBy(this IEnumerable<string> lines, string separator)
     {
