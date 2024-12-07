@@ -94,8 +94,6 @@ public sealed class Day10 : Day
             if (diff == 6) yield return p.Neighbor(straight);
         }
         
-        public record IndexDirection(Index2D Index, Direction Direction);
-        
         private Direction StartDirection(Grid<char> board, Index2D start)
         {
             IndexDirection[] nb =

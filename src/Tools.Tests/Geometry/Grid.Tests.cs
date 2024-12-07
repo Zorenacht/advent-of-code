@@ -47,18 +47,4 @@ public class GridTests
         var grid = new Grid<int>(DigitGrid.Lines().Select(x => x.Select(x => x - '0').ToArray()).ToArray());
         return grid.ValueOrDefault(i, j);
     }
-
-    [TestCase(0, 0, ExpectedResult = 1)]
-    [TestCase(0, 8, ExpectedResult = 9)]
-    [TestCase(1, 0, ExpectedResult = 9)]
-    [TestCase(1, 8, ExpectedResult = 1)]
-    [TestCase(-1, 0, ExpectedResult = null)]
-    [TestCase(+0, 9, ExpectedResult = null)]
-    [TestCase(+1, 9, ExpectedResult = null)]
-    [TestCase(+2, 8, ExpectedResult = null)]
-    public int? ValueOrDefault(int i, int j)
-    {
-        var grid = new Grid<int>(DigitGrid.Lines().Select(x => x.Select(x => x - '0').ToArray()).ToArray());
-        return grid.ValueOrDefault(i, j);
-    }
 }
