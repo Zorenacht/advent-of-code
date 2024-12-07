@@ -1,7 +1,3 @@
-using FluentAssertions;
-using MathNet.Numerics;
-using System.Reflection.Metadata.Ecma335;
-
 namespace AoC_2024;
 
 public sealed class Day02 : Day
@@ -44,7 +40,7 @@ public sealed class Day02 : Day
             for (int i = 0; i < all.Count; i++)
             {
                 var vals = all.Where((x, ind) => ind != i).ToList();
-                if(IsSafe(vals))
+                if (IsSafe(vals))
                 {
                     result++;
                     break;

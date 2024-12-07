@@ -12,30 +12,30 @@ public static class Directions
         Direction.S,
         Direction.SE,
     ];
-    
+
     public static Direction[] Cardinal = [
         Direction.E,
         Direction.N,
         Direction.W,
         Direction.S,
     ];
-    
+
     public static Direction[] Ordinal = [
         Direction.NE,
         Direction.NW,
         Direction.SW,
         Direction.SE,
     ];
-    
+
     public static Direction Left(this Direction dir)
         => (Direction)(((int)dir + 2) % 8);
-    
+
     public static Direction Right(this Direction dir)
         => (Direction)(((int)dir + 6) % 8);
-    
+
     public static Direction Backwards(this Direction dir)
         => (Direction)(((int)dir + 4) % 8);
-    
+
     public static bool RightAngle(Direction dir1, Direction dir2)
     {
         return BasicMath.Modulo((int)dir1 - (int)dir2, 2) == 0

@@ -5,7 +5,7 @@ namespace Tools.Geometry;
 public interface IGrid<T> : IEnumerable, IEnumerable<T> where T : struct
 {
     public T[][] Lattice { get; set; }
-    public int TotalLength { get; }    
+    public int TotalLength { get; }
     public int RowLength { get; }
     public int ColLength { get; }
     public T[] this[int row] { get; set; }

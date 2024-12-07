@@ -1,13 +1,10 @@
-global using FluentAssertions;
-global using NUnit.Framework;
-
 namespace Performance.Tests;
 
 public class DatastructureTests
 {
     private int Times = 10_000;
     private const int Length = 10_000;
-    
+
     protected record Int(int Number);
 
     public class RangeTests : DatastructureTests

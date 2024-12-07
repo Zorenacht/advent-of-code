@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Tools.Shapes;
 
@@ -41,7 +39,7 @@ public class Intersection
             for (int i = 0; i < num1.Length; ++i) n1[i] = int.Parse(num1[num1.Length - 1 - i].ToString());
             for (int i = 0; i < num2.Length; ++i) n2[i] = int.Parse(num2[num2.Length - 1 - i].ToString());
 
-            var answer = Multiply(n1,n2);
+            var answer = Multiply(n1, n2);
 
             bool hasStarted = false;
             var sb = new StringBuilder();

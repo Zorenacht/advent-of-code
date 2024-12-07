@@ -1,5 +1,3 @@
-using FluentAssertions;
-
 namespace AoC_2024;
 
 public sealed class Day03 : Day
@@ -18,7 +16,7 @@ public sealed class Day03 : Day
         }
         return result;
     }
-    
+
     [Puzzle(answer: 87163705)]
     public long Part2()
     {

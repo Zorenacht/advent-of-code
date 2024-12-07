@@ -1,5 +1,3 @@
-﻿using System.Collections;
-
-namespace Tools.Geometry;
+﻿namespace Tools.Geometry;
 
 public record IndexDirection(Index2D Index, Direction Direction);

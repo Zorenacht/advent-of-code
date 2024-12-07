@@ -1,4 +1,3 @@
-using FluentAssertions;
 using System.Text;
 using Tools.Geometry;
 
@@ -13,7 +12,7 @@ public sealed class Day04 : Day
         return lines2.EnumerableWithIndex()
             .Where(ele => ele.Value == 'X')
             .Sum(ele => CountXMAS(ele.Index, lines2));
-        
+
         int CountXMAS(Index2D index, Grid<char> grid)
         {
             var words = Directions.All
@@ -21,7 +20,7 @@ public sealed class Day04 : Day
                 .ToArray();
             return words.Count(x => x == "XMAS");
         }
-        
+
         string XmasWalk(Index2D index, Direction dir, Grid<char> input)
         {
             var sb = new StringBuilder();
@@ -35,8 +34,8 @@ public sealed class Day04 : Day
             return sb.ToString();
         }
     }
-    
-    
+
+
     [Puzzle(answer: 2029)]
     public int Part2()
     {
@@ -47,7 +46,7 @@ public sealed class Day04 : Day
             if (value == 'A') result += CountXMas(index, lines2) ? 1 : 0;
         }
         return result;
-        
+
         bool CountXMas(Index2D p, Grid<char> grid)
         {
             var values = Directions.Ordinal

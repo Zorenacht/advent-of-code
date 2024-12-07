@@ -1,5 +1,4 @@
 using Tools;
-using Tools.Collections;
 using Tools.Geometry;
 
 namespace Collections.Geometry;

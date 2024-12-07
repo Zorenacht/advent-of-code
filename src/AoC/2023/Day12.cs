@@ -1,9 +1,3 @@
-using NUnit.Framework.Constraints;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
-using System.Text;
-using static AoC_2023.Day17;
-
 namespace AoC_2023;
 
 public sealed class Day12 : Day
@@ -49,7 +43,7 @@ public sealed class Day12 : Day
             }
 
             public override string ToString()
-            { 
+            {
                 return string.Join(",", States);
             }
         }

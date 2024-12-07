@@ -1,5 +1,3 @@
-using NUnit.Compatibility;
-
 namespace AoC_2021;
 
 public sealed class Day21 : Day

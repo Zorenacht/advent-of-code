@@ -107,7 +107,8 @@ public sealed class Day11(bool withAnimation = false) : Day
                 .Select(x => x
                     .Select(x => x - '0')
                     .ToArray())
-                .ToArray()) { }
+                .ToArray())
+        { }
 
         public void Print(int step, int count, bool withAnimation = false)
         {

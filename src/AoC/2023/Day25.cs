@@ -1,8 +1,4 @@
-using MathNet.Numerics.LinearAlgebra;
 using System.Data;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AoC_2023;
 

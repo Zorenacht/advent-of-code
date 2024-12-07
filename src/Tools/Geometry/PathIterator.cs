@@ -11,7 +11,7 @@ public class Path<T>(
     int Count) : IEnumerable<(Index2D Index, T Value)> where T : struct
 {
     public HashSet<Index2D> Points = [];
-    
+
     public Path<T> Determine()
     {
         foreach ((Index2D index, T value) in this)
@@ -20,17 +20,17 @@ public class Path<T>(
         }
         return this;
     }
-    
+
     public IEnumerator<(Index2D Index, T Value)> GetEnumerator()
     {
         var index = Start;
         for (int i = 0; i <= Count; ++i)
         {
-            if(Grid.ValueOrDefault(index) is {} value)
+            if (Grid.ValueOrDefault(index) is { } value)
                 yield return (index, value);
             index = Next(index, Grid);
         }
     }
-    
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

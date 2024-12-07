@@ -98,15 +98,15 @@ public sealed class Day24 : Day
 
             for (int i = -1000; i < 1000; i++)
             {
-                var grouped = parsed.Select(parse => parse.P.Z + (parse.D.Z - i) / (parse.D.X - result.D.X) * (result.I.X - parse.P.X) )
+                var grouped = parsed.Select(parse => parse.P.Z + (parse.D.Z - i) / (parse.D.X - result.D.X) * (result.I.X - parse.P.X))
                     .GroupBy(z => z)
                     .Select(x => x.Key)
                     .Where(x => x is not double.NegativeInfinity or double.PositiveInfinity)
                     .OrderBy(x => x)
                     .ToList();
-                if(Math.Abs(grouped[0] - grouped[^1]) < 5d)
+                if (Math.Abs(grouped[0] - grouped[^1]) < 5d)
                 {
-                    return (long)(result.I.X + result.I.Y + grouped[grouped.Count/2]);
+                    return (long)(result.I.X + result.I.Y + grouped[grouped.Count / 2]);
                 }
             }
             return -1;

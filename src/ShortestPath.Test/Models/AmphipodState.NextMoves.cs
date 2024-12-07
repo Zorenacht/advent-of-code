@@ -31,9 +31,9 @@ public sealed partial class AmphipodState : IState<AmphipodState>, IEnumerable<A
     public int SpaceInRoom(Amphipod amphipod)
     {
         var col = AmphipodRoomCol(amphipod);
-        for(int row = Rooms.GetLength(0)-1; row >= 0; row--)
+        for (int row = Rooms.GetLength(0) - 1; row >= 0; row--)
         {
-            if(Rooms[row, col] != amphipod)
+            if (Rooms[row, col] != amphipod)
             {
                 return (row + 1);
             };
@@ -118,7 +118,7 @@ public sealed partial class AmphipodState : IState<AmphipodState>, IEnumerable<A
                 roomRow = row - 1;
             }
         }
-        if(roomRow == -1)
+        if (roomRow == -1)
         {
             roomRow = Rooms.GetLength(0) - 1;
         }
