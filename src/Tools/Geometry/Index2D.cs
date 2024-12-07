@@ -6,14 +6,15 @@ namespace Tools.Geometry;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "For Rider")]
 public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
 {
     public static readonly Index2D O = new(0, 0);
 
-    public static readonly Index2D N = new(-1, 0);
-    public static readonly Index2D S = new(1, 0);
-    public static readonly Index2D E = new(0, 1);
-    public static readonly Index2D W = new(0, -1);
+    public static readonly Index2D N = new(-1, +0);
+    public static readonly Index2D S = new(+1, +0);
+    public static readonly Index2D E = new(+0, +1);
+    public static readonly Index2D W = new(+0, -1);
     public static readonly Index2D NE = N + E;
     public static readonly Index2D NW = N + W;
     public static readonly Index2D SW = S + W;
@@ -55,13 +56,4 @@ public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
     public static Index2D operator -(Index2D left, Direction right) => left.Neighbor(right.Backwards());
     public static Index2D operator *(int left, Index2D right) => new(left * right.Row, left * right.Row);
     public static Index2D operator *(Index2D left, int right) => new(left.Row * right, left.Row * right);
-}
-
-public class IndexIterator<T> : IEnumerable<Index2D>
-{
-    public Func<Index2D, T, bool> Condition { get; init; }
-
-    public IEnumerator<Index2D> GetEnumerator() => throw new NotImplementedException();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

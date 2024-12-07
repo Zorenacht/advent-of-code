@@ -14,7 +14,6 @@ public sealed class Day22 : Day
     [Puzzle(answer: 74594)]
     public long Part2() => new Airship().Part1(Input, false);
 
-
     private class Airship
     {
         internal long Part1(string[] input, bool p1)
@@ -105,7 +104,6 @@ public sealed class Day22 : Day
             sortedBricks2 = sortedBricks2.OrderBy(x => x.Item6).ToList();
             foreach (var brick in sortedBricks2)
             {
-                var supported = false;
                 for (int i = brick.Item2; i <= brick.Item3; i++)
                 {
                     for (int j = brick.Item4; j <= brick.Item5; j++)

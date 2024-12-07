@@ -2,77 +2,79 @@
 
 namespace Tools.Geometry;
 
-public class Grid : IEnumerable
+public class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
 {
-    public int[][] Lattice { get; set; }
+    public T[][] Lattice { get; set; }
 
-    public int TotalLength { get { return RowLength * ColumnLength; } }
-    public int RowLength { get { return Lattice.Length; } }
-    public int ColumnLength { get { return Lattice[0].Length; } }
+    public int TotalLength => RowLength * ColLength;
+    public int RowLength => Lattice.Length;
+    public int ColLength => Lattice[0].Length;
 
-    public Grid(string[] lines)
+    public Grid(T[][] lines)
     {
-        Lattice = new int[lines.Length][];
+        Lattice = new T[lines.Length][];
         for (int i = 0; i < lines.Length; i++)
         {
-            Lattice[i] = new int[lines[i].Length];
+            Lattice[i] = new T[lines[i].Length];
             for (int j = 0; j < lines[i].Length; j++)
             {
-                Lattice[i][j] = Convert.ToInt32(lines[i][j]) - '0';
+                Lattice[i][j] = lines[i][j];
             }
         }
     }
 
     public Grid(int row, int col)
     {
-        Lattice = new int[row][];
+        Lattice = new T[row][];
         for (int i = 0; i < row; i++)
-            Lattice[i] = new int[col];
+            Lattice[i] = new T[col];
     }
 
-    public int[] this[int row]
+    public T[] this[int row]
     {
-        get { return Lattice[row]; }
-        set { Lattice[row] = value; }
+        get => Lattice[row];
+        set => Lattice[row] = value;
     }
 
-    public int[] As1D()
+    public T[] As1D()
     {
         return Enumerable().ToArray();
     }
+
     public void Reset()
     {
         foreach (var (index, val) in EnumerableWithIndex())
         {
-            UpdateAt(index, 0);
+            UpdateAt(index, default);
         }
     }
 
     public bool IsValid(int i, int j)
     {
         return i >= 0 && i < Lattice.Length
-            && j >= 0 && j < Lattice[0].Length;
-    }
-    public bool IsValid(Point point)
-    {
-        return point.X >= 0 && point.X < Lattice.Length
-            && point.Y >= 0 && point.Y < Lattice[0].Length;
+                      && j >= 0 && j < Lattice[0].Length;
     }
 
-    public int ValueAt(int row, int col)
+    public bool IsValid(Index2D point)
+    {
+        return point.Row >= 0 && point.Row < Lattice.Length
+                            && point.Col >= 0 && point.Col < Lattice[0].Length;
+    }
+
+    public T ValueAt(int row, int col) => Lattice[row][col];
+
+    public T ValueAt(Index2D point) => ValueAt(point.Row, point.Col);
+
+    public T? ValueOrDefault(int row, int col)
     {
         if (IsValid(row, col))
             return Lattice[row][col];
-        return -100;
-    }
-    public int ValueAt(Point point)
-    {
-        if (IsValid(point.X, point.Y))
-            return Lattice[point.X][point.Y];//maybe confusing that X is row
-        return -100;
+        return null;
     }
 
-    public bool UpdateAt(int row, int col, int value)
+    public T? ValueOrDefault(Index2D point) => ValueOrDefault(point.Row, point.Col);
+
+    public bool UpdateAt(int row, int col, T value)
     {
         if (IsValid(row, col))
             Lattice[row][col] = value;
@@ -83,48 +85,41 @@ public class Grid : IEnumerable
         return IsValid(row, col);
     }
 
-    public bool UpdateAt(Point point, int value)
+    public bool UpdateAt(Index2D point, T value)
     {
         if (IsValid(point))
-            Lattice[point.X][point.Y] = value;
+            Lattice[point.Row][point.Col] = value;
         return IsValid(point);
     }
 
-    public void ApplyToEach(Action<int, int> func)
+    public void ApplyRange(Index2D from, Index2D to, T value)
     {
-        for (int i = 0; i < Lattice.Length; i++)
+        for (int i = Math.Min(from.Row, to.Row); i <= Math.Max(from.Row, to.Row); i++)
         {
-            for (int j = 0; j < Lattice[i].Length; j++)
-            {
-                func(i, j);
-            }
-        }
-    }
-
-    public void ApplyRange(Point from, Point to, int value)
-    {
-        for (int i = Math.Min(from.X, to.X); i <= Math.Max(from.X, to.X); i++)
-        {
-            for (int j = Math.Min(from.Y, to.Y); j <= Math.Max(from.Y, to.Y); j++)
+            for (int j = Math.Min(from.Col, to.Col); j <= Math.Max(from.Col, to.Col); j++)
             {
                 UpdateAt(i, j, value);
             }
         }
     }
 
-    public virtual void Print()
+    public IEnumerable<Index2D> FindIndexes(T value)
     {
-        Console.WriteLine(new string('-', Lattice[0].Length));
-        foreach (int[] row in Lattice)
+        foreach (var (index, val) in EnumerableWithIndex())
         {
-            foreach (int element in row)
-            {
-                if (element == 0) Console.Write(" ");
-                else Console.Write(element);
-            }
-            Console.WriteLine();
+            if (val.Equals(value)) yield return index;
         }
-        Console.WriteLine(new string('-', Lattice[0].Length));
+    }
+
+    IEnumerator<T> IEnumerable<T>.GetEnumerator()
+    {
+        for (int i = 0; i < Lattice.Length; i++)
+        {
+            for (int j = 0; j < Lattice[i].Length; j++)
+            {
+                yield return Lattice[i][j];
+            }
+        }
     }
 
     public IEnumerator GetEnumerator()
@@ -137,7 +132,8 @@ public class Grid : IEnumerable
             }
         }
     }
-    public IEnumerable<int> Enumerable()
+
+    public IEnumerable<T> Enumerable()
     {
         for (int i = 0; i < Lattice.Length; i++)
         {
@@ -148,27 +144,45 @@ public class Grid : IEnumerable
         }
     }
 
-    public IEnumerable<(Point, int)> EnumerableWithIndex()
+    public IEnumerable<(Index2D Index, T Value)> EnumerableWithIndex()
     {
         for (int i = 0; i < Lattice.Length; i++)
         {
             for (int j = 0; j < Lattice[i].Length; j++)
             {
-                yield return (new Point(i, j), Lattice[i][j]);
+                yield return (new Index2D(i, j), Lattice[i][j]);
             }
         }
     }
 
-    public static bool operator ==(Grid grid1, Grid grid2)
+    public IEnumerable<(Index2D, T)> Enumerable(Func<Index2D, bool> condition)
     {
-        if (grid1.ColumnLength != grid2.ColumnLength) return false;
+        for (int i = 0; i < Lattice.Length; i++)
+        {
+            for (int j = 0; j < Lattice[i].Length; j++)
+            {
+                yield return (new Index2D(i, j), Lattice[i][j]);
+            }
+        }
+    }
+
+    public static bool operator ==(Grid<T> grid1, Grid<T> grid2)
+    {
+        if (grid1.ColLength != grid2.ColLength) return false;
         if (grid1.RowLength != grid2.RowLength) return false;
         foreach (var (point, val) in grid1.EnumerableWithIndex())
         {
-            if (val != grid2.ValueAt(point)) return false;
+            if (!val.Equals(grid2.ValueOrDefault(point))) return false;
         }
         return true;
     }
 
-    public static bool operator !=(Grid grid1, Grid grid2) => !(grid1 == grid2);
+    public static bool operator !=(Grid<T> grid1, Grid<T> grid2) => !(grid1 == grid2);
+
+    public override bool Equals(object? obj) => this == obj;
+
+    public override int GetHashCode()
+    {
+        throw new NotSupportedException();
+    }
 }

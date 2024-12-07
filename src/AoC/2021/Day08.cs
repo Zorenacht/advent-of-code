@@ -2,6 +2,27 @@ namespace AoC_2021;
 
 public sealed class Day08 : Day
 {
+    [Puzzle(answer: 387)]
+    public int Part1()
+    {
+        List<List<string>> attempts = new List<List<string>>();
+        List<List<string>> output = new List<List<string>>();
+        parseInput(attempts, output);
+        int count = 0;
+        foreach (var entry in output)
+        {
+            foreach (var str in entry)
+            {
+                if (str.Length == 2 || str.Length == 3 || str.Length == 4 || str.Length == 7)
+                {
+                    //Console.WriteLine(str);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     [Puzzle(answer: 986034)]
     public int Part2()
     {
@@ -66,126 +87,103 @@ public sealed class Day08 : Day
         }
         Console.WriteLine("Total Count: " + count);
         return count;
+    }
 
-        int decipherValue(string coded, int[] mapping)
+    void parseInput(List<List<string>> attempts, List<List<string>> output)
+    {
+        foreach (string line in Input)
         {
-            if (coded.Length == 2)
-                return 1;
-            if (coded.Length == 3)
-                return 7;
-            if (coded.Length == 4)
-                return 4;
-            if (coded.Length == 7)
-                return 8;
-            if (coded.Length == 5)
-            {
-                if (!coded.Contains((char)(mapping[5] + 'a')))
-                    return 2;
-                if (!coded.Contains((char)(mapping[1] + 'a')))
-                    return 3;
-                if (!coded.Contains((char)(mapping[2] + 'a')))
-                    return 5;
-            }
-            if (coded.Length == 6)
-            {
-                if (!coded.Contains((char)(mapping[3] + 'a')))
-                    return 0;
-                if (!coded.Contains((char)(mapping[4] + 'a')))
-                    return 9;
-                if (!coded.Contains((char)(mapping[2] + 'a')))
-                    return 6;
+            //Console.WriteLine(line);
+            attempts.Add(line.Split('|')[0].Split(' ').SkipLast(1).ToList());
+            output.Add(line.Split('|')[1].Split(' ').Skip(1).ToList());
+        }
+        //Console.WriteLine("Count attempts" + attempts.Last().Count());
+        //Console.WriteLine("Count output" + output.Last().Count());
+    }
 
-            }
-            return -1;
+    int decipherValue(string coded, int[] mapping)
+    {
+        if (coded.Length == 2)
+            return 1;
+        if (coded.Length == 3)
+            return 7;
+        if (coded.Length == 4)
+            return 4;
+        if (coded.Length == 7)
+            return 8;
+        if (coded.Length == 5)
+        {
+            if (!coded.Contains((char)(mapping[5] + 'a')))
+                return 2;
+            if (!coded.Contains((char)(mapping[1] + 'a')))
+                return 3;
+            if (!coded.Contains((char)(mapping[2] + 'a')))
+                return 5;
+        }
+        if (coded.Length == 6)
+        {
+            if (!coded.Contains((char)(mapping[3] + 'a')))
+                return 0;
+            if (!coded.Contains((char)(mapping[4] + 'a')))
+                return 9;
+            if (!coded.Contains((char)(mapping[2] + 'a')))
+                return 6;
 
         }
+        return -1;
 
-        int findCodingForA(List<string> input)
+    }
+
+    int findCodingForA(List<string> input)
+    {
+        string codingOf1 = "";
+        string codingOf7 = "";
+        foreach (var str in input)
         {
-            string codingOf1 = "";
-            string codingOf7 = "";
-            foreach (var str in input)
+            if (str.Length == 2)
             {
-                if (str.Length == 2)
-                {
-                    codingOf1 = str;
-                }
-                else if (str.Length == 3)
-                {
-                    codingOf7 = str;
-                }
+                codingOf1 = str;
             }
-            return findFirstDifference(codingOf7, codingOf1) - 'a';//this is the a line
+            else if (str.Length == 3)
+            {
+                codingOf7 = str;
+            }
         }
+        return findFirstDifference(codingOf7, codingOf1) - 'a';//this is the a line
+    }
 
-        int findCodingForD(List<string> input)
+    int findCodingForD(List<string> input)
+    {
+        int[] occurenceCount = new int[7];
+        foreach (var str in input)
         {
-            int[] occurenceCount = new int[7];
-            foreach (var str in input)
+            if (str.Length == 5 || str.Length == 4)
             {
-                if (str.Length == 5 || str.Length == 4)
+                foreach (char c in str)
                 {
-                    foreach (char c in str)
-                    {
-                        occurenceCount[c - 'a']++;
-                    }
+                    occurenceCount[c - 'a']++;
                 }
             }
-            for (int i = 0; i < occurenceCount.Length; i++)
-            {
-                if (occurenceCount[i] == 4)
-                {
-                    return i;
-                }
-            }
-            return -1;
         }
-
-        char findFirstDifference(string input, string scrambledSubstringOfInput)
+        for (int i = 0; i < occurenceCount.Length; i++)
         {
-            foreach (char c1 in input)
+            if (occurenceCount[i] == 4)
             {
-                if (!scrambledSubstringOfInput.Contains(c1))
-                {
-                    return c1;
-                }
+                return i;
             }
-            return '0';
         }
+        return -1;
+    }
 
-
-        void part1()
+    char findFirstDifference(string input, string scrambledSubstringOfInput)
+    {
+        foreach (char c1 in input)
         {
-            List<List<string>> attempts = new List<List<string>>();
-            List<List<string>> output = new List<List<string>>();
-            parseInput(attempts, output);
-            int count = 0;
-            foreach (var entry in output)
+            if (!scrambledSubstringOfInput.Contains(c1))
             {
-                foreach (var str in entry)
-                {
-                    if (str.Length == 2 || str.Length == 3 || str.Length == 4 || str.Length == 7)
-                    {
-                        //Console.WriteLine(str);
-                        count++;
-                    }
-                }
+                return c1;
             }
-            Console.WriteLine("Total Count: " + count);
         }
-
-
-        void parseInput(List<List<string>> attempts, List<List<string>> output)
-        {
-            foreach (string line in Input)
-            {
-                //Console.WriteLine(line);
-                attempts.Add(line.Split('|')[0].Split(' ').SkipLast(1).ToList());
-                output.Add(line.Split('|')[1].Split(' ').Skip(1).ToList());
-            }
-            //Console.WriteLine("Count attempts" + attempts.Last().Count());
-            //Console.WriteLine("Count output" + output.Last().Count());
-        }
-
+        return '0';
     }
 }

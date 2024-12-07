@@ -176,8 +176,9 @@ public sealed class Day24 : Day
             return Math.Abs(y - x) < 0.00000000001 ? x : null;
         }
 
-        public bool InsideBounds(long min, long max) =>
-            min <= X && X <= max && min <= Y && Y <= max;
+        public bool InsideBounds(long min, long max) => min <= X && X <= max && min <= Y && Y <= max;
+        public override bool Equals(object? obj) => obj is Point2D point && X == point.X && Y == point.Y;
+        public override int GetHashCode() => X.GetHashCode() ^ (Y.GetHashCode() << 16);
     }
 
     public record Intersection

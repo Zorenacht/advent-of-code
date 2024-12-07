@@ -2,6 +2,35 @@ namespace AoC_2021;
 
 public sealed class Day09 : Day
 {
+
+    [Puzzle(answer: 535)]
+    public int Part1()
+    {
+        var  lines = Input;
+        int count = 0;
+        for (int i = 0; i < lines.Length; i++)
+        {
+            for (int j = 0; j < lines[i].Length; j++)
+            {
+                count += isMinValue(i, j, lines) ? lines[i][j] - '1' + 2 : 0;
+            }
+        }
+        return count;
+    }
+
+    bool isMinValue(int i, int j, string[] text)
+    {
+        if (i > 0 && text[i - 1][j] <= text[i][j])
+            return false;
+        if (i < text.Length - 1 && text[i + 1][j] <= text[i][j])
+            return false;
+        if (j > 0 && text[i][j - 1] <= text[i][j])
+            return false;
+        if (j < text[i].Length - 1 && text[i][j + 1] < text[i][j])
+            return false;
+        return true;
+    }
+
     [Puzzle(answer: 1122700)]
     public int Part2()
     {
@@ -62,74 +91,6 @@ public sealed class Day09 : Day
             if (j < text[i].Length - 1 && text[i][j + 1] - '0' > value && text[i][j + 1] - '0' < 9)
                 findBasin(i, j + 1, value + 1, ref count, text, alreadyVisited);
             return;
-        }
-
-
-
-        void AddBasin(Tuple<int, int> coord, List<List<Tuple<int, int>>> Basins)
-        {
-            int addedTo = -1;
-            for (int i = 0; i < Basins.Count(); i++)
-            {
-                foreach (var coordinate in Basins[i])
-                {
-                    if (neighbor(coordinate, coord))
-                    {
-                        if (addedTo == -1)
-                        {
-                            Basins[i].Add(coordinate);
-                            addedTo = i;
-                        }
-                        else
-                        {
-                            Basins[addedTo].AddRange(Basins[i]);
-                            Basins.RemoveAt(i);
-                        }
-                    }
-                }
-            }
-            if (addedTo == -1)
-            {
-                Basins.Add(new List<Tuple<int, int>>());
-                Basins.Last().Add(coord);
-            }
-        }
-
-        bool neighbor(Tuple<int, int> coord1, Tuple<int, int> coord2)
-        {
-            return coord1 == coord2 ||
-                (coord1.Item1 == coord2.Item1 - 1 && coord1.Item2 == coord2.Item2) ||
-                (coord1.Item1 == coord2.Item1 + 1 && coord1.Item2 == coord2.Item2) ||
-                (coord1.Item1 == coord2.Item1 && coord1.Item2 == coord2.Item2 - 1) ||
-                (coord1.Item1 == coord2.Item1 && coord1.Item2 == coord2.Item2 + 1);
-
-        }
-
-        void part1()
-        {
-            string[] text = Reader.ReadLines("Input.txt");
-            int count = 0;
-            for (int i = 0; i < text.Length; i++)
-            {
-                for (int j = 0; j < text[i].Length; j++)
-                {
-                    count += isMinValue(i, j, text) ? text[i][j] - '1' + 2 : 0;
-                }
-            }
-            Console.WriteLine("Count: " + count);
-        }
-
-        bool isMinValue(int i, int j, string[] text)
-        {
-            if (i > 0 && text[i - 1][j] <= text[i][j])
-                return false;
-            if (i < text.Length - 1 && text[i + 1][j] <= text[i][j])
-                return false;
-            if (j > 0 && text[i][j - 1] <= text[i][j])
-                return false;
-            if (j < text[i].Length - 1 && text[i][j + 1] < text[i][j])
-                return false;
-            return true;
         }
     }
 }
