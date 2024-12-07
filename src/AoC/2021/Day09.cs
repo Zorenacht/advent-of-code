@@ -6,7 +6,7 @@ public sealed class Day09 : Day
     [Puzzle(answer: 535)]
     public int Part1()
     {
-        var  lines = Input;
+        var lines = Input;
         int count = 0;
         for (int i = 0; i < lines.Length; i++)
         {

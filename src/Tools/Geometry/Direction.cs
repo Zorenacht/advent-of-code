@@ -3,6 +3,7 @@
 namespace Tools.Geometry;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Rider")]
 public enum Direction
 {
     E = 0,

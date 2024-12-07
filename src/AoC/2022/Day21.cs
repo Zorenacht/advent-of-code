@@ -99,7 +99,7 @@ public sealed partial class Day21 : Day
                 return monkey.Value!.Value;
             }
             var args = monkey.Args.Select(arg => Find(All[arg])).ToArray();
-            monkey.Value = monkey.Operation(args[0], args[1]);
+            monkey.Value = monkey.Operation!(args[0], args[1]);
             Known.Add(monkey);
             return monkey.Value!.Value;
         }
@@ -147,10 +147,10 @@ public sealed partial class Day21 : Day
 
     private class Monkey
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public long? Value { get; set; }
-        public Func<long, long, long> Operation { get; set; }
-        public string[] Args { get; set; }
+        public Func<long, long, long>? Operation { get; set; }
+        public string[] Args { get; set; } = [];
 
         public override int GetHashCode()
         {

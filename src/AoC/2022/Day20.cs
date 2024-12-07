@@ -25,11 +25,11 @@ public sealed partial class Day20 : Day
 
         public long Top3()
         {
-            var node = OriginalOrder.First(x => x.Value == 0);
+            Node node = OriginalOrder.First(x => x.Value == 0);
             long sum = 0;
             for (int i = 1; i <= 3000; i++)
             {
-                node = node.Next;
+                node = node.Next!;
                 if (i % 1000 == 0)
                 {
                     sum += node.Value;
@@ -49,9 +49,9 @@ public sealed partial class Day20 : Day
 
         private void Mix()
         {
-            foreach (var node in OriginalOrder)
+            foreach (Node node in OriginalOrder)
             {
-                var current = node;
+                Node current = node;
                 var sign = Math.Sign(node.Value);
                 if (node.Value == 0)
                 {
@@ -59,11 +59,11 @@ public sealed partial class Day20 : Day
                 }
                 for (int i = 0; i < Math.Abs(node.Value) % (OriginalOrder.Count - 1); i += 1)
                 {
-                    if (sign > 0) current = current.Next;
-                    else if (sign < 0) current = current.Prev;
+                    if (sign > 0) current = current.Next!;
+                    else if (sign < 0) current = current.Prev!;
                 }
                 Remove(node);
-                if (Math.Sign(node.Value) > 0) InsertBefore(current.Next, node);
+                if (Math.Sign(node.Value) > 0) InsertBefore(current.Next!, node);
                 if (Math.Sign(node.Value) < 0) InsertBefore(current, node);
             }
         }

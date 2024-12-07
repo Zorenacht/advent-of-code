@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Tools.Geometry;
 
 [SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
+[SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Rider")]
 public class Path<T>(
     Index2D Start,
     Func<Index2D, Grid<T>, Index2D> Next,

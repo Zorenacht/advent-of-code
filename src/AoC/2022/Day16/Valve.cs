@@ -4,13 +4,13 @@ namespace AoC_2022;
 
 public class ReducedValveNode : ValveNode
 {
-    public new List<DistanceNode<ReducedValveNode>> Next { get; set; }
+    public new List<DistanceNode<ReducedValveNode>> Next { get; set; } = [];
 }
 
 public class ValveNode : IEquatable<ValveNode>, IState<ValveNode>
 {
     public List<ValveNode> Next { get; set; } = new List<ValveNode>();
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int No { get; set; }
     public int Pressure { get; set; }
 
@@ -28,8 +28,8 @@ public class ValveNode : IEquatable<ValveNode>, IState<ValveNode>
 
 }
 
-public class DistanceNode<T>
+public class DistanceNode<T> where T : new()
 {
     public int Distance { get; set; }
-    public T Node { get; set; }
+    public T Node { get; set; } = new();
 }

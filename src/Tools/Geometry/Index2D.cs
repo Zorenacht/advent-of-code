@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Tools.Geometry;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-[SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "For Rider")]
+[SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Rider")]
 public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
 {
     public static readonly Index2D O = new(0, 0);

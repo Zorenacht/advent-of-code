@@ -4,8 +4,8 @@ namespace AoC_2022;
 
 public class CaveValves
 {
-    public Dictionary<int, ValveNode> Valves { get; set; }
-    public Dictionary<string, int> NameMap { get; set; }
+    public Dictionary<int, ValveNode> Valves { get; set; } = [];
+    public Dictionary<string, int> NameMap { get; set; } = [];
 
     public static CaveValves Parse(string[] lines)
     {
@@ -62,8 +62,8 @@ public class CaveValves
 
 public class ReducedCaveValves
 {
-    public Dictionary<int, ReducedValveNode> Valves { get; set; }
-    public Dictionary<string, int> NameMap { get; set; }
+    public Dictionary<int, ReducedValveNode> Valves { get; set; } = [];
+    public Dictionary<string, int> NameMap { get; set; } = [];
     public Dictionary<int, int> Memoization { get; set; } = new Dictionary<int, int>(10_000_000);
 
     public int Max(int time) => RecursiveElephant(
