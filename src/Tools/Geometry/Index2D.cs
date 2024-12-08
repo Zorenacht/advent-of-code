@@ -39,8 +39,8 @@ public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
     public int Norm => Row * Row + Col * Col;
     public int Manhattan => Math.Abs(Row) + Math.Abs(Col);
     public override string ToString() => $"({Row},{Col})";
-    public override bool Equals([NotNullWhen(true)] object? obj) => obj is Point other && Equals(other);
     public bool Equals(Index2D other) => other.Row == Row && other.Col == Col;
+    public override bool Equals([NotNullWhen(true)] object? obj) => obj is Index2D other && Equals(other);
     public override int GetHashCode() => (Row + Col) * (Row + Col + 1) / 2 + Col;
 
     public static bool operator ==(Index2D left, Index2D right) => left.Equals(right);
