@@ -53,6 +53,6 @@ public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
     public static Index2D operator -(Direction left, Index2D right) => -right.Neighbor(left);
     public static Index2D operator +(Index2D left, Direction right) => left.Neighbor(right);
     public static Index2D operator -(Index2D left, Direction right) => left.Neighbor(right.Backwards());
-    public static Index2D operator *(int left, Index2D right) => new(left * right.Row, left * right.Row);
-    public static Index2D operator *(Index2D left, int right) => new(left.Row * right, left.Row * right);
+    public static Index2D operator *(int left, Index2D right) => new(left * right.Row, left * right.Col);
+    public static Index2D operator *(Index2D left, int right) => new(left.Row * right, left.Col * right);
 }

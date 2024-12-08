@@ -2,7 +2,7 @@
 
 namespace Tools.Geometry;
 
-public class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
+public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
 {
     public T[][] Lattice { get; set; }
 
@@ -175,6 +175,19 @@ public class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             if (!val.Equals(grid2.ValueOrDefault(point))) return false;
         }
         return true;
+    }
+    public virtual void Print()
+    {
+        Console.WriteLine(new string('-', Lattice[0].Length));
+        foreach (T[] row in Lattice)
+        {
+            foreach (T element in row)
+            {
+                Console.Write(element);
+            }
+            Console.WriteLine();
+        }
+        Console.WriteLine(new string('-', Lattice[0].Length));
     }
 
     public static bool operator !=(Grid<T> grid1, Grid<T> grid2) => !(grid1 == grid2);

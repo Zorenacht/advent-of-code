@@ -2,11 +2,11 @@ namespace AoC_2024;
 
 public sealed class Day07 : Day
 {
-    [Puzzle(answer: 1708857123053)]
+    [Puzzle(answer: 001_708_857_123_053)]
     public long Part1() => Input.Sum(line => new Operator(line).CalibrationValue(false));
 
 
-    [Puzzle(answer: 189207836795655)]
+    [Puzzle(answer: 189_207_836_795_655)]
     public long Part2() => Input.Sum(line => new Operator(line).CalibrationValue(true));
 
     private class Operator
