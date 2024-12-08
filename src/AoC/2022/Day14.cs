@@ -28,7 +28,7 @@ public sealed partial class Day14 : Day
 
         public int Simulate()
         {
-            Index2D current = Sand;
+            var current = Sand;
             int count = 0;
             while (current.Row < CaveGrid.RowLength - 1)
             {
@@ -47,7 +47,7 @@ public sealed partial class Day14 : Day
 
         public int Simulate2()
         {
-            Index2D current = Sand;
+            var current = Sand;
             int count = 0;
             while (CaveGrid.ValueAt(Sand) == 0)
             {

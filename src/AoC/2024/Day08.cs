@@ -1,5 +1,3 @@
-using FluentAssertions;
-using MathNet.Numerics.Financial;
 using Tools.Shapes;
 
 namespace AoC_2024;
@@ -32,11 +30,11 @@ public sealed class Day08 : Day
                 for (int j = i + 1; j < arr.Length; j++)
                 {
                     var diff = arr[j].Index - arr[i].Index;
-                    foreach(int k in interval)
-                        if (!grid.UpdateAt(arr[j].Index + (k * diff), '#')) 
+                    foreach (int k in interval)
+                        if (!grid.UpdateAt(arr[j].Index + k * diff, '#'))
                             break;
                     foreach (int k in interval)
-                        if (!grid.UpdateAt(arr[i].Index - (k * diff), '#')) 
+                        if (!grid.UpdateAt(arr[i].Index - k * diff, '#'))
                             break;
                 }
             }

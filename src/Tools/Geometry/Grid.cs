@@ -36,10 +36,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
         set => Lattice[row] = value;
     }
 
-    public T[] As1D()
-    {
-        return Enumerable().ToArray();
-    }
+    public T[] As1D() => Enumerable().ToArray();
 
     public void Reset()
     {
@@ -91,6 +88,8 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             Lattice[point.Row][point.Col] = value;
         return IsValid(point);
     }
+
+    public Grid<T> Copy() => new(Lattice);
 
     public void ApplyRange(Index2D from, Index2D to, T value)
     {

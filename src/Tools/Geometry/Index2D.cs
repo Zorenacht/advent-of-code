@@ -45,8 +45,8 @@ public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
 
     public static bool operator ==(Index2D left, Index2D right) => left.Equals(right);
     public static bool operator !=(Index2D left, Index2D right) => !(left == right);
-    public static Index2D operator -(Index2D self) => new(-self.Row, -self.Col); // Does this make sense to exist?
-    public static Index2D operator +(Index2D self) => self; // Does this make sense to exist?
+    public static Index2D operator -(Index2D self) => new(-self.Row, -self.Col);
+    public static Index2D operator +(Index2D self) => self;
     public static Index2D operator +(Index2D left, Index2D right) => new(left.Row + right.Row, left.Col + right.Col);
     public static Index2D operator -(Index2D left, Index2D right) => new(left.Row - right.Row, left.Col - right.Col);
     public static Index2D operator +(Direction left, Index2D right) => right.Neighbor(left);
