@@ -5,154 +5,90 @@ namespace AoC_2024;
 
 public sealed class Day09 : Day
 {
-    [Puzzle(answer: 6279058075753)]
-    public long Part1()
+    [Puzzle(answer: 6_279_058_075_753)]
+    public long Part1() => new DiskFragmenter(InputAsText).Compact().Checksum();
+    
+    private class DiskFragmenter
     {
-        int result = 0;
-        var txt = InputAsText;
-        var digits = txt.Select(x => x - '0').ToArray();
-        //var even = digits.ToList().Where((d, i) => i % 2 == 0).ToArray();
-        //var odd = digits.ToList().Where((d, i) => i % 2 == 1).ToArray();
-        var arr = new List<int?>();
-        for (int i = 0; i < digits.Length; ++i)
+        private readonly List<int?> _disk = [];
+        private readonly List<Space> _empty = [];
+        private readonly List<Space> _files = [];
+        
+        public DiskFragmenter(string input)
         {
-            if (i % 2 == 0)
+            var digits = input.Select(x => x - '0').ToArray();
+            
+            int index = 0;
+            for (int i = 0; i < digits.Length; ++i)
             {
                 for (int j = 0; j < digits[i]; ++j)
                 {
-                    arr.Add(i / 2);
+                    _disk.Add(i % 2 == 0 ? i / 2 : null);
                 }
-            }
-            else
-            {
-                for (int j = 0; j < digits[i]; ++j)
-                {
-                    arr.Add(null);
-                }
+                
+                if (i % 2 == 0) _files.Add(new Space(i / 2, digits[i], index));
+                else _empty.Add(new Space(0, digits[i], index));
+                index += digits[i];
             }
         }
-
-        int left = 0;
-        int right = arr.Count - 1;
-        while (left < right)
+        
+        public DiskFragmenter Compact()
         {
-            if (arr[left] != null) { ++left; continue; }
-            if (arr[right] == null) { --right; continue; }
-            arr[left] = arr[right];
-            arr[right] = null;
+            int left = 0;
+            int right = _disk.Count - 1;
+            while (left < right)
+            {
+                if (_disk[left] != null)
+                {
+                    ++left;
+                    continue;
+                }
+                if (_disk[right] == null)
+                {
+                    --right;
+                    continue;
+                }
+                _disk[left] = _disk[right];
+                _disk[right] = null;
+            }
+            return this;
         }
-
-        return arr.Where(d => d is not null)
-            .Select((d, i) => (long)(d!.Value * i))
-            .Sum();
+        
+        public DiskFragmenter CompactFiles()
+        {
+            for (int i = _files.Count - 1; i >= 0; --i)
+            {`
+                var firstEmpty = _empty.FirstOrDefault(x => _files[i].Length <= x.Length && x.Index < _files[i].Index);
+                if (firstEmpty == default) continue;
+                for (int j = 0; j < _files[i].Length; ++j)
+                {
+                    _disk[firstEmpty.Index + j] = _files[i].Value;
+                    _disk[_files[i].Index + j] = null;
+                }
+                if (firstEmpty.Length == _files[i].Length) _empty.Remove(firstEmpty);
+                else
+                {
+                    firstEmpty.Index += _files[i].Length;
+                    firstEmpty.Length -= _files[i].Length;
+                }
+            }
+            return this;
+        }
+        
+        public long Checksum() =>
+            _disk
+                .Select((d, i) => (long)((d ?? 0) * i))
+                .Sum();
+        
+        private class Space(int value, int length, int index)
+        {
+            public int Value { get; set; } = value;
+            public int Length { get; set; } = length;
+            public int Index { get; set; } = index;
+            public override string ToString() => $"Value={Value}, Length={Length}, Index={Index}";
+        }
     }
-
-    private record Fs(List<(int Index, int Length)> Files);
-    private record Space(int Length);
-
-    [Puzzle(answer: null)]
-    public long Part2()
-    {
-        int result = 0;
-        var txt = InputExampleAsText;
-        var digits = txt.Select(x => x - '0').ToArray();
-        //var even = digits.ToList().Where((d, i) => i % 2 == 0).ToArray();
-        //var odd = digits.ToList().Where((d, i) => i % 2 == 1).ToArray();
-        var arr = new List<int?>();
-        for (int i = 0; i < digits.Length; ++i)
-        {
-            if (i % 2 == 0)
-            {
-                for (int j = 0; j < digits[i]; ++j)
-                {
-                    arr.Add(i / 2);
-                }
-            }
-            else
-            {
-                for (int j = 0; j < digits[i]; ++j)
-                {
-                    arr.Add(null);
-                }
-            }
-        }
-
-        int left = 0;
-        int right = arr.Count - 1;
-        while (left < right)
-        {
-            if (arr[left] != null) { ++left; continue; }
-            if (arr[right] == null) { --right; continue; }
-
-            int emptyIndex = left;
-            int emptyLength = 0;
-            while (arr[emptyIndex++] == null) { emptyLength++; }
-
-            int fileToBeMovedLength = 0;
-            int fileToBeMovedValue = arr[right]!.Value;
-            while (arr[right] == fileToBeMovedValue) { fileToBeMovedLength++; right--; }
-
-            if (fileToBeMovedLength <= emptyLength)
-            {
-                for (int i = 0; i < fileToBeMovedLength; ++i)
-                {
-                    arr[left + i] = fileToBeMovedValue;
-                    arr[right + 1 + i] = null;
-                }
-            }
-        }
-
-        return arr.Where(d => d is not null)
-            .Select((d, i) => (long)(d!.Value * i))
-            .Sum();
-    }
-
-    //[Puzzle(answer: null)]
-    //public long Part2()
-    //{
-    //    int result = 0;
-    //    var txt = InputExampleAsText;
-    //    var digits = txt.Select(x => x - '0').ToArray();
-    //    var even = digits.ToList().Select((d, i) => (d, i)).Where((d, i) => i % 2 == 0).ToList();
-    //    var odd = digits.ToList().Where((d, i) => i % 2 == 1).ToList();
-
-    //    int index = 0;
-    //    var files = new List<(int Value, int Length)>();
-    //    var empty = new List<(int Value, int Length)>();
-    //    for (int i = 0; i < digits.Length; ++i)
-    //    {
-    //        if(i % 2 == 0) files.Add((i/2, digits[i]));
-    //        else empty.Add((0, digits[i]));
-    //    }
-
-    //    var total = new List<(int Value, int Length)>();
-    //    int fIndex = 0;
-    //    for (int i = 0; i < empty.Count && i < files.Count; ++i)
-    //    {
-    //        total.Add(files[0]);
-
-    //        int length = empty[i].Length;
-    //        for (int j = files.Count - 1; j >= 0; --j)
-    //        {
-    //            if (files[j].Length <= length)
-    //            {
-    //                length -= files[j].Length;
-    //                empty.Insert(i, files[j]);
-    //                total.Add(files[j]);
-    //                ++i;
-    //                files.RemoveAt(j);
-    //            }
-    //        }
-    //        empty[i] = (0, length);
-    //        total.Add(empty[i]);
-
-    //        fIndex++;
-    //    }
-
-    //    return 0;
-
-    //    //return arr.Where(d => d is not null)
-    //    //    .Select((d, i) => (long)(d!.Value * i))
-    //    //    .Sum();
-    //}
-};
+    
+    [Puzzle(answer: 6_301_361_958_738)]
+    public long Part2() => new DiskFragmenter(InputAsText).CompactFiles().Checksum();
+}
