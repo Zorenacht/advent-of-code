@@ -8,6 +8,9 @@ public sealed class Day09 : Day
     [Puzzle(answer: 6_279_058_075_753)]
     public long Part1() => new DiskFragmenter(InputAsText).Compact().Checksum();
     
+    [Puzzle(answer: 6_301_361_958_738)]
+    public long Part2() => new DiskFragmenter(InputAsText).CompactFiles().Checksum();
+    
     private class DiskFragmenter
     {
         private readonly List<int?> _disk = [];
@@ -57,7 +60,7 @@ public sealed class Day09 : Day
         public DiskFragmenter CompactFiles()
         {
             for (int i = _files.Count - 1; i >= 0; --i)
-            {`
+            {
                 var firstEmpty = _empty.FirstOrDefault(x => _files[i].Length <= x.Length && x.Index < _files[i].Index);
                 if (firstEmpty == default) continue;
                 for (int j = 0; j < _files[i].Length; ++j)
@@ -88,7 +91,4 @@ public sealed class Day09 : Day
             public override string ToString() => $"Value={Value}, Length={Length}, Index={Index}";
         }
     }
-    
-    [Puzzle(answer: 6_301_361_958_738)]
-    public long Part2() => new DiskFragmenter(InputAsText).CompactFiles().Checksum();
 }
