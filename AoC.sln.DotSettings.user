@@ -9,6 +9,7 @@
     &lt;Project Location="/Users/renzo/home/source/advent-of-code/src/AoC" Presentation="&amp;lt;AoC&amp;gt;" /&gt;
   &lt;/And&gt;
 &lt;/SessionState&gt;</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fa5bea9c_002D256b_002D4088_002D9ca7_002D0c9b57bc349b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from &amp;lt;Tools.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/renzo/home/source/advent-of-code/src/Tools.Tests" Presentation="&amp;lt;Tools.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
