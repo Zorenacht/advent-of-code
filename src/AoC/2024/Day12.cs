@@ -10,7 +10,7 @@ public sealed class Day12 : Day
             .Sum(x => x.Count * x.Border.Count);
     
     [Puzzle(answer: 818286)]
-    public int Part2Try()
+    public int Part2()
     {
         return Input.ToCharGrid()
             .FloodFillRegions()
