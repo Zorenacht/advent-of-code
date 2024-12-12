@@ -1,18 +1,19 @@
-namespace AoC_2022;
+using AoC._2022.Input;
+namespace AoC._2022;
 
-public sealed partial class Day11 : Day
+public sealed class Day11 : Day
 {
     [Test]
-    public void Example() => Simulate(ExampleInput, 20, 3).Should().Be(10605);
+    public void Example() => Simulate(Day11Input.ExampleInput, 20, 3).Should().Be(10605);
     [Test]
-    public void Part1() => Simulate(Input, 20, 3).Should().Be(110220);
+    public void Part1() => Simulate(Day11Input.Input, 20, 3).Should().Be(110220);
     [Test]
-    public void ExampleP2() => Simulate(ExampleInput, 10000, 1).Should().Be(2713310158);
+    public void ExampleP2() => Simulate(Day11Input.ExampleInput, 10000, 1).Should().Be(2713310158);
     [Test]
-    public void Part2() => Simulate(Input, 10000, 1).Should().Be(19457438264);
-
-    private static int Prod = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23;
-
+    public void Part2() => Simulate(Day11Input.Input, 10000, 1).Should().Be(19457438264);
+    
+    private const int Prod = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23;
+    
     private long Simulate(List<Monkey> monkeys, int turns, int divisor)
     {
         for (int i = 0; i < turns; i++)
@@ -34,7 +35,7 @@ public sealed partial class Day11 : Day
         return (long)topMonkeys[0] * topMonkeys[1];
     }
 
-    private class Monkey
+    public class Monkey
     {
         public List<long> Items { get; set; }
         public Func<long, long> Operation { get; set; }
