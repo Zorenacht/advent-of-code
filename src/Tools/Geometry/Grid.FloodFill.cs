@@ -50,7 +50,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
         
         foreach (var (index, value) in EnumerableWithIndex())
         {
-            if (value is not char ch) continue;
+            if (value is not char ch) continue; //todo remove check
             if (indexAreaMapping.ContainsKey(index)) continue;
             var flooded = new Area();
             var toBeFlooded = new Queue<Index2D>();
@@ -59,13 +59,14 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             {
                 if (indexAreaMapping.ContainsKey(next)) throw new NotSupportedException("should not be reachable");
                 if (!flooded.Add(next)) continue;
-                var directions = diagonals ? Directions.All : Directions.Cardinal;
-                var toBeEnqueued = directions
-                    .Select(dir => next + dir)
-                    .Where(ind => ValueOrDefault(ind) is char nbVal && nbVal == ch);
-                foreach (var toEnqueue in toBeEnqueued)
+                var directions = diagonals ? Directions.AllIndex : Directions.CardinalIndex;
+                var neighbors = directions.Select(dir => new BorderIndex(next + dir, dir));
+                foreach (var nb in neighbors)
                 {
-                    toBeFlooded.Enqueue(toEnqueue);
+                    if (ValueOrDefault(nb.Index) is char nbVal && nbVal == ch)
+                        toBeFlooded.Enqueue(nb.Index);
+                    else
+                        flooded.Border.Add(nb);
                 }
             }
             int areaIdentifier = keyedAreas.Count;
@@ -94,7 +95,25 @@ public class Areas<T> where T : struct
 
 public class Area : HashSet<Index2D>
 {
-    public Area()
+    public HashSet<BorderIndex> Border { get; } = [];
+    
+    public int NumberOfSides()
     {
-    }
+        var horizontalSides = Border            
+            .Where(x => x.Direction == Index2D.N || x.Direction == Index2D.S)
+            .GroupBy(x => (x.Index.Row, x.Direction))
+            .Select(x => x.OrderBy(border => border.Index.Col).ToArray())
+            .Sum(group => group.Zip(group.Skip(1))
+                .Count(x => x.Second.Index.Col - x.First.Index.Col > 1 || x.Second.Direction != x.First.Direction)
+                .Plus(1));
+        var temp = Border
+            .Where(x => x.Direction == Index2D.E || x.Direction == Index2D.W)
+            .GroupBy(x => (x.Index.Col, x.Direction))
+            .Select(x => x.OrderBy(border => border.Index.Row).ToArray());
+        var verticalSides = temp
+            .Sum(group => group.Zip(group.Skip(1))
+                .Count(x => x.Second.Index.Row - x.First.Index.Row > 1 || x.Second.Direction != x.First.Direction)
+                .Plus(1));
+        return horizontalSides + verticalSides;
+    } 
 }

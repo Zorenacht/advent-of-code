@@ -26,7 +26,25 @@ public static class Directions
         Direction.SW,
         Direction.SE,
     ];
-
+    
+    public  static readonly Index2D[] AllIndex = [
+        Index2D.E,
+        Index2D.NE,
+        Index2D.N,
+        Index2D.NW,
+        Index2D.W,
+        Index2D.SW,
+        Index2D.S,
+        Index2D.SE,
+    ];
+    
+    public static readonly Index2D[] CardinalIndex = [
+        Index2D.E,
+        Index2D.N,
+        Index2D.W,
+        Index2D.S,
+    ];
+    
     public static Direction Left(this Direction dir)
         => (Direction)(((int)dir + 2) % 8);
 
