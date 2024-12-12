@@ -1,6 +1,4 @@
-using System.Data;
-
-namespace AoC_2023;
+namespace AoC._2023;
 
 public sealed class Day25 : Day
 {

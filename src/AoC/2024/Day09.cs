@@ -1,7 +1,4 @@
-using FluentAssertions;
-using System.Numerics;
-
-namespace AoC_2024;
+namespace AoC._2024;
 
 public sealed class Day09 : Day
 {

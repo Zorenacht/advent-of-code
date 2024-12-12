@@ -1,4 +1,4 @@
-﻿namespace Tools.Geometry;
+﻿namespace Tools;
 
 public static class BasicMath
 {

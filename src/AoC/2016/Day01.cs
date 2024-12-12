@@ -1,6 +1,6 @@
 ﻿using Tools.Shapes;
 
-namespace AoC_2016;
+namespace AoC._2016;
 
 public sealed class Day01 : Day
 {

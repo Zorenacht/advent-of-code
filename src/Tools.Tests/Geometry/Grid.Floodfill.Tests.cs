@@ -1,8 +1,6 @@
-using System.Runtime.InteropServices;
-using Tools;
 using Tools.Geometry;
 
-namespace Collections.Geometry;
+namespace Tools.Tests.Geometry;
 
 public class GridFloodFillTests
 {

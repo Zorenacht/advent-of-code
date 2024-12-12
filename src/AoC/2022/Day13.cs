@@ -1,7 +1,6 @@
-using NUnit.Framework.Internal;
 using System.Text;
 
-namespace AoC_2022;
+namespace AoC._2022;
 
 public static class ListExtensionForDistressSignal
 {

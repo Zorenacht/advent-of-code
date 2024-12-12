@@ -1,9 +1,6 @@
-using Tools;
 using Tools.Geometry;
-using System.Collections.Concurrent;
-using Tools.Tests;
 
-namespace Collections.Geometry;
+namespace Tools.Tests.Geometry;
 
 internal static class SizeTestCases
 {

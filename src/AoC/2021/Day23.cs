@@ -1,6 +1,7 @@
 using AoC._2021.Models;
+using ShortestPath;
 
-namespace ShortestPath.Test.Tests;
+namespace AoC._2021;
 
 public class Day23 : Day
 { 

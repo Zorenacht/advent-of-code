@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace AoC_2023;
+namespace AoC._2023;
 
 public sealed class Day08 : Day
 {

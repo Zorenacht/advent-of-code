@@ -1,7 +1,7 @@
 using System.Text;
 using Tools.Geometry;
 
-namespace AoC_2024;
+namespace AoC._2024;
 
 public sealed class Day04 : Day
 {
@@ -34,7 +34,6 @@ public sealed class Day04 : Day
             return sb.ToString();
         }
     }
-
 
     [Puzzle(answer: 2029)]
     public int Part2()

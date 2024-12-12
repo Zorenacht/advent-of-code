@@ -1,6 +1,6 @@
 using Tools.Geometry;
 
-namespace AoC_2021;
+namespace AoC._2021;
 
 public sealed class Day11(bool withAnimation = false) : Day
 {

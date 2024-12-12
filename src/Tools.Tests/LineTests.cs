@@ -1,7 +1,7 @@
 using System.Text;
 using Tools.Shapes;
 
-namespace Shapes.Line_specs;
+namespace Tools.Tests;
 
 public class Intersection
 {

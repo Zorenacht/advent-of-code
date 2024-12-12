@@ -1,4 +1,4 @@
-namespace Performance.Tests;
+namespace Tools.Tests;
 
 public class DatastructureTests
 {

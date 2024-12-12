@@ -1,6 +1,6 @@
 using Tools.Collections;
 
-namespace Collections.OrderedSet_specs;
+namespace Tools.Tests.Collections;
 
 internal readonly struct Struct(int number)
 {

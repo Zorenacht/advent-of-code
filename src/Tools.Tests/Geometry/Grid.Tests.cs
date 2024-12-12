@@ -1,7 +1,6 @@
-using Tools;
 using Tools.Geometry;
 
-namespace Collections.Geometry;
+namespace Tools.Tests.Geometry;
 
 public class GridTests
 {
