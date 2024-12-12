@@ -2,6 +2,8 @@ namespace AoC_2021;
 
 public sealed class Day03 : Day
 {
+    private int Length = 12 + Environment.NewLine.Length;
+    
     [Puzzle(answer: 3969126)]
     public int Part2()
     {
@@ -15,8 +17,8 @@ public sealed class Day03 : Day
         Console.WriteLine(String.Join(",", oxygenList));
         Console.WriteLine(String.Join(",", co2List));
 
-        double oxygen = binaryToInt(data.Substring(14 * oxygenList[0], 12));
-        double co2 = binaryToInt(data.Substring(14 * co2List[0], 12));
+        double oxygen = binaryToInt(data.Substring(Length * oxygenList[0], 12));
+        double co2 = binaryToInt(data.Substring(Length * co2List[0], 12));
 
         Console.WriteLine(oxygen + " " + co2);
         Console.WriteLine(oxygen * co2);
@@ -41,14 +43,14 @@ public sealed class Day03 : Day
                 int count = 0;
                 foreach (int index in oxygenList)
                 {
-                    count += (int)char.GetNumericValue(data[i + 14 * index]);
+                    count += (int)char.GetNumericValue(data[i + Length * index]);
                 }
                 int mostCommon = (2 * count >= oxygenList.Count ? 1 : 0);
                 Console.WriteLine("1 has occurred: " + count + " vs avg " + (double)oxygenList.Count / 2 +
                     ", thus " + mostCommon + " is most common");
                 for (int index = oxygenList.Count - 1; index >= 0; index--)
                 {
-                    if ((int)char.GetNumericValue(data[i + 14 * oxygenList[index]]) != mostCommon)
+                    if ((int)char.GetNumericValue(data[i + Length * oxygenList[index]]) != mostCommon)
                     {
                         oxygenList.RemoveAt(index);
                     }
@@ -67,14 +69,14 @@ public sealed class Day03 : Day
                 int count = 0;
                 foreach (int index in oxygenList)
                 {
-                    count += (int)char.GetNumericValue(data[i + 14 * index]);
+                    count += (int)char.GetNumericValue(data[i + Length * index]);
                 }
                 int leastCommon = (2 * count >= oxygenList.Count ? 0 : 1);
                 Console.WriteLine("1 has occurred: " + count + " vs avg " + (double)oxygenList.Count / 2 +
                     ", thus " + leastCommon + " is least common");
                 for (int index = oxygenList.Count - 1; index >= 0; index--)
                 {
-                    if ((int)char.GetNumericValue(data[i + 14 * oxygenList[index]]) != leastCommon)
+                    if ((int)char.GetNumericValue(data[i + Length * oxygenList[index]]) != leastCommon)
                     {
                         oxygenList.RemoveAt(index);
                     }

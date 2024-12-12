@@ -10,8 +10,8 @@ public abstract class Day
     {
         var year = GetType().Namespace![^4..];
         var className = GetType().Name;
-        Reader.TryReadLines(@$"{year}\Input\{className}-Example.txt", out InputExample);
-        Reader.TryReadLines(@$"{year}\Input\{className}-1.txt", out InputPart1);
+        Reader.TryReadLines(@$"{year}/Input/{className}-Example.txt", out InputExample);
+        Reader.TryReadLines(@$"{year}/Input/{className}-1.txt", out InputPart1);
         InputPart2 = InputPart1;
     }
 }
