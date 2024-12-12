@@ -8,7 +8,7 @@ public sealed class Day04 : Day
     [Puzzle(answer: 2567)]
     public int Part1()
     {
-        var lines2 = Input.ToGrid();
+        var lines2 = Input.ToCharGrid();
         return lines2.EnumerableWithIndex()
             .Where(ele => ele.Value == 'X')
             .Sum(ele => CountXMAS(ele.Index, lines2));
@@ -40,7 +40,7 @@ public sealed class Day04 : Day
     public int Part2()
     {
         int result = 0;
-        var lines2 = Input.ToGrid();
+        var lines2 = Input.ToCharGrid();
         foreach ((var index, char value) in lines2.EnumerableWithIndex())
         {
             if (value == 'A') result += CountXMas(index, lines2) ? 1 : 0;

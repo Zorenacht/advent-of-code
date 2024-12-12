@@ -18,7 +18,7 @@ public sealed class Day08 : Day
 
     private int Antinodes(string[] lines, Interval1D interval)
     {
-        var grid = lines.ToGrid();
+        var grid = lines.ToCharGrid();
         var grouped = grid.EnumerableWithIndex()
             .GroupBy(x => x.Value)
             .Where(x => x.Key != '.');

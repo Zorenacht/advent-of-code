@@ -5,9 +5,9 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Tools.Geometry;
 
-public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
+public class CharGrid : Grid<char>
 {
-    public Areas<T> FloodFill(string chars, bool diagonals = false)
+    public Areas FloodFill(string chars, bool diagonals = false)
     {
         Dictionary<int, Area> keyedAreas = [];
         Dictionary<Index2D, Area> indexAreas = [];
@@ -35,7 +35,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             keyedAreas[areaIdentifier] = flooded;
             foreach (var ind in flooded) indexAreas.Add(ind, flooded);
         }
-        return new Areas<T>
+        return new Areas
         {
             KeyedAreas = keyedAreas,
             IndexAreas = indexAreas,
@@ -43,14 +43,13 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
     }
     
     
-    public Areas<T> FloodFillRegions(bool diagonals = false)
+    public Areas FloodFillRegions(bool diagonals = false)
     {
         Dictionary<int, Area> keyedAreas = [];
         Dictionary<Index2D, Area> indexAreaMapping = [];
         
         foreach (var (index, value) in EnumerableWithIndex())
         {
-            if (value is not char ch) continue; //todo remove check
             if (indexAreaMapping.ContainsKey(index)) continue;
             var flooded = new Area();
             var toBeFlooded = new Queue<Index2D>();
@@ -63,7 +62,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
                 var neighbors = directions.Select(dir => new BorderIndex(next + dir, dir));
                 foreach (var nb in neighbors)
                 {
-                    if (ValueOrDefault(nb.Index) is char nbVal && nbVal == ch)
+                    if (ValueOrDefault(nb.Index) is char nbVal && nbVal == value)
                         toBeFlooded.Enqueue(nb.Index);
                     else
                         flooded.Border.Add(nb);
@@ -73,7 +72,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             keyedAreas[areaIdentifier] = flooded;
             foreach (var ind in flooded) indexAreaMapping.Add(ind, flooded);
         }
-        return new Areas<T>
+        return new Areas
         {
             KeyedAreas = keyedAreas,
             IndexAreas = indexAreaMapping,
@@ -81,9 +80,17 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
     }
     
     private bool IsBorder(string chars, Index2D index) => ValueOrDefault(index) is char ch && chars.Contains(ch);
+    
+    public CharGrid(char[][] lines) : base(lines)
+    {
+    }
+    
+    public CharGrid(int row, int col) : base(row, col)
+    {
+    }
 }
 
-public class Areas<T> where T : struct
+public class Areas
 {
     public Dictionary<int, Area> KeyedAreas { get; init; } = [];
     public Dictionary<Index2D, Area> IndexAreas { get; init; } = [];
@@ -99,7 +106,7 @@ public class Area : HashSet<Index2D>
     
     public int NumberOfSides()
     {
-        var horizontalSides = Border            
+        var horizontalSides = Border
             .Where(x => x.Direction == Index2D.N || x.Direction == Index2D.S)
             .GroupBy(x => (x.Index.Row, x.Direction))
             .Select(x => x.OrderBy(border => border.Index.Col).ToArray())
@@ -115,5 +122,5 @@ public class Area : HashSet<Index2D>
                 .Count(x => x.Second.Index.Row - x.First.Index.Row > 1 || x.Second.Direction != x.First.Direction)
                 .Plus(1));
         return horizontalSides + verticalSides;
-    } 
+    }
 }

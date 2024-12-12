@@ -15,7 +15,7 @@ public sealed class Day06 : Day
 
     private HashSet<IndexDirection> Path(string[] lines)
     {
-        var grid = lines.ToGrid();
+        var grid = lines.ToCharGrid();
         var current = grid.FindIndexes('^').First();
         var dir = Direction.N;
         var set = new HashSet<IndexDirection>();
@@ -37,7 +37,7 @@ public sealed class Day06 : Day
 
     private int Loop(string[] lines)
     {
-        var grid = lines.ToGrid();
+        var grid = lines.ToCharGrid();
         var path = Path(lines);
         return path.Zip(path.Skip(1))
             .Where(pair => grid.ValueOrDefault(pair.Second.Index) is '.')

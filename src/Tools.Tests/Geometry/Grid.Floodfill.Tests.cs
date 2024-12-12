@@ -49,7 +49,7 @@ public class GridFloodFillTests
     [Test]
     public void FloodFill_DisallowDiagonals()
     {
-        var grid = CharGrid.ToGrid();
+        var grid = CharGrid.ToCharGrid();
         
         var areas = grid.FloodFill("1234567890!");
         
@@ -63,7 +63,7 @@ public class GridFloodFillTests
     [Test]
     public void FloodFill_AllowDiagonals()
     {
-        var grid = CharGrid.ToGrid();
+        var grid = CharGrid.ToCharGrid();
         
         var areas = grid.FloodFill("1234567890!", true);
         
@@ -73,26 +73,26 @@ public class GridFloodFillTests
     }
     
     [Test]
-    public void FloodFillInclude_DisallowDiagonals()
+    public void FloodFillRegions_DisallowDiagonals()
     {
-        var grid = CharGrid.ToGrid();
+        var grid = CharGrid.ToCharGrid();
         
         var areas = grid.FloodFillRegions();
         
         var upper = areas.KeyedAreas[0];
-        var lower = areas.KeyedAreas[1];
-        upper.Should().BeEquivalentTo(UpperBorder);
-        lower.Should().BeEquivalentTo(LowerBorder);
+        var lower = areas.KeyedAreas[6];
+        upper.Should().BeEquivalentTo(Outer);
+        lower.Should().BeEquivalentTo(Inner);
     }
     
     [Test]
-    public void FloodFillInclude_AllowDiagonals()
+    public void FloodFillRegions_AllowDiagonals()
     {
-        var grid = CharGrid.ToGrid();
+        var grid = CharGrid.ToCharGrid();
         
         var areas = grid.FloodFillRegions(true);
         
         var upper = areas.KeyedAreas[0];
-        upper.Should().BeEquivalentTo(LowerBorder.Union(UpperBorder));
+        upper.Should().BeEquivalentTo(Outer.Union(Inner));
     }
 }
