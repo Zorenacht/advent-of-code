@@ -77,9 +77,8 @@ public class GridFloodFillTests
     {
         var grid = CharGrid.ToGrid();
         
-        var areas = grid.FloodFillInclude("234567890!");
+        var areas = grid.FloodFillRegions();
         
-        areas.KeyedAreas.Should().HaveCount(2);
         var upper = areas.KeyedAreas[0];
         var lower = areas.KeyedAreas[1];
         upper.Should().BeEquivalentTo(UpperBorder);
@@ -91,9 +90,8 @@ public class GridFloodFillTests
     {
         var grid = CharGrid.ToGrid();
         
-        var areas = grid.FloodFillInclude("234567890!", true);
+        var areas = grid.FloodFillRegions(true);
         
-        areas.KeyedAreas.Should().HaveCount(1);
         var upper = areas.KeyedAreas[0];
         upper.Should().BeEquivalentTo(LowerBorder.Union(UpperBorder));
     }

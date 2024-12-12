@@ -2,7 +2,7 @@
 
 public static class Directions
 {
-    public static Direction[] All = [
+    public  static readonly Direction[] All = [
         Direction.E,
         Direction.NE,
         Direction.N,
@@ -13,14 +13,14 @@ public static class Directions
         Direction.SE,
     ];
 
-    public static Direction[] Cardinal = [
+    public static readonly Direction[] Cardinal = [
         Direction.E,
         Direction.N,
         Direction.W,
         Direction.S,
     ];
 
-    public static Direction[] Ordinal = [
+    public static readonly Direction[] Ordinal = [
         Direction.NE,
         Direction.NW,
         Direction.SW,

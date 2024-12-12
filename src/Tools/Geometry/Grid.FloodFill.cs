@@ -43,7 +43,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
     }
     
     
-    public Areas<T> FloodFillInclude(string include, bool diagonals = false)
+    public Areas<T> FloodFillRegions(bool diagonals = false)
     {
         Dictionary<int, Area> keyedAreas = [];
         Dictionary<Index2D, Area> indexAreaMapping = [];
@@ -51,7 +51,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
         foreach (var (index, value) in EnumerableWithIndex())
         {
             if (value is not char ch) continue;
-            if (!include.Contains(ch) || indexAreaMapping.ContainsKey(index)) continue;
+            if (indexAreaMapping.ContainsKey(index)) continue;
             var flooded = new Area();
             var toBeFlooded = new Queue<Index2D>();
             toBeFlooded.Enqueue(index);

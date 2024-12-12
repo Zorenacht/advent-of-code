@@ -1,97 +1,96 @@
-using FluentAssertions;
-using FluentAssertions.Data;
-using Tools.Geometry;
-
 namespace AoC_2024;
 
 public sealed class Day12 : Day
 {
-    [Puzzle(answer: null)]
+    [Puzzle(answer: 1370100)]
     public int Part1()
     {
         int result = 0;
         var grid = Input.ToGrid();
-        var areas = grid.FloodFillInclude("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        var areas = grid.FloodFillRegions();
         foreach (var area in areas.KeyedAreas)
         {
-            var nbCount = new Dictionary<(double, double), int>();
+            var nbCount = new Dictionary<Border, int>();
             foreach (var index in area.Value)
             {
-                foreach (var nb in new (double, double)[] { (0, 0.5), (0.5, 0), (-0.5, 0), (0, -0.5) }
-                             .Select(x => (index.Row + x.Item1, index.Col + x.Item2)))
+                foreach (var nb in BorderIndex.Cardinals
+                             .Select(x => new Border(index.Row + x.Row, index.Col + x.Col, x)))
                 {
-                    if (nbCount.ContainsKey(nb)) nbCount[nb]++;
-                    else nbCount[nb] = 1;
+                    if (!nbCount.TryAdd(nb, 1)) ++nbCount[nb];
                 }
             }
-            var perim = nbCount.Count(x => x.Value == 1);
-            var are = area.Value.Count;
-            result += perim * are;
+            var perimeterCount = nbCount.Count(x => x.Value == 1);
+            var areaCount = area.Value.Count;
+            result += perimeterCount * areaCount;
         }
         return result;
     }
     
-    public record Border(double Y, double X, (double Y, double X) Dir)
+    public record Border(double Row, double Col, BorderIndex Dir)
     {
-        public virtual bool Equals(Border? other) => other is { } && (Y, X) == (other.Y, other.X);
-        public override int GetHashCode() => (Y, X).GetHashCode();
+        public virtual bool Equals(Border? other) => other is { } && (Row, Col) == (other.Row, other.Col);
+        public override int GetHashCode() => (Row, Col).GetHashCode();
     }
+    
+    public struct BorderIndex(double row, double col)
+    {
+        public double Row { get; } = row;
+        public double Col { get; } = col;
+        
+        public static readonly BorderIndex N = new(-0.5, +0.0);
+        public static readonly BorderIndex S = new(+0.5, +0.0);
+        public static readonly BorderIndex E = new(+0.0, +0.5);
+        public static readonly BorderIndex W = new(+0.0, -0.5);
+        public static readonly BorderIndex NE = N + E;
+        public static readonly BorderIndex NW = N + W;
+        public static readonly BorderIndex SW = S + W;
+        public static readonly BorderIndex SE = S + E;
+        
+        public static BorderIndex operator +(BorderIndex left, BorderIndex right) => new(left.Row + right.Row, left.Col + right.Col);
+        
+        public bool Equals(BorderIndex other) => Math.Abs(other.Row - Row) < 0.00001 && Math.Abs(other.Col - Col) < 0.00001;
+        public static bool operator ==(BorderIndex left, BorderIndex right) => left.Equals(right);
+        public static bool operator !=(BorderIndex left, BorderIndex right) => !(left == right);
+        
+        public static readonly BorderIndex[] Cardinals = [E, N, W, S];
+    };
     
     [Puzzle(answer: 818286)]
     public int Part2()
     {
         int result = 0;
         var grid = Input.ToGrid();
-        var areas = grid.FloodFillInclude("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        var areas = grid.FloodFillRegions();
         foreach (var area in areas.KeyedAreas)
         {
             var nbCount = new Dictionary<Border, int>();
             foreach (var index in area.Value)
             {
-                foreach (var nb in new (double, double)[] { (0, 0.5), (0.5, 0), (-0.5, 0), (0, -0.5) }
-                             .Select(x => new Border(index.Row + x.Item1, index.Col + x.Item2, x)))
+                foreach (var nb in BorderIndex.Cardinals
+                             .Select(x => new Border(index.Row + x.Row, index.Col + x.Col, x)))
                 {
-                    if (!nbCount.TryAdd(nb, 1)) nbCount[nb]++;
+                    if (!nbCount.TryAdd(nb, 1)) ++nbCount[nb];
                 }
             }
-            var perim = nbCount.Where(x => x.Value == 1);
-            var perimX = perim
+            var perimeter = nbCount.Where(x => x.Value == 1).ToArray();
+            var horizontalCost = perimeter
                 .Select(x => x.Key)
-                .Where(x => x.Y % 1 != 0)
-                .GroupBy(x => x.Y);
-            var px1Tot = 0;
-            foreach (var group in perimX)
-            {
-                var prev = new Border(-100d, -100d, (-100d, -100d));
-                foreach (var yxDir in group.OrderBy(x => x.X).ToArray())
-                {
-                    if (yxDir.X - prev.X > 1 || yxDir.Dir != prev.Dir)
-                    {
-                        px1Tot++;
-                    }
-                    prev = yxDir;
-                }
-            }
-            
-            var perimY = perim
+                .Where(x => x.Row % 1 != 0)
+                .GroupBy(x => (x.Row, x.Dir))
+                .Select(x => x.OrderBy(border => border.Col).ToArray())
+                .Sum(group => group.Zip(group.Skip(1))
+                    .Count(x => x.Second.Col - x.First.Col > 1 || x.Second.Dir != x.First.Dir)
+                    .Plus(1));
+            var verticalCost = perimeter
                 .Select(x => x.Key)
-                .Where(x => x.X % 1 != 0)
-                .GroupBy(x => (x.X, x.Dir));
-            var px2Tot = 0;
-            foreach (var group in perimY)
-            {
-                var prev = new Border(-100d, -100d, (-100d, -100d));
-                foreach (var yxDir in group.OrderBy(x => x.Y).ToArray())
-                {
-                    if (yxDir.Y - prev.Y > 1 || yxDir.Dir != prev.Dir)
-                    {
-                        px1Tot++;
-                    }
-                    prev = yxDir;
-                }
-            }
-            var are = area.Value.Count;
-            result += (px1Tot + px2Tot) * are;
+                .Where(x => x.Col % 1 != 0)
+                .GroupBy(x => (x.Col, x.Dir))
+                .Select(x => x.OrderBy(border => border.Row).ToArray())
+                .Sum(group => group.Zip(group.Skip(1))
+                    .Count(x => x.Second.Row - x.First.Row > 1 || x.Second.Dir != x.First.Dir)
+                    .Plus(1));
+            var areaCost = area.Value.Count;
+            result += (horizontalCost + verticalCost) * areaCost;
         }
         return result;
     }
