@@ -11,7 +11,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
     {
         Dictionary<int, Area> keyedAreas = [];
         Dictionary<Index2D, Area> indexAreas = [];
-
+        
         foreach (var (index, value) in EnumerableWithIndex())
         {
             if (IsBorder(chars, index) || indexAreas.ContainsKey(index)) continue;
@@ -50,7 +50,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
         
         foreach (var (index, value) in EnumerableWithIndex())
         {
-            if (value is not char ch) continue; 
+            if (value is not char ch) continue;
             if (!include.Contains(ch) || indexAreaMapping.ContainsKey(index)) continue;
             var flooded = new Area();
             var toBeFlooded = new Queue<Index2D>();
@@ -62,7 +62,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
                 var directions = diagonals ? Directions.All : Directions.Cardinal;
                 var toBeEnqueued = directions
                     .Select(dir => next + dir)
-                    .Where(ind => IsBorder(include, ind) );
+                    .Where(ind => ValueOrDefault(ind) is char nbVal && nbVal == ch);
                 foreach (var toEnqueue in toBeEnqueued)
                 {
                     toBeFlooded.Enqueue(toEnqueue);
@@ -86,14 +86,15 @@ public class Areas<T> where T : struct
 {
     public Dictionary<int, Area> KeyedAreas { get; init; } = [];
     public Dictionary<Index2D, Area> IndexAreas { get; init; } = [];
-
+    
     public Areas()
     {
-
     }
 }
 
 public class Area : HashSet<Index2D>
 {
-    public Area() { }
+    public Area()
+    {
+    }
 }
