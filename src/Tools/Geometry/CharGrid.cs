@@ -1,9 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System.Collections;
-using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace Tools.Geometry;
+﻿namespace Tools.Geometry;
 
 public class CharGrid : Grid<char>
 {
