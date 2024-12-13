@@ -90,10 +90,16 @@
   &lt;/Or&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c233d76e_002D86d2_002D4eba_002D9c8d_002Df2847dd29dba/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;And&gt;
-    &lt;Namespace&gt;AoC._2024&lt;/Namespace&gt;
-    &lt;Project Location="/Users/renzo/home/source/advent-of-code/src/AoC" Presentation="&amp;lt;AoC&amp;gt;" /&gt;
-  &lt;/And&gt;
+  &lt;Or&gt;
+    &lt;And&gt;
+      &lt;Namespace&gt;AoC._2024&lt;/Namespace&gt;
+      &lt;Project Location="/Users/renzo/home/source/advent-of-code/src/AoC" Presentation="&amp;lt;AoC&amp;gt;" /&gt;
+    &lt;/And&gt;
+    &lt;TestAncestor&gt;
+      &lt;TestId&gt;NUnit3x::8E511325-C640-4B3E-9517-EBAFB800D4D7::net8.0::AoC_2024.Day13.Part1&lt;/TestId&gt;
+      &lt;TestId&gt;NUnit3x::8E511325-C640-4B3E-9517-EBAFB800D4D7::net8.0::AoC_2024.Day13.Part2&lt;/TestId&gt;
+    &lt;/TestAncestor&gt;
+  &lt;/Or&gt;
 &lt;/SessionState&gt;</s:String>
 	
 	
