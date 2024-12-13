@@ -5,11 +5,11 @@ namespace Tools.Geometry;
 public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
 {
     public T[][] Lattice { get; set; }
-
+    
     public int TotalLength => RowLength * ColLength;
     public int RowLength => Lattice.Length;
     public int ColLength => Lattice[0].Length;
-
+    
     public Grid(T[][] lines)
     {
         Lattice = new T[lines.Length][];
@@ -22,22 +22,22 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             }
         }
     }
-
+    
     public Grid(int row, int col)
     {
         Lattice = new T[row][];
         for (int i = 0; i < row; i++)
             Lattice[i] = new T[col];
     }
-
+    
     public T[] this[int row]
     {
         get => Lattice[row];
         set => Lattice[row] = value;
     }
-
+    
     public T[] As1D() => Enumerable().ToArray();
-
+    
     public void Reset()
     {
         foreach (var (index, val) in EnumerableWithIndex())
@@ -45,52 +45,34 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             UpdateAt(index, default);
         }
     }
-
-    public bool IsValid(int i, int j)
-    {
-        return i >= 0 && i < Lattice.Length
-                      && j >= 0 && j < Lattice[0].Length;
-    }
-
-    public bool IsValid(Index2D point)
-    {
-        return point.Row >= 0 && point.Row < Lattice.Length
-                            && point.Col >= 0 && point.Col < Lattice[0].Length;
-    }
-
-    public T ValueAt(int row, int col) => Lattice[row][col];
-
-    public T ValueAt(Index2D point) => ValueAt(point.Row, point.Col);
-
-    public T? ValueOrDefault(int row, int col)
-    {
-        if (IsValid(row, col))
-            return Lattice[row][col];
-        return null;
-    }
-
-    public T? ValueOrDefault(Index2D point) => ValueOrDefault(point.Row, point.Col);
-
+    
+    public bool IsValid(int i, int j) =>
+        i >= 0 && i < Lattice.Length &&
+        j >= 0 && j < Lattice[0].Length;
+    
+    public bool IsValid(Index2D index) =>
+        index.Row >= 0 && index.Row < Lattice.Length &&
+        index.Col >= 0 && index.Col < Lattice[0].Length;
+    
+    public T ValueAt(Index2D index) => this[index.Row][index.Col];
+    
+    public T? ValueOrDefault(int row, int col) => IsValid(row, col)
+        ? Lattice[row][col]
+        : null;
+    
+    public T? ValueOrDefault(Index2D index) => ValueOrDefault(index.Row, index.Col);
+    
     public bool UpdateAt(int row, int col, T value)
     {
-        if (IsValid(row, col))
-            Lattice[row][col] = value;
-        else
-        {
-            throw new IndexOutOfRangeException();
-        }
-        return IsValid(row, col);
+        if (!IsValid(row, col)) return false;
+        Lattice[row][col] = value;
+        return true;
     }
-
-    public bool UpdateAt(Index2D point, T value)
-    {
-        if (IsValid(point))
-            Lattice[point.Row][point.Col] = value;
-        return IsValid(point);
-    }
-
+    
+    public bool UpdateAt(Index2D index, T value) => UpdateAt(index.Row, index.Col, value);
+    
     public Grid<T> Copy() => new(Lattice);
-
+    
     public void ApplyRange(Index2D from, Index2D to, T value)
     {
         for (int i = Math.Min(from.Row, to.Row); i <= Math.Max(from.Row, to.Row); i++)
@@ -101,7 +83,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             }
         }
     }
-
+    
     public IEnumerable<Index2D> FindIndexes(T value)
     {
         foreach (var (index, val) in EnumerableWithIndex())
@@ -109,7 +91,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             if (val.Equals(value)) yield return index;
         }
     }
-
+    
     IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {
         for (int i = 0; i < Lattice.Length; i++)
@@ -120,7 +102,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             }
         }
     }
-
+    
     public IEnumerator GetEnumerator()
     {
         for (int i = 0; i < Lattice.Length; i++)
@@ -131,7 +113,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             }
         }
     }
-
+    
     public IEnumerable<T> Enumerable()
     {
         for (int i = 0; i < Lattice.Length; i++)
@@ -142,7 +124,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             }
         }
     }
-
+    
     public IEnumerable<(Index2D Index, T Value)> EnumerableWithIndex()
     {
         for (int i = 0; i < Lattice.Length; i++)
@@ -153,7 +135,7 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             }
         }
     }
-
+    
     public IEnumerable<(Index2D, T)> Enumerable(Func<Index2D, bool> condition)
     {
         for (int i = 0; i < Lattice.Length; i++)
@@ -164,17 +146,18 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
             }
         }
     }
-
+    
     public static bool operator ==(Grid<T> grid1, Grid<T> grid2)
     {
         if (grid1.ColLength != grid2.ColLength) return false;
         if (grid1.RowLength != grid2.RowLength) return false;
-        foreach (var (point, val) in grid1.EnumerableWithIndex())
+        foreach (var (index, val) in grid1.EnumerableWithIndex())
         {
-            if (!val.Equals(grid2.ValueOrDefault(point))) return false;
+            if (!val.Equals(grid2.ValueOrDefault(index))) return false;
         }
         return true;
     }
+    
     public virtual void Print()
     {
         Console.WriteLine(new string('-', Lattice[0].Length));
@@ -188,13 +171,10 @@ public partial class Grid<T> : IEnumerable, IEnumerable<T> where T : struct
         }
         Console.WriteLine(new string('-', Lattice[0].Length));
     }
-
+    
     public static bool operator !=(Grid<T> grid1, Grid<T> grid2) => !(grid1 == grid2);
-
-    public override bool Equals(object? obj) => this == obj;
-
-    public override int GetHashCode()
-    {
-        throw new NotSupportedException();
-    }
+    
+    public override bool Equals(object? obj) => obj is Grid<T> grid && this == grid;
+    
+    public override int GetHashCode() => throw new NotSupportedException();
 }

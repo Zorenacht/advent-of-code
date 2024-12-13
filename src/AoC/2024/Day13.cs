@@ -26,8 +26,8 @@ public sealed class Day13 : Day
             int[] buttonB = [int.Parse(bMatches.Groups[1].Value), int.Parse(bMatches.Groups[2].Value)];
             long[] prize = [extraCost + int.Parse(prizeMatches.Groups[1].Value), extraCost + int.Parse(prizeMatches.Groups[2].Value)];
             
-            //                          [ buttonA[0] buttonB[0] ] [ aPresses ] = prize[0]
-            // Solve the linear system  [ buttonA[1] buttonB[1] ] [ bPresses ] = prize[1]
+            //                          [ buttonA[0] buttonB[0] ] [ aPresses ] = [ prize[0] ]
+            // Solve the linear system  [ buttonA[1] buttonB[1] ] [ bPresses ] = [ prize[1] ]
             // by inverting the matrix and checking afterward if the solution consists of integers
             var matrix = new int[][]
             {
