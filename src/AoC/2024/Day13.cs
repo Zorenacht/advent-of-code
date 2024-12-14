@@ -1,7 +1,7 @@
 using FluentAssertions;
 using System.Text.RegularExpressions;
 
-namespace AoC_2024;
+namespace AoC._2024;
 
 public sealed class Day13 : Day
 {

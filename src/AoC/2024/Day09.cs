@@ -16,7 +16,9 @@ public sealed class Day09 : Day
         
         public DiskFragmenter(string input)
         {
-            var digits = input.Select(x => x - '0').ToArray();
+            var digits = input
+                .Where(x => x >= '0' && x <= '9')
+                .Select(x => x - '0').ToArray();
             
             int index = 0;
             for (int i = 0; i < digits.Length; ++i)

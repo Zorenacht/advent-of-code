@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace AoC_YearPlaceholder;
+namespace AoC._YearPlaceholder;
 
 public sealed class DayDayPlaceholder : Day
 {
