@@ -82,6 +82,7 @@ public class CharGrid : Grid<char>
     
     public CharGrid(int row, int col) : base(row, col)
     {
+        ApplyRange(new Index2D(0, 0), new Index2D(row-1, col-1), '.');
     }
 }
 

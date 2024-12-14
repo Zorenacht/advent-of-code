@@ -1,4 +1,4 @@
-using AoC._2024;
+using AoC_2024;
 
-var result = new Day06().Part2();
+var result = new Day14().Part2();
 Console.WriteLine(result);
