@@ -1,14 +1,16 @@
+using Collections;
 using Tools.Geometry;
+using static AoC._2021.Day20;
 
 namespace AoC._2024;
 
 public sealed class Day14 : Day
 {
     [Puzzle(answer: 218619120)]
-    public long Part1() => new RobotIterator(103, 101, Input).SafetyFactor();
+    public long Part1() => new RobotIterator(103, 101, Input).SafetyFactors(100).Last();
 
     [Puzzle(answer: 7055)]
-    public long Part2() => new RobotIterator(103, 101, Input).IndexOfBiggestArea();
+    public long Part2() => new RobotIterator(103, 101, Input).SafetyFactors(103 * 101).MinWithIndex().Index;
 
     private class RobotIterator
     {
@@ -34,6 +36,48 @@ public sealed class Day14 : Day
             }
         }
 
+        public List<long> SafetyFactors(int iter)
+        {
+            var sfs = new List<long>() { long.MaxValue };
+            for (int i = 1; i <= iter; ++i)
+            {
+                sfs.Add(SafetyFactor());
+            }
+            return sfs;
+        }
+
+        public long SafetyFactor()
+        {
+            var grid = new Grid<int>(Height, Width);
+            foreach (var robot in Robots)
+            {
+                robot.Current = new Index2D(
+                    (robot.Current.Row + robot.Velocity.Row).Modulo(Height),
+                    (robot.Current.Col + robot.Velocity.Col).Modulo(Width));
+            }
+            var quadrants = new long[4] { 0, 0, 0, 0 };
+            foreach (var robot in Robots)
+            {
+                grid.UpdateAt(robot.Current, grid.ValueAt(robot.Current) + 1);
+                if (robot.Current.Row < Height / 2 && robot.Current.Col < Width / 2) quadrants[0]++;
+                if (robot.Current.Row < Height / 2 && robot.Current.Col > Width / 2) quadrants[1]++;
+                if (robot.Current.Row > Height / 2 && robot.Current.Col < Width / 2) quadrants[2]++;
+                if (robot.Current.Row > Height / 2 && robot.Current.Col > Width / 2) quadrants[3]++;
+            }
+            return quadrants[0] * quadrants[1] * quadrants[2] * quadrants[3];
+        }
+
+        public class Robot(Index2D start, Index2D velocity)
+        {
+            public Index2D Start { get; } = start;
+            public Index2D Velocity { get; } = velocity;
+            public Index2D Current { get; set; } = start;
+
+            public override bool Equals(object? obj) => obj is Robot other && Current.Equals(other.Current);
+            public override int GetHashCode() => Current.GetHashCode();
+        }
+
+        // Alternative, but slower algorithm using flood fill
         public int IndexOfBiggestArea()
         {
             var biggestArea = new List<int>() { -100 };
@@ -74,40 +118,6 @@ public sealed class Day14 : Day
                 biggestArea.Add(areas.Max(x => x.Count));
             }
             return biggestArea.IndexOf(biggestArea.Max());
-        }
-
-        public long SafetyFactor()
-        {
-            var grid = new Grid<int>(Height, Width);
-            for (int i = 0; i < 100; ++i)
-            {
-                foreach (var robot in Robots)
-                {
-                    robot.Current = new Index2D(
-                        (robot.Current.Row + robot.Velocity.Row).Modulo(Height),
-                        (robot.Current.Col + robot.Velocity.Col).Modulo(Width));
-                }
-            }
-            var quadrants = new long[4] { 0, 0, 0, 0 };
-            foreach (var robot in Robots)
-            {
-                grid.UpdateAt(robot.Current, grid.ValueAt(robot.Current) + 1);
-                if (robot.Current.Row < Height / 2 && robot.Current.Col < Width / 2) quadrants[0]++;
-                if (robot.Current.Row < Height / 2 && robot.Current.Col > Width / 2) quadrants[1]++;
-                if (robot.Current.Row > Height / 2 && robot.Current.Col < Width / 2) quadrants[2]++;
-                if (robot.Current.Row > Height / 2 && robot.Current.Col > Width / 2) quadrants[3]++;
-            }
-            return quadrants[0] * quadrants[1] * quadrants[2] * quadrants[3];
-        }
-
-        public class Robot(Index2D start, Index2D velocity)
-        {
-            public Index2D Start { get; } = start;
-            public Index2D Velocity { get; } = velocity;
-            public Index2D Current { get; set; } = start;
-
-            public override bool Equals(object? obj) => obj is Robot other && Current.Equals(other.Current);
-            public override int GetHashCode() => Current.GetHashCode();
         }
     }
 }
