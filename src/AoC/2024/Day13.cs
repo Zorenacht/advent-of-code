@@ -19,12 +19,12 @@ public sealed class Day13 : Day
         {
             var buttonRegex = new Regex(@"Button .: X\+(\d+), Y\+(\d+)");
             var prizeRegex = new Regex(@"Prize: X=(\d+), Y=(\d+)");
-            var aMatches = buttonRegex.Match(group[0]);
-            var bMatches = buttonRegex.Match(group[1]);
-            var prizeMatches = prizeRegex.Match(group[2]);
-            int[] buttonA = [int.Parse(aMatches.Groups[1].Value), int.Parse(aMatches.Groups[2].Value)];
-            int[] buttonB = [int.Parse(bMatches.Groups[1].Value), int.Parse(bMatches.Groups[2].Value)];
-            long[] prize = [extraCost + int.Parse(prizeMatches.Groups[1].Value), extraCost + int.Parse(prizeMatches.Groups[2].Value)];
+            var aValues = group[0].Ints();
+            var bValues = group[1].Ints();
+            var pValues = group[2].Ints();
+            int[] buttonA = [aValues[0], aValues[1]];
+            int[] buttonB = [bValues[0], bValues[1]];
+            long[] prize = [extraCost + pValues[0], extraCost + pValues[1]];
             
             //                          [ buttonA[0] buttonB[0] ] [ aPresses ] = [ prize[0] ]
             // Solve the linear system  [ buttonA[1] buttonB[1] ] [ bPresses ] = [ prize[1] ]

@@ -28,9 +28,9 @@ public sealed class Day14 : Day
             Robots = new List<Robot>();
             foreach (var line in lines)
             {
-                var splitted = line.Split("= ,".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                var index = new Index2D(int.Parse(splitted[2]), int.Parse(splitted[1]));
-                var velocity = new Index2D(int.Parse(splitted[5]), int.Parse(splitted[4]));
+                var ints = line.Ints();
+                var index = new Index2D(ints[1], ints[0]);
+                var velocity = new Index2D(ints[3], ints[2]);
                 var robot = new Robot(index, velocity);
                 Robots.Add(robot);
             }
