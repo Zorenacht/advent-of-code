@@ -8,47 +8,37 @@ public sealed class Day15 : Day
     [Puzzle(answer: 1495147)]
     public long Part1()
     {
-        int result = 0;
         var groups = Input.GroupBy(string.Empty);
         var grid = groups[0].ToCharGrid();
-        var sequence = string.Join("", groups[1]);
+        var moves = string.Join("", groups[1]);
         var current = grid.FindIndexes('@').First();
+
         grid.Print();
-        foreach (var ch in sequence)
+        foreach (var move in moves)
         {
-            var next = current + Map(ch);
-            if (grid.ValueOrDefault(next) == '#') continue;
-            var prop = next;
-            var os = new List<Index2D>();
-            while (grid.ValueAt(prop) == 'O')
+            var dir = Map(move);
+            var next = current + dir;
+            var propagated = next;
+
+            while (grid.ValueAt(propagated) == 'O')
             {
-                prop = prop + Map(ch);
+                propagated = propagated + Map(move);
             }
-            if (grid.ValueAt(prop) == '#') next = current;
-            else
+            if (grid.ValueAt(propagated) == '.')
             {
-                grid.UpdateAt(prop, 'O');
+                grid.UpdateAt(propagated, 'O');
                 grid.UpdateAt(current, '.');
                 grid.UpdateAt(next, '@');
                 current = next;
             }
         }
         grid.Print();
-        long sum = 0;
-        foreach (var (ind, val) in grid.EnumerableWithIndex())
-        {
-            if (val == 'O') sum += ind.Row * 100 + ind.Col;
-        }
-        return sum;
-    }
 
-    public Index2D Map(char ch) => ch switch
-    {
-        '^' => Index2D.N,
-        'v' => Index2D.S,
-        '>' => Index2D.E,
-        '<' => Index2D.W,
-    };
+        return grid
+            .EnumerableWithIndex()
+            .Where(iv => iv.Value == 'O')
+            .Sum(iv => iv.Index.Row * 100 + iv.Index.Col);
+    }
 
     [Puzzle(answer: 1524905)]
     public long Part2()
@@ -59,35 +49,33 @@ public sealed class Day15 : Day
                 .Replace("#", "##")
                 .Replace("O", "[]")
                 .Replace(".", "..")
-                .Replace("@", "@.")).ToArray().ToCharGrid();
-        var sequence = string.Join("", groups[1]);
+                .Replace("@", "@."))
+            .ToArray()
+            .ToCharGrid();
+        var moves = string.Join("", groups[1]);
         var current = grid.FindIndexes('@').First();
-        grid.Print();
-        foreach (var ch in sequence)
-        {
-            var dir = Map(ch);
-            var next = current + Map(ch);
-            if (grid.ValueOrDefault(next) == '#') continue;
-            var prop = next;
-            var os = new List<Index2D>();
 
-            Console.WriteLine($"Move {ch}");
+        grid.Print();
+        foreach (var move in moves)
+        {
+            var dir = Map(move);
+            var next = current + dir;
 
             // horizontal movement
             if (dir == Index2D.E || dir == Index2D.W)
             {
-                var propagated = new List<Index2D>();
-                while (grid.ValueAt(prop) == '[' || grid.ValueAt(prop) == ']')
+                var boxes = new List<Index2D>();
+                var propagated = next;
+                while (grid.ValueAt(propagated) == '[' || grid.ValueAt(propagated) == ']')
                 {
-                    propagated.Add(prop);
-                    prop = prop + Map(ch);
+                    boxes.Add(propagated);
+                    propagated = propagated + Map(move);
                 }
-                if (grid.ValueAt(prop) == '#') next = current;
-                else
+                if (grid.ValueAt(propagated) == '.')
                 {
-                    for(int j = propagated.Count-1; j >= 0; j--)
+                    for (int j = boxes.Count - 1; j >= 0; j--)
                     {
-                        grid.UpdateAt(propagated[j] + dir, grid.ValueAt(propagated[j]));
+                        grid.UpdateAt(boxes[j] + dir, grid.ValueAt(boxes[j]));
                     }
                     grid.UpdateAt(next, '@');
                     grid.UpdateAt(current, '.');
@@ -100,26 +88,28 @@ public sealed class Day15 : Day
             {
                 var toBeMoved = new List<Index2D>() { current };
                 var currentRow = new HashSet<Index2D>() { current };
-                bool move = true;
-                while (move && currentRow.Count > 0)
+                bool canMove = true;
+                while (canMove && currentRow.Count > 0)
                 {
                     var nexts = new HashSet<Index2D>();
                     foreach (var cur in currentRow)
                     {
-                        if (grid.ValueAt(cur + dir) == '[') nexts.UnionWith([cur + dir, cur + dir + Index2D.E]);
-                        if (grid.ValueAt(cur + dir) == ']') nexts.UnionWith([cur + dir, cur + dir + Index2D.W]);
-                        if (grid.ValueAt(cur + dir) == '#')
+                        var nxt = cur + dir;
+                        if (grid.ValueAt(nxt) == '[') nexts.UnionWith([nxt, nxt + Index2D.E]);
+                        if (grid.ValueAt(nxt) == ']') nexts.UnionWith([nxt, nxt + Index2D.W]);
+                        if (grid.ValueAt(nxt) == '#')
                         {
                             nexts = [];
-                            move = false;
+                            canMove = false;
                             break;
                         }
                     }
                     currentRow = nexts;
                     toBeMoved.AddRange(nexts);
                 }
-                if (move)
+                if (canMove)
                 {
+                    // iterating in reverse prevents overwriting boxes yet to be moved
                     toBeMoved.Reverse();
                     foreach (var box in toBeMoved)
                     {
@@ -129,13 +119,21 @@ public sealed class Day15 : Day
                     current = next;
                 }
             }
-            grid.Print();
         }
-        long sum = 0;
-        foreach (var (ind, val) in grid.EnumerableWithIndex())
-        {
-            if (val == '[') sum += ind.Row * 100 + ind.Col;
-        }
-        return sum;
+        grid.Print();
+
+        return grid
+            .EnumerableWithIndex()
+            .Where(iv => iv.Value == '[')
+            .Sum(iv => iv.Index.Row * 100 + iv.Index.Col);
     }
+
+    public Index2D Map(char ch) => ch switch
+    {
+        '^' => Index2D.N,
+        'v' => Index2D.S,
+        '>' => Index2D.E,
+        '<' => Index2D.W,
+        _ => throw new ArgumentOutOfRangeException()
+    };
 };
