@@ -5,9 +5,9 @@ namespace AoC._YearPlaceholder;
 public sealed class DayDayPlaceholder : Day
 {
     [Puzzle(answer: null)]
-    public int Part1()
+    public long Part1()
     {
-        int result = 0;
+        long result = 0;
         var lines = Input;
         foreach (var line in lines)
         {
@@ -18,7 +18,7 @@ public sealed class DayDayPlaceholder : Day
     }
 
     [Puzzle(answer: null)]
-    public int Part2()
+    public long Part2()
     {
         return 0;
     }
