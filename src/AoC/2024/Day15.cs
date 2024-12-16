@@ -89,7 +89,7 @@ public sealed class Day15 : Day
                 var toBeMoved = new List<Index2D>() { current };
                 var currentRow = new HashSet<Index2D>() { current };
                 bool canMove = true;
-                while (canMove && currentRow.Count > 0)
+                while (currentRow.Count > 0)
                 {
                     var nexts = new HashSet<Index2D>();
                     foreach (var cur in currentRow)
