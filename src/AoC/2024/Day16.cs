@@ -11,12 +11,11 @@ public sealed class Day16 : Day
     [Puzzle(answer: 94444)]
     public long Part1()
     {
-        long result = 0;
         var grid = Input.ToCharGrid();
-        var current = grid.FindIndexes('S').First();
+        var start = grid.FindIndexes('S').First();
         var end = grid.FindIndexes('E').First();
         var pq = new PriorityQueue<IndexDirection, int>();
-        pq.Enqueue(new(current, Direction.E), 0);
+        pq.Enqueue(new IndexDirection(start, Direction.E), 0);
         var hs = new HashSet<IndexDirection>();
         while (pq.TryDequeue(out var indexDir, out var priority))
         {
@@ -24,7 +23,7 @@ public sealed class Day16 : Day
             if (indexDir.Index == end)
                 return priority;
             hs.Add(indexDir);
-
+            
             var straight = new IndexDirection(indexDir.Index + indexDir.Direction, indexDir.Direction);
             var left = new IndexDirection(indexDir.Index, indexDir.Direction.Left());
             var right = new IndexDirection(indexDir.Index, indexDir.Direction.Right());
@@ -32,91 +31,75 @@ public sealed class Day16 : Day
                 pq.Enqueue(straight, priority + 1);
             pq.Enqueue(left, priority + 1000);
             pq.Enqueue(right, priority + 1000);
-            //var left = new IndexDirection(indexDir.Index + indexDir.Direction.Left(), indexDir.Direction.Left());
-            //var right = new IndexDirection(indexDir.Index + indexDir.Direction.Right(), indexDir.Direction.Right());
-            //if ("E.".Contains(grid.ValueAt(straight.Index))) 
-            //    pq.Enqueue(straight, priority + 1);
-            //if ("E.".Contains(grid.ValueAt(left.Index))) 
-            //    pq.Enqueue(left, priority + 1001);
-            //if ("E.".Contains(grid.ValueAt(right.Index))) 
-            //    pq.Enqueue(right, priority + 1001);
         }
-        return result;
+        throw new NotImplementedException("Should not be reached");
     }
-
-    public class DijkstraNode(IndexDirection Id, int Value, Index2D Prev)
+    
+    private record DijkstraNode(IndexDirection Current, IndexDirection? Prev);
+    
+    private class DijkstraInfo(int distance, HashSet<IndexDirection> previous)
     {
-        public IndexDirection Id { get; } = Id;
-        public int Value { get; } = Value;
-        public Index2D Prev { get; } = Prev;
-
-        public override bool Equals(object? obj) => obj is DijkstraNode node && Id == node.Id;
-        public override int GetHashCode() => Id.GetHashCode();
-    };
-
-    public record DijkstraThing(int Value, List<IndexDirection> Previous);
-
-    [Puzzle(answer: null)]
+        public int Distance { get; set; } = distance;
+        public HashSet<IndexDirection> Previous { get; set; } = previous;
+    }
+    
+    [Puzzle(answer: 502)]
     public long Part2()
     {
-        long result = 0;
         var grid = Input.ToCharGrid();
-        var current = grid.FindIndexes('S').First();
+        var start = grid.FindIndexes('S').First();
         var end = grid.FindIndexes('E').First();
         var pq = new PriorityQueue<DijkstraNode, int>();
-        pq.Enqueue(new(new(current, Direction.E), 0, Index2D.O), 0);
-        var hs = new Dictionary<IndexDirection, DijkstraThing>();
-        while (pq.TryDequeue(out var dnode, out var priority))
+        pq.Enqueue(new DijkstraNode(new IndexDirection(start, Direction.E), null), 0);
+        var nodes = new Dictionary<IndexDirection, DijkstraInfo>();
+        while (pq.TryDequeue(out var dnode, out var distance))
         {
-            var indexDir = dnode.Id;
-            if (hs.ContainsKey(indexDir)) continue;
-            if (indexDir.Index == end)
-                return priority;
-            hs.Add(indexDir, [dnode.Prev]);
-
-            var straight = new IndexDirection(indexDir.Index + indexDir.Direction, indexDir.Direction);
-            var left = new IndexDirection(indexDir.Index, indexDir.Direction.Left());
-            var right = new IndexDirection(indexDir.Index, indexDir.Direction.Right());
-            if ("E.".Contains(grid.ValueAt(straight.Index)))
-                pq.Enqueue(new(straight, priority + 1, indexDir.Index), priority + 1);
-            pq.Enqueue(new(left, priority + 1000, indexDir.Index), priority + 1000);
-            pq.Enqueue(new(right, priority + 1000, indexDir.Index), priority + 1000);
+            var currentIndex = dnode.Current;
+            if (nodes.TryGetValue(currentIndex, out var dijkstraInfo))
+            {
+                if (dijkstraInfo.Distance < distance)
+                {
+                    if (currentIndex.Index == end) break;
+                    continue;
+                }
+                if (dijkstraInfo.Distance == distance && dnode.Prev is { })
+                {
+                    dijkstraInfo.Previous.Add(dnode.Prev);
+                }
+                if (dijkstraInfo.Distance > distance)
+                {
+                    dijkstraInfo.Distance = distance;
+                    dijkstraInfo.Previous = dnode.Prev is { } ? [dnode.Prev] : [];
+                }
+            }
+            else
+            {
+                nodes.Add(currentIndex, new DijkstraInfo(distance, dnode.Prev is { } ? [dnode.Prev] : []));
+            }
+            
+            var straight = new IndexDirection(currentIndex.Index + currentIndex.Direction, currentIndex.Direction);
+            var left = new IndexDirection(currentIndex.Index, currentIndex.Direction.Left());
+            var right = new IndexDirection(currentIndex.Index, currentIndex.Direction.Right());
+            if ("E.".Contains(grid.ValueAt(straight.Index))) pq.Enqueue(new DijkstraNode(straight, currentIndex), distance + 1);
+            pq.Enqueue(new DijkstraNode(left, currentIndex), distance + 1000);
+            pq.Enqueue(new DijkstraNode(right, currentIndex), distance + 1000);
         }
-        return result;
-    }
-
-
-
-
-
-    public class State : IState<State>
-    {
-        public IndexDirection IndexDirection { get; init; }
-        public CharGrid Grid { get; init; }
-
-        public bool Equals(State? other)
+        var optimal = new HashSet<Index2D>();
+        var queue = new Queue<IndexDirection>();
+        var eastEnd = new IndexDirection(end, Direction.E);
+        var northEnd = new IndexDirection(end, Direction.N);
+        if (nodes[eastEnd].Distance <= nodes[northEnd].Distance) queue.Enqueue(new IndexDirection(end, Direction.E));
+        if (nodes[eastEnd].Distance >= nodes[northEnd].Distance) queue.Enqueue(new IndexDirection(end, Direction.N));
+        while (queue.TryDequeue(out var element))
         {
-            return IndexDirection.Index == other!.IndexDirection.Index;
+            grid.UpdateAt(element.Index, 'O');
+            optimal.Add(element.Index);
+            foreach (var prev in nodes[element].Previous)
+            {
+                queue.Enqueue(prev);
+            }
         }
-
-        public override int GetHashCode()
-        {
-            return IndexDirection.Index.GetHashCode();
-        }
-
-        public int Heuristic()
-        {
-            return 0;
-        }
-
-        public IEnumerable<Node<State>> NextNodes(int initialDistance)
-        {
-            var straight = new IndexDirection(IndexDirection.Index + IndexDirection.Direction, IndexDirection.Direction);
-            var left = new IndexDirection(IndexDirection.Index + IndexDirection.Direction.Left(), IndexDirection.Direction.Left());
-            var right = new IndexDirection(IndexDirection.Index + IndexDirection.Direction.Right(), IndexDirection.Direction.Right());
-            if ("E.".Contains(Grid.ValueAt(straight.Index))) yield return new Node<State>(new() { IndexDirection = straight, Grid = Grid }, initialDistance + 1);
-            if ("E.".Contains(Grid.ValueAt(left.Index))) yield return new Node<State>(new() { IndexDirection = left, Grid = Grid }, initialDistance + 1000);
-            if ("E.".Contains(Grid.ValueAt(right.Index))) yield return new Node<State>(new() { IndexDirection = right, Grid = Grid }, initialDistance + 1000);
-        }
+        grid.Print();
+        return optimal.Count;
     }
 };
