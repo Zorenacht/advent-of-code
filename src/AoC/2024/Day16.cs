@@ -9,7 +9,7 @@ namespace AoC._2024;
 public sealed class Day16 : Day
 {
     [Puzzle(answer: 94444)]
-    public long Part1V2()
+    public long Part1()
     {
         var maze = Input.ToMaze();
         var start = maze.FindIndexes('S').First();

@@ -1,5 +1,9 @@
 using FluentAssertions;
+using MathNet.Numerics.LinearAlgebra.Complex;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Channels;
+using Tools.Shapes;
 
 namespace AoC._2024;
 
@@ -12,19 +16,19 @@ public sealed class Day17 : Day
             return OpCode switch
             {
                 //0 => state.Move() with { A = state.A / (2 << Combo(state)) },
-                0 => state.Move() with { A = state.A >> Combo(state) },
+                0 => state.Move() with { A = state.A >> (int)Combo(state) },
                 1 => state.Move() with { B = state.B ^ Operand },
                 2 => state.Move() with { B = Combo(state) % 8 },
                 3 => state with { Pointer = state.A == 0 ? state.Pointer + 2 : Operand },
                 4 => state.Move() with { B = state.B ^ state.C },
                 5 => state.Move() with { Output = state.Output == string.Empty ? (Combo(state) % 8).ToString() : state.Output + "," + Combo(state) % 8 },
-                6 => state.Move() with { B = state.A >> Combo(state) },
-                7 => state.Move() with { C = state.A >> Combo(state) },
+                6 => state.Move() with { B = state.A >> (int)Combo(state) },
+                7 => state.Move() with { C = state.A >> (int)Combo(state) },
                 _ => throw new UnreachableException("Should not be reachable")
             };
         }
         
-        private int Combo(State state) => Operand switch
+        private long Combo(State state) => Operand switch
         {
             0 or 1 or 2 or 3 => Operand,
             4 => state.A,
@@ -34,12 +38,12 @@ public sealed class Day17 : Day
         };
     };
     
-    private record State(int A, int B, int C, string Output, int Pointer)
+    private record State(long A, long B, long C, string Output, int Pointer)
     {
         public State Move() => this with { Pointer = Pointer + 2 };
     };
     
-    [Puzzle(answer: null)]
+    [Puzzle(answer: "7,5,4,3,4,5,3,4,6")]
     public string Part1()
     {
         var lines = Input;
@@ -68,28 +72,45 @@ public sealed class Day17 : Day
     [Test]
     public void Example5() => Execute(0, 2024, 43690, [4, 0]).B.Should().Be(44354);
     
-    private State Execute(int a, int b, int c, int[] instr)
+    private State Execute(long a, long b, long c, int[] instr)
     {
-        long result = 0;
         var state = new State(a, b, c, string.Empty, 0);
+        var instructions = new List<Instruction>();
+        for (int i = 0; i < instr.Length - 1; i++)
+            instructions.Add(new Instruction(instr[i], instr[i + 1]));
+        while (state.Pointer < instructions.Count)
+            state = instructions[state.Pointer].Execute(state);
+        return state;
+    }
+    
+    [Test]
+    public void ExamplePart2() => FindMinReplicating([0, 3, 5, 4, 3, 0]).Should().Be(117440);
+    
+    [Puzzle(answer: 164278899142333)]
+    public long Part2() => FindMinReplicating(Input[4].Ints());
+    
+    private long FindMinReplicating(int[] instr)
+    {
         var instructions = new List<Instruction>();
         for (int i = 0; i < instr.Length - 1; i++)
         {
             instructions.Add(new Instruction(instr[i], instr[i + 1]));
         }
         
-        Console.WriteLine($"A={state.A}, B={state.B}, C={state.C}, Output={state.Output}, Pointer={state.Pointer}");
-        while (state.Pointer < instructions.Count)
+        var range = Enumerable.Range(0, 2 << 9).ToArray();
+        var candidatesAll = range.Select(x => (long)x).ToList();
+        for (int k = 1; k < instructions.Count; ++k)
         {
-            state = instructions[state.Pointer].Execute(state);
-            Console.WriteLine($"A={state.A}, B={state.B}, C={state.C}, Output={state.Output}, Pointer={state.Pointer}");
+            var goal = string.Join(",", instr[..(k + 1)]);
+            candidatesAll = range
+                .SelectMany(x => candidatesAll.Select(prev => prev + ((long)x << (3 * k))))
+                .Distinct()
+                .Where(x => Execute(x, 0, 0, instr).Output.StartsWith(goal))
+                .ToList();
         }
-        return state;
+        var results = candidatesAll
+            .Where(x => Execute(x, 0, 0, instr).Output == string.Join(",", instr))
+            .OrderBy(x => x);
+        return results.Min();
     }
-    
-    [Puzzle(answer: null)]
-    public long Part2()
-    {
-        return 0;
-    }
-};
+}
