@@ -75,4 +75,5 @@
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=Modified_003A_0020Reformat_0020_0026_0020Apply/@EntryIndexedValue"></s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=Modified_003A_0020Reformat_0020_0026_0020Apply/@EntryIndexRemoved">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/NULL_CHECKING_PATTERN_STYLE/@EntryValue">EmptyRecursivePattern</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=intstructions/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=splitted/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

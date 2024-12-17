@@ -39,41 +39,43 @@ public sealed class Day17 : Day
     [Puzzle(answer: 164278899142333)]
     public long Part2() => FindMinReplicating(Input[4].Ints());
     
-    private static State Execute(long a, long b, long c, int[] instr)
+    private static State Execute(long a, long b, long c, int[] intstructions)
+    {
+        var instructions = new List<Instruction>();
+        for (int i = 0; i < intstructions.Length - 1; i++)
+            instructions.Add(new Instruction(intstructions[i], intstructions[i + 1]));
+        return Execute(a, b, c, instructions);
+    }
+    
+    private static State Execute(long a, long b, long c, List<Instruction> instructions)
     {
         var state = new State(a, b, c, string.Empty, 0);
-        var instructions = new List<Instruction>();
-        for (int i = 0; i < instr.Length - 1; i++)
-            instructions.Add(new Instruction(instr[i], instr[i + 1]));
         while (state.Pointer < instructions.Count)
             state = instructions[state.Pointer].Execute(state);
         return state;
     }
     
-    private static long FindMinReplicating(int[] instr)
+    private static long FindMinReplicating(int[] intstructions)
     {
         var instructions = new List<Instruction>();
-        for (int i = 0; i < instr.Length - 1; i++)
+        for (int i = 0; i < intstructions.Length - 1; i++)
         {
-            instructions.Add(new Instruction(instr[i], instr[i + 1]));
+            instructions.Add(new Instruction(intstructions[i], intstructions[i + 1]));
         }
         
-        // 0b000 000 000 000 ^1
-        var range = Enumerable.Range(0, 2 << 9).ToArray();
+        var range = Enumerable.Range(0, 600).ToArray();
         var candidatesAll = range.Select(x => (long)x).ToList();
-        var sum = 0;
         for (int k = 1; k < instructions.Count; ++k)
         {
-            var goal = string.Join(",", instr[..(k + 1)]);
-            sum += range.Count() * candidatesAll.Count;
+            var goal = string.Join(",", intstructions[..(k + 1)]);
             candidatesAll = range
                 .SelectMany(x => candidatesAll.Select(prev => prev + ((long)x << (3 * k))))
                 .Distinct()
-                .Where(x => Execute(x, 0, 0, instr).Output.StartsWith(goal))
+                .Where(x => Execute(x, 0, 0, instructions).Output.StartsWith(goal))
                 .ToList();
         }
         var results = candidatesAll
-            .Where(x => Execute(x, 0, 0, instr).Output == string.Join(",", instr))
+            .Where(x => Execute(x, 0, 0, intstructions).Output == string.Join(",", intstructions))
             .OrderBy(x => x);
         return results.Min();
     }
