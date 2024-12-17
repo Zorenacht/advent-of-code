@@ -1,48 +1,9 @@
-using FluentAssertions;
-using MathNet.Numerics.LinearAlgebra.Complex;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System.Diagnostics;
-using System.Threading.Channels;
-using Tools.Shapes;
 
 namespace AoC._2024;
 
 public sealed class Day17 : Day
 {
-    private record Instruction(int OpCode, int Operand)
-    {
-        public State Execute(State state)
-        {
-            return OpCode switch
-            {
-                //0 => state.Move() with { A = state.A / (2 << Combo(state)) },
-                0 => state.Move() with { A = state.A >> (int)Combo(state) },
-                1 => state.Move() with { B = state.B ^ Operand },
-                2 => state.Move() with { B = Combo(state) % 8 },
-                3 => state with { Pointer = state.A == 0 ? state.Pointer + 2 : Operand },
-                4 => state.Move() with { B = state.B ^ state.C },
-                5 => state.Move() with { Output = state.Output == string.Empty ? (Combo(state) % 8).ToString() : state.Output + "," + Combo(state) % 8 },
-                6 => state.Move() with { B = state.A >> (int)Combo(state) },
-                7 => state.Move() with { C = state.A >> (int)Combo(state) },
-                _ => throw new UnreachableException("Should not be reachable")
-            };
-        }
-        
-        private long Combo(State state) => Operand switch
-        {
-            0 or 1 or 2 or 3 => Operand,
-            4 => state.A,
-            5 => state.B,
-            6 => state.C,
-            _ => throw new UnreachableException("Should not be reachable")
-        };
-    };
-    
-    private record State(long A, long B, long C, string Output, int Pointer)
-    {
-        public State Move() => this with { Pointer = Pointer + 2 };
-    };
-    
     [Puzzle(answer: "7,5,4,3,4,5,3,4,6")]
     public string Part1()
     {
@@ -72,7 +33,13 @@ public sealed class Day17 : Day
     [Test]
     public void Example5() => Execute(0, 2024, 43690, [4, 0]).B.Should().Be(44354);
     
-    private State Execute(long a, long b, long c, int[] instr)
+    [Test]
+    public void ExamplePart2() => FindMinReplicating([0, 3, 5, 4, 3, 0]).Should().Be(117440);
+    
+    [Puzzle(answer: 164278899142333)]
+    public long Part2() => FindMinReplicating(Input[4].Ints());
+    
+    private static State Execute(long a, long b, long c, int[] instr)
     {
         var state = new State(a, b, c, string.Empty, 0);
         var instructions = new List<Instruction>();
@@ -83,13 +50,7 @@ public sealed class Day17 : Day
         return state;
     }
     
-    [Test]
-    public void ExamplePart2() => FindMinReplicating([0, 3, 5, 4, 3, 0]).Should().Be(117440);
-    
-    [Puzzle(answer: 164278899142333)]
-    public long Part2() => FindMinReplicating(Input[4].Ints());
-    
-    private long FindMinReplicating(int[] instr)
+    private static long FindMinReplicating(int[] instr)
     {
         var instructions = new List<Instruction>();
         for (int i = 0; i < instr.Length - 1; i++)
@@ -97,11 +58,14 @@ public sealed class Day17 : Day
             instructions.Add(new Instruction(instr[i], instr[i + 1]));
         }
         
+        // 0b000 000 000 000 ^1
         var range = Enumerable.Range(0, 2 << 9).ToArray();
         var candidatesAll = range.Select(x => (long)x).ToList();
+        var sum = 0;
         for (int k = 1; k < instructions.Count; ++k)
         {
             var goal = string.Join(",", instr[..(k + 1)]);
+            sum += range.Count() * candidatesAll.Count;
             candidatesAll = range
                 .SelectMany(x => candidatesAll.Select(prev => prev + ((long)x << (3 * k))))
                 .Distinct()
@@ -113,4 +77,34 @@ public sealed class Day17 : Day
             .OrderBy(x => x);
         return results.Min();
     }
+    
+    private record Instruction(int OpCode, int Operand)
+    {
+        public State Execute(State state) => OpCode switch
+        {
+            0 => state.Move() with { A = state.A >> (int)Combo(state) },
+            1 => state.Move() with { B = state.B ^ Operand },
+            2 => state.Move() with { B = Combo(state) % 8 },
+            3 => state with { Pointer = state.A == 0 ? state.Pointer + 2 : Operand },
+            4 => state.Move() with { B = state.B ^ state.C },
+            5 => state.Move() with { Output = state.Output == string.Empty ? (Combo(state) % 8).ToString() : state.Output + "," + Combo(state) % 8 },
+            6 => state.Move() with { B = state.A >> (int)Combo(state) },
+            7 => state.Move() with { C = state.A >> (int)Combo(state) },
+            _ => throw new UnreachableException("Should not be reachable")
+        };
+        
+        private long Combo(State state) => Operand switch
+        {
+            0 or 1 or 2 or 3 => Operand,
+            4 => state.A,
+            5 => state.B,
+            6 => state.C,
+            _ => throw new UnreachableException("Should not be reachable")
+        };
+    };
+    
+    private record State(long A, long B, long C, string Output, int Pointer)
+    {
+        public State Move() => this with { Pointer = Pointer + 2 };
+    };
 }
