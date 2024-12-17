@@ -10,6 +10,7 @@ public static class StringExtensions
 
     public static CharGrid ToCharGrid(this string text) => text.Lines().ToCharGrid();
     public static CharGrid ToCharGrid(this string[] lines) => new(lines.Select(x => x.ToCharArray()).ToArray());
+    public static Maze ToMaze(this string[] lines) => new(lines.Select(x => x.ToCharArray()).ToArray());
     public static Grid<int> ToIntGrid(this string[] lines) => new(lines.Select(x => x.Select(x => x - '0').ToArray()).ToArray());
     public static int[] Ints(this string line) => new Regex(@"(-?\d+)")
         .Matches(line)

@@ -1,20 +1,15 @@
-using FluentAssertions;
-using ShortestPath;
-using System.Linq;
-using Tools.Geometry;
-using static AoC._2021.Day20;
+﻿namespace Tools.Geometry;
 
-namespace AoC._2024;
-
-public sealed class Day16 : Day
+public class Maze : CharGrid
 {
-    [Puzzle(answer: 94444)]
-    public long Part1V2()
+    public char Wall { get; set; }
+    
+    public Maze(char[][] lines) : base(lines)
     {
-        var maze = Input.ToMaze();
-        var start = maze.FindIndexes('S').First();
-        var end = maze.FindIndexes('E').First();
-        return maze.ShortestPath(new IndexDirection(start, Direction.E), end, null!);
+    }
+    
+    public Maze(int row, int col) : base(row, col)
+    {
     }
     
     private record DijkstraNode(IndexDirection Current, IndexDirection? Prev);
@@ -25,14 +20,10 @@ public sealed class Day16 : Day
         public HashSet<IndexDirection> Previous { get; set; } = previous;
     }
     
-    [Puzzle(answer: 502)]
-    public long Part2()
+    public int ShortestPath(IndexDirection start, Index2D end, Func<IndexDirection, IndexDirection> func)
     {
-        var grid = Input.ToCharGrid();
-        var start = grid.FindIndexes('S').First();
-        var end = grid.FindIndexes('E').First();
         var pq = new PriorityQueue<DijkstraNode, int>();
-        pq.Enqueue(new DijkstraNode(new IndexDirection(start, Direction.E), null), 0);
+        pq.Enqueue(new DijkstraNode(start, null), 0);
         var nodes = new Dictionary<IndexDirection, DijkstraInfo>();
         while (pq.TryDequeue(out var dnode, out var distance))
         {
@@ -62,26 +53,13 @@ public sealed class Day16 : Day
             var straight = new IndexDirection(currentIndex.Index + currentIndex.Direction, currentIndex.Direction);
             var left = new IndexDirection(currentIndex.Index, currentIndex.Direction.Left());
             var right = new IndexDirection(currentIndex.Index, currentIndex.Direction.Right());
-            if ("E.".Contains(grid.ValueAt(straight.Index))) pq.Enqueue(new DijkstraNode(straight, currentIndex), distance + 1);
+            if ("E.".Contains(ValueAt(straight.Index))) pq.Enqueue(new DijkstraNode(straight, currentIndex), distance + 1);
             pq.Enqueue(new DijkstraNode(left, currentIndex), distance + 1000);
             pq.Enqueue(new DijkstraNode(right, currentIndex), distance + 1000);
         }
-        var optimal = new HashSet<Index2D>();
-        var queue = new Queue<IndexDirection>();
-        var eastEnd = new IndexDirection(end, Direction.E);
-        var northEnd = new IndexDirection(end, Direction.N);
-        if (nodes[eastEnd].Distance <= nodes[northEnd].Distance) queue.Enqueue(new IndexDirection(end, Direction.E));
-        if (nodes[eastEnd].Distance >= nodes[northEnd].Distance) queue.Enqueue(new IndexDirection(end, Direction.N));
-        while (queue.TryDequeue(out var element))
-        {
-            grid.UpdateAt(element.Index, 'O');
-            optimal.Add(element.Index);
-            foreach (var prev in nodes[element].Previous)
-            {
-                queue.Enqueue(prev);
-            }
-        }
-        grid.Print();
-        return optimal.Count;
+        
+        return nodes.Where(x => x.Key.Index == end)
+            .MinBy(kv => kv.Value.Distance)
+            .Value.Distance;
     }
-};
+}
