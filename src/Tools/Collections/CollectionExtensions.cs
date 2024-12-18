@@ -1,5 +1,8 @@
-﻿namespace Collections;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Collections;
+
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public static class CollectionExtensions
 {
     public static (int Index, long Value) MaxWithIndex(this IEnumerable<long> enumerable)
@@ -35,4 +38,12 @@ public static class CollectionExtensions
         }
         return (minIndex, minValue);
     }
+    
+    public static int? MaxOrNull(this IEnumerable<int> enumerable) => enumerable.Any()
+        ? enumerable.Max()
+        : null;
+    
+    public static int? MinOrNull(this IEnumerable<int> enumerable) => enumerable.Any()
+        ? enumerable.Min() 
+        : null;
 }

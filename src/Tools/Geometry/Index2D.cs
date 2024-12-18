@@ -8,17 +8,27 @@ namespace Tools.Geometry;
 [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Rider")]
 public readonly struct Index2D(int row, int col) : IEquatable<Index2D>
 {
+    public Index2D(int row, int col, int direction) : this(row, col)
+    {
+        _direction = direction;
+    }
+    
     public static readonly Index2D O = new(0, 0);
 
-    public static readonly Index2D N = new(-1, +0);
-    public static readonly Index2D S = new(+1, +0);
-    public static readonly Index2D E = new(+0, +1);
-    public static readonly Index2D W = new(+0, -1);
-    public static readonly Index2D NE = N + E;
-    public static readonly Index2D NW = N + W;
-    public static readonly Index2D SW = S + W;
-    public static readonly Index2D SE = S + E;
-
+    public static readonly Index2D N = new(-1, +0, direction: 0);
+    public static readonly Index2D NE = new(-1, +1, direction: 1);
+    public static readonly Index2D E = new(+0, +1, direction: 2);
+    public static readonly Index2D SE = new(+1, +1, direction: 3);
+    public static readonly Index2D S = new(+1, +0, direction: 4);
+    public static readonly Index2D SW = new(+1, -1, direction: 5);
+    public static readonly Index2D W = new(+0, -1, direction: 6);
+    public static readonly Index2D NW = new(+1, +1, direction: 7);
+    public static Index2D[] Directions => [ N, NE, E, SE, S, SW, W, NW ];
+    
+    public Index2D TurnLeft() => Directions[(_direction + 6) % 8];
+    public Index2D TurnRight() => Directions[(_direction + 2) % 8];
+    
+    private readonly int _direction = -1;
     public int Row { get; } = row;
     public int Col { get; } = col;
 

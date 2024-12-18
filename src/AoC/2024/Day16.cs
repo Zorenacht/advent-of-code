@@ -14,7 +14,9 @@ public sealed class Day16 : Day
         var maze = Input.ToMaze();
         var start = maze.FindIndexes('S').First();
         var end = maze.FindIndexes('E').First();
-        return maze.ShortestPath(new IndexDirection(start, Direction.E), end, null!);
+        maze.UpdateAt(start, '.');
+        maze.UpdateAt(end, '.');
+        return maze.ShortestPath(new IndexDirection(start, Direction.E), end);
     }
     
     private record DijkstraNode(IndexDirection Current, IndexDirection? Prev);
@@ -66,6 +68,7 @@ public sealed class Day16 : Day
             pq.Enqueue(new DijkstraNode(left, currentIndex), distance + 1000);
             pq.Enqueue(new DijkstraNode(right, currentIndex), distance + 1000);
         }
+        
         var optimal = new HashSet<Index2D>();
         var queue = new Queue<IndexDirection>();
         var eastEnd = new IndexDirection(end, Direction.E);

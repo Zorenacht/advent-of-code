@@ -1,3 +1,4 @@
+using Collections;
 using FluentAssertions;
 using System.Diagnostics.CodeAnalysis;
 using Tools.Geometry;
@@ -11,17 +12,17 @@ public sealed class Day18 : Day
     public long Part1_Example()
     {
         var maze = InitMaze(7, 7, 12, InputExample);
-        return ShortestPath(Index2D.O, new Index2D(maze.RowLength - 1, maze.ColLength - 1), maze);
+        return maze.ShortestPathV2(Index2D.O, new Index2D(maze.RowLength - 1, maze.ColLength - 1));
     }
     
     [Puzzle(answer: 336)]
     public long Part1()
     {
         var maze = InitMaze(71, 71, 1024, Input);
-        return ShortestPath(Index2D.O, new Index2D(maze.RowLength - 1, maze.ColLength - 1), maze);
+        maze.Print();
+        return maze.ShortestPathV2(Index2D.O, new Index2D(maze.RowLength - 1, maze.ColLength - 1));
     }
     
-    //2951
     [Puzzle(answer: "24,30")]
     public string Part2()
     {
@@ -35,7 +36,7 @@ public sealed class Day18 : Day
         {
             var mid = (left + right + 1) / 2;
             var midMaze = InitMaze(size, size, mid + 1, lines);
-            var midValue = ShortestPath(start, end, midMaze);
+            var midValue = midMaze.ShortestPathV2(start, end);
             if (midValue == -1) right = mid;
             else left = mid + 1;
         }
@@ -51,55 +52,5 @@ public sealed class Day18 : Day
             maze.UpdateAt(ints[0], ints[1], '#');
         }
         return maze;
-    }
-    
-    private static int ShortestPath(Index2D start, Index2D end, Maze maze)
-    {
-        var pq = new PriorityQueue<DijkstraNode, int>();
-        pq.Enqueue(new DijkstraNode(start, null), 0);
-        var nodes = new Dictionary<Index2D, DijkstraInfo>();
-        while (pq.TryDequeue(out var dnode, out var distance))
-        {
-            var currentIndex = dnode.Current;
-            if (nodes.TryGetValue(currentIndex, out var dijkstraInfo))
-            {
-                if (dijkstraInfo.Distance < distance)
-                {
-                    continue;
-                }
-                
-                if (dijkstraInfo.Distance >= distance)
-                {
-                    dijkstraInfo.Distance = distance;
-                    dijkstraInfo.Previous = dnode.Previous is { } previous ? [previous] : [];
-                }
-                if (dijkstraInfo.Distance == distance && dnode.Previous is { })
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                nodes.Add(currentIndex, new DijkstraInfo(distance, dnode.Previous is { } ? [dnode.Previous.Value] : []));
-            }
-            if (currentIndex == end) return distance;
-            
-            foreach (var nb in Directions.CardinalIndex.Select(dir => currentIndex + dir)
-                         .Where(nb => maze.ValueOrDefault(nb) == '.'))
-                //.Where(nb => !nodes.ContainsKey(nb)))
-            {
-                pq.Enqueue(new DijkstraNode(nb, currentIndex), distance + 1);
-            }
-        }
-        return -1;
-    }
-    
-    private record DijkstraNode(Index2D Current, Index2D? Previous);
-    
-    private class DijkstraInfo(int distance, List<Index2D> previous)
-    {
-        public int Distance { get; set; } = distance;
-        public int Heuristic { get; set; } = 0;
-        public List<Index2D> Previous { get; set; } = previous;
     }
 };
