@@ -5,8 +5,11 @@ using System.Diagnostics;
 var day = new Day19();
 ElapsedTime(() =>
 {
-    var result = day.Part2();
-    Console.WriteLine($"Answer: {result}");
+    for (int i = 0; i < 1000; ++i)
+    {
+        var result = day.Part2();
+    }
+    //Console.WriteLine($"Answer: {result}");
 });
 
 
