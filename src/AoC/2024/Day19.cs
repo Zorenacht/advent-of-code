@@ -6,19 +6,8 @@ namespace AoC._2024;
 
 public sealed class Day19 : Day
 {
-    private int IndexOf(char ch) => ch switch
-    {
-        'w' => 0,
-        'u' => 1,
-        'b' => 2,
-        'r' => 3,
-        'g' => 4,
-        _ => throw new NotSupportedException()
-    };
-    
     [Puzzle(answer: 330)]
     public long Part1() => Possibilities(Input).Count(x => x > 0);
-    
     
     [Puzzle(answer: 950763269786650)]
     public long Part2() => Possibilities(Input).Sum(x => x);
@@ -69,6 +58,16 @@ public sealed class Day19 : Day
         }
         return permutations;
     }
+    
+    private static int IndexOf(char ch) => ch switch
+    {
+        'w' => 0,
+        'u' => 1,
+        'b' => 2,
+        'r' => 3,
+        'g' => 4,
+        _ => throw new NotSupportedException()
+    };
     
     public class TrieNode(char character, bool isEnd)
     {
