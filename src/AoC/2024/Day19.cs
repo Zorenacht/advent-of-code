@@ -15,21 +15,52 @@ public sealed class Day19 : Day
     
     private static List<long> Possibilities(string[] lines)
     {
-        var parts = lines[0].Split(", ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var possibilities = new List<long>(lines[2..].Length);
+        var root = new TrieNode('0', false);
+        
+        var parts = lines[0].Split(", ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+        foreach (var part in parts)
+        {
+            var node = root;
+            foreach (var ch in part)
+            {
+                if (node.Nexts.TryGetValue(ch, out var nde)) node = nde;
+                else
+                {
+                    node.Nexts[ch] = new TrieNode(ch, false);
+                    node = node.Nexts[ch];
+                }
+            }
+            node.IsEnd = true;
+        }
+        
+        var permutations = new List<long>(lines[2..].Length);
         foreach (var line in lines[2..])
         {
             var dp = new long[line.Length + 1];
             dp[0] = 1;
+            
             for (int i = 0; i < line.Length; i++)
             {
-                foreach (var part in parts.Where(x => line[i..].StartsWith(x)))
+                var node = root;
+                for (int j = i; j < line.Length; ++j)
                 {
-                    dp[i + part.Length] += dp[i];
+                    if (node.Nexts.TryGetValue(line[j], out var nde))
+                    {
+                        node = nde;
+                        if (node.IsEnd) dp[j + 1] += dp[i];
+                    }
+                    else break;
                 }
             }
-            possibilities.Add(dp[^1]);
+            permutations.Add(dp[^1]);
         }
-        return possibilities;
+        return permutations;
+    }
+    
+    public class TrieNode(char character, bool isEnd)
+    {
+        public char Character { get; } = character;
+        public bool IsEnd { get; set; } = isEnd;
+        public Dictionary<char, TrieNode> Nexts { get; } = [];
     }
 };
