@@ -2,10 +2,10 @@ using AoC._2024;
 using System.Diagnostics;
 
 
-var day = new Day19();
+var day = new Day20();
 ElapsedTime(() =>
 {
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         var result = day.Part2();
     }
