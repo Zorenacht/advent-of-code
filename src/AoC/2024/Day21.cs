@@ -13,6 +13,14 @@ public sealed class Day21 : Day
     [Puzzle(answer: 279638326609472)]
     public long Part2() => ComplexitiesV2(Input, 25);
 
+    // Determined rules:
+    // first by running the algorithm and taking the lower result
+    // later through logic, determined that < is far away and should be grouped
+    // <^ bt ^>, because [<^]=[v<<,>^,>] and [^>]=[<,v<,>>^] where the latter contains an ungrouped <
+    // v> bt >v, because [v>]=[<v,>,^  ] and [>v]=[v,<,^>  ] where the latter contains an ungrouped <
+    // ^> bt >^, because [^>]=[<,v>,^  ] and [>^]=[v,<^,>  ] the logic doesnt seem to hold here :(,
+    //           probably gets overruled due to <^ being more expensive than v> 
+    // <v bt v<, because [<v]=[v<<,>,^>] and [v<]=[<v,<,>>^] where the latter contains an ungrouped <
     public long ComplexitiesV2(string[] codes, int pads)
     {
         var numbers = codes.Select(line => line.Ints().First());
@@ -74,14 +82,8 @@ public sealed class Day21 : Day
         return result;
     }
     
-    // Determined rules:
-    // first by running the algorithm and taking the lower result
-    // later through logic, determined that < is far away and should be grouped
-    // <^ bt ^>, because [<^]=[v<<,>^,>] and [^>]=[<,v<,>>^] where the latter contains an ungrouped <
-    // v> bt >v, because [v>]=[<v,>,^  ] and [>v]=[v,<,^>  ] where the latter contains an ungrouped <
-    // ^> bt >^, because [^>]=[<,v>,^  ] and [>^]=[v,<^,>  ] the logic doesnt seem to hold here :(,
-    //           probably gets overruled due to <^ being more expensive than v> 
-    // <v bt v<, because [<v]=[v<<,>,^>] and [v<]=[<v,<,>>^] where the latter contains an ungrouped <
+    // Map for optimal required button pressed (Value),
+    //  to make the robot go from (Key="ab") a to b and press b
     Dictionary<string, string> Dpads = new Dictionary<string, string>()
     {
         { "A<", "v<<A" },
