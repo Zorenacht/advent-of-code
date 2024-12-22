@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework.Interfaces;
-using NUnit.Framework.Internal.Builders;
 using NUnit.Framework.Internal;
+using NUnit.Framework.Internal.Builders;
 
 namespace Tools.Tests;
 

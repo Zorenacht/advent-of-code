@@ -1,7 +1,3 @@
-using FluentAssertions;
-using System;
-using Tools;
-
 namespace AoC._2024;
 
 [PuzzleType(PuzzleType.Compute, PuzzleType.DP)]

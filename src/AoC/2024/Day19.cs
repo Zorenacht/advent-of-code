@@ -1,7 +1,3 @@
-using Collections;
-using FluentAssertions;
-using System.Text.RegularExpressions;
-
 namespace AoC._2024;
 
 [PuzzleType(PuzzleType.Permutations, PuzzleType.DP, PuzzleType.Tree)]
@@ -9,14 +5,14 @@ public sealed class Day19 : Day
 {
     [Puzzle(answer: 330)]
     public long Part1() => Possibilities(Input).Count(x => x > 0);
-    
+
     [Puzzle(answer: 950763269786650)]
     public long Part2() => Possibilities(Input).Sum(x => x);
-    
+
     private List<long> Possibilities(string[] lines)
     {
         var root = new TrieNode('0', false);
-        
+
         var parts = lines[0].Split(", ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
         foreach (var part in parts)
         {
@@ -34,13 +30,13 @@ public sealed class Day19 : Day
             }
             node!.IsEnd = true;
         }
-        
+
         var permutations = new List<long>(lines[2..].Length);
         foreach (var line in lines[2..])
         {
             var dp = new long[line.Length + 1];
             dp[0] = 1;
-            
+
             for (int i = 0; i < line.Length; i++)
             {
                 var node = root;
@@ -59,7 +55,7 @@ public sealed class Day19 : Day
         }
         return permutations;
     }
-    
+
     private static int IndexOf(char ch) => ch switch
     {
         'w' => 0,
@@ -69,7 +65,7 @@ public sealed class Day19 : Day
         'g' => 4,
         _ => throw new NotSupportedException()
     };
-    
+
     public class TrieNode(char character, bool isEnd)
     {
         public char Character { get; } = character;

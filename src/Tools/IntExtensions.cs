@@ -1,7 +1,4 @@
-﻿using System.Text;
-using Tools.Geometry;
-
-namespace Tools;
+﻿namespace Tools;
 
 public static class IntExtensions
 {

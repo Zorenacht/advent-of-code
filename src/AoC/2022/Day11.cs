@@ -11,9 +11,9 @@ public sealed class Day11 : Day
     public void ExampleP2() => Simulate(Day11Input.ExampleInput, 10000, 1).Should().Be(2713310158);
     [Test]
     public void Part2() => Simulate(Day11Input.Input, 10000, 1).Should().Be(19457438264);
-    
+
     private const int Prod = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23;
-    
+
     private long Simulate(List<Monkey> monkeys, int turns, int divisor)
     {
         for (int i = 0; i < turns; i++)

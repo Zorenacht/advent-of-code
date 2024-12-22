@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Tools.Geometry;
 
 namespace AoC._2024;

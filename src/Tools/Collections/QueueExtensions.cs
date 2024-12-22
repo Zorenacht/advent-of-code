@@ -8,7 +8,7 @@ public static class QueueExtensions
             queue.Enqueue(element);
         return queue;
     }
-    
+
     public static PriorityQueue<T, TPriority> With<T, TPriority>(this PriorityQueue<T, TPriority> queue, T element, TPriority priority)
     {
         queue.Enqueue(element, priority);

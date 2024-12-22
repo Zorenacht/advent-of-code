@@ -5,22 +5,22 @@ public sealed class Day09 : Day
 {
     [Puzzle(answer: 6_279_058_075_753)]
     public long Part1() => new DiskFragmenter(InputAsText).Compact().Checksum();
-    
+
     [Puzzle(answer: 6_301_361_958_738)]
     public long Part2() => new DiskFragmenter(InputAsText).CompactFiles().Checksum();
-    
+
     private class DiskFragmenter
     {
         private readonly List<int?> _disk = [];
         private readonly List<Space> _empty = [];
         private readonly List<Space> _files = [];
-        
+
         public DiskFragmenter(string input)
         {
             var digits = input
                 .Where(x => x >= '0' && x <= '9')
                 .Select(x => x - '0').ToArray();
-            
+
             int index = 0;
             for (int i = 0; i < digits.Length; ++i)
             {
@@ -28,13 +28,13 @@ public sealed class Day09 : Day
                 {
                     _disk.Add(i % 2 == 0 ? i / 2 : null);
                 }
-                
+
                 if (i % 2 == 0) _files.Add(new Space(i / 2, digits[i], index));
                 else _empty.Add(new Space(0, digits[i], index));
                 index += digits[i];
             }
         }
-        
+
         public DiskFragmenter Compact()
         {
             int left = 0;
@@ -56,7 +56,7 @@ public sealed class Day09 : Day
             }
             return this;
         }
-        
+
         public DiskFragmenter CompactFiles()
         {
             for (int i = _files.Count - 1; i >= 0; --i)
@@ -77,12 +77,12 @@ public sealed class Day09 : Day
             }
             return this;
         }
-        
+
         public long Checksum() =>
             _disk
                 .Select((d, i) => (long)((d ?? 0) * i))
                 .Sum();
-        
+
         private class Space(int value, int length, int index)
         {
             public int Value { get; set; } = value;

@@ -7,24 +7,24 @@ public sealed class Day11 : Day
     public long Part1() => PebbleCountIterative(25);
     [Puzzle(answer: 194557)]
     public long Part1_Recursive() => PebbleCountRecursive(25);
-    
+
     [Puzzle(answer: 231532558973909)]
     public long Part2() => PebbleCountIterative(75);
     [Puzzle(answer: 231532558973909)]
     public long Part2_Recursive() => PebbleCountRecursive(75);
-    
+
     private long PebbleCountRecursive(int iterations)
     {
         var pebbles = InputAsText.Split(' ', StringSplitOptions.TrimEntries).ToList();
         var dp = new Dictionary<(string Value, int Iterations), long>();
         return pebbles.Sum(x => PebbleCount(x, iterations, dp));
     }
-    
+
     private static long PebbleCount(string value, int iterations, Dictionary<(string Value, int Iterations), long> dict)
     {
         if (iterations == 0) return 1;
         if (dict.TryGetValue((value, iterations), out var count)) return count;
-        
+
         long val = 0;
         if (value == "0")
         {
@@ -39,11 +39,11 @@ public sealed class Day11 : Day
         {
             val += PebbleCount((long.Parse(value) * 2024).ToString(), iterations - 1, dict);
         }
-        
+
         dict[(value, iterations)] = val;
         return val;
     }
-    
+
     private long PebbleCountIterative(int iterations)
     {
         var split = InputAsText.Split(' ', StringSplitOptions.TrimEntries).ToList();
@@ -68,7 +68,7 @@ public sealed class Day11 : Day
             counts = next;
         }
         return counts.Sum(x => x.Value);
-        
+
         void AddOrPlus(Dictionary<string, long> dict, long plus, string value)
         {
             if (!dict.TryAdd(value, plus)) dict[value] += plus;

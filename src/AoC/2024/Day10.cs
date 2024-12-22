@@ -14,9 +14,9 @@ public sealed class Day10 : Day
             (int current) => current == 0,
             (int current, int next) => next == current + 1,
             (int next) => next == 9);
-        return bfs.Paths(grid).GroupBy(x => (x[0],x[^1])).Count();
+        return bfs.Paths(grid).GroupBy(x => (x[0], x[^1])).Count();
     }
-    
+
     [Puzzle(answer: 1514)]
     public int Part2()
     {
@@ -27,7 +27,7 @@ public sealed class Day10 : Day
             (int next) => next == 9);
         return bfs.Paths(grid).Count;
     }
-    
+
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     private class BFS<T>(
         Func<T, bool> startingCondition,

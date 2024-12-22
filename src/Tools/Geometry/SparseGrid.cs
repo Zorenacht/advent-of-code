@@ -7,9 +7,9 @@ namespace Tools.Geometry;
 public class SparseGrid
 {
     private Dictionary<int, HashSet<int>> WallCols { get; }
-    
+
     private Dictionary<int, HashSet<int>> WallRows { get; }
-    
+
     public SparseGrid(CharGrid grid, char wall)
     {
         WallRows = new Dictionary<int, HashSet<int>>();
@@ -23,7 +23,7 @@ public class SparseGrid
             else WallCols.Add(index.Col, [index.Row]);
         }
     }
-    
+
     public IndexDirectionV2 NextBlockade(IndexDirectionV2 indexDirection)
     {
         if (indexDirection.Direction == Index2D.N)

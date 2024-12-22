@@ -10,9 +10,9 @@ public static class CollectionExtensions
         long maxValue = long.MinValue;
         int maxIndex = -1;
         int index = 0;
-        foreach(var item in enumerable)
+        foreach (var item in enumerable)
         {
-            if(maxValue < item || item == maxValue && maxIndex == -1)
+            if (maxValue < item || item == maxValue && maxIndex == -1)
             {
                 maxValue = item;
                 maxIndex = index;
@@ -38,12 +38,12 @@ public static class CollectionExtensions
         }
         return (minIndex, minValue);
     }
-    
+
     public static int? MaxOrNull(this IEnumerable<int> enumerable) => enumerable.Any()
         ? enumerable.Max()
         : null;
-    
+
     public static int? MinOrNull(this IEnumerable<int> enumerable) => enumerable.Any()
-        ? enumerable.Min() 
+        ? enumerable.Min()
         : null;
 }

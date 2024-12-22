@@ -1,7 +1,4 @@
-using FluentAssertions;
-using System.Collections.Generic;
 using System.Text;
-using Tools.Geometry;
 
 namespace AoC._2024;
 
@@ -82,7 +79,7 @@ public sealed class Day21 : Day
         }
         return result;
     }
-    
+
     // Map for optimal required button pressed (Value),
     //  to make the robot go from (Key="ab") a to b and press b
     Dictionary<string, string> Dpads = new Dictionary<string, string>()

@@ -3,7 +3,7 @@ namespace AoC._2021;
 public sealed class Day03 : Day
 {
     private int Length = 12 + Environment.NewLine.Length;
-    
+
     [Puzzle(answer: 3969126)]
     public int Part2()
     {

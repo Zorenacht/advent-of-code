@@ -6,37 +6,37 @@ namespace Tools.Geometry;
 public class Maze : CharGrid
 {
     public char Wall { get; set; }
-    
+
     public Maze(char[][] lines) : base(lines)
     {
     }
-    
+
     public Maze(int row, int col) : base(row, col)
     {
     }
-    
+
     public struct IndexDirectionStruct(Index2D index, Direction direction)
     {
         public Index2D Index { get; } = index;
         public Direction Direction { get; } = direction;
     }
-    
+
     private record DijkstraClassNode<T>(T Current, T? Previous) where T : class;
-    
+
     private record DijkstraStructNode<T>(T Current, T? Previous) where T : struct;
-    
+
     private class DijkstraInfo(int distance, HashSet<IndexDirection> previous)
     {
         public int Distance { get; set; } = distance;
         public HashSet<IndexDirection> Previous { get; set; } = previous;
     }
-    
+
     private class DijkstraStructInfo<T>(int distance, HashSet<T> previous) where T : struct
     {
         public int Distance { get; set; } = distance;
         public HashSet<T> Previous { get; set; } = previous;
     }
-    
+
     public int ShortestPath(IndexDirection start, Index2D end)
     {
         var pq = new PriorityQueue<DijkstraClassNode<IndexDirection>, int>();
@@ -66,7 +66,7 @@ public class Maze : CharGrid
             {
                 nodes.Add(currentIndex, new DijkstraInfo(distance, dnode.Previous is { } ? [dnode.Previous] : []));
             }
-            
+
             var straight = new IndexDirection(currentIndex.Index + currentIndex.Direction, currentIndex.Direction);
             var left = new IndexDirection(currentIndex.Index, currentIndex.Direction.Left());
             var right = new IndexDirection(currentIndex.Index, currentIndex.Direction.Right());
@@ -75,12 +75,12 @@ public class Maze : CharGrid
             pq.Enqueue(new DijkstraClassNode<IndexDirection>(left, currentIndex), distance + 1000);
             pq.Enqueue(new DijkstraClassNode<IndexDirection>(right, currentIndex), distance + 1000);
         }
-        
+
         return nodes.Where(x => x.Key.Index == end)
             .MinBy(kv => kv.Value.Distance)
             .Value.Distance;
     }
-    
+
     public int ShortestPathV2(Index2D start, Index2D end)
     {
         var pq = new PriorityQueue<DijkstraStructNode<Index2D>, int>()
@@ -109,7 +109,7 @@ public class Maze : CharGrid
                 nodes.Add(currentIndex, new DijkstraStructInfo<Index2D>(distance, dnode.Previous is { } ? [dnode.Previous.Value] : []));
                 if (currentIndex == end) goalDistance = distance;
             }
-            
+
             foreach (var nb in Directions.CardinalIndex
                          .Select(dir => currentIndex + dir)
                          .Where(nb => ValueOrDefault(nb) == '.'))
@@ -126,6 +126,6 @@ public class Maze : CharGrid
 public class Path : IEnumerable<Index2D>
 {
     public IEnumerator<Index2D> GetEnumerator() => throw new NotImplementedException();
-    
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

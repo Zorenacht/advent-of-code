@@ -4,7 +4,7 @@ using ShortestPath;
 namespace AoC._2021;
 
 public class Day23 : Day
-{ 
+{
     public static IEnumerable<TestCaseData> InitialRooms_Day1()
     {
         yield return new TestCaseData(new Amphipod[2, 4]

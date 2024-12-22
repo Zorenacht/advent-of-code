@@ -6,7 +6,7 @@ public class CharGrid : Grid<char>
     {
         Dictionary<int, Area> keyedAreas = [];
         Dictionary<Index2D, Area> indexAreas = [];
-        
+
         foreach (var (index, value) in EnumerableWithIndex())
         {
             if (IsBorder(chars, index) || indexAreas.ContainsKey(index)) continue;
@@ -36,13 +36,13 @@ public class CharGrid : Grid<char>
             IndexAreas = indexAreas,
         };
     }
-    
-    
+
+
     public Areas FloodFillRegions(bool diagonals = false)
     {
         Dictionary<int, Area> keyedAreas = [];
         Dictionary<Index2D, Area> indexAreaMapping = [];
-        
+
         foreach (var (index, value) in EnumerableWithIndex())
         {
             if (indexAreaMapping.ContainsKey(index)) continue;
@@ -73,16 +73,16 @@ public class CharGrid : Grid<char>
             IndexAreas = indexAreaMapping,
         };
     }
-    
+
     private bool IsBorder(string chars, Index2D index) => ValueOrDefault(index) is char ch && chars.Contains(ch);
-    
+
     public CharGrid(char[][] lines) : base(lines)
     {
     }
-    
+
     public CharGrid(int row, int col) : base(row, col)
     {
-        ApplyRange(new Index2D(0, 0), new Index2D(row-1, col-1), '.');
+        ApplyRange(new Index2D(0, 0), new Index2D(row - 1, col - 1), '.');
     }
 }
 
@@ -90,7 +90,7 @@ public class Areas
 {
     public Dictionary<int, Area> KeyedAreas { get; init; } = [];
     public Dictionary<Index2D, Area> IndexAreas { get; init; } = [];
-    
+
     public Areas()
     {
     }
@@ -99,7 +99,7 @@ public class Areas
 public class Area : HashSet<Index2D>
 {
     public HashSet<BorderIndex> Border { get; } = [];
-    
+
     public int NumberOfSides()
     {
         var horizontalSides = Border

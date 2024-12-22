@@ -1,5 +1,3 @@
-using Collections;
-using FluentAssertions;
 using System.Diagnostics.CodeAnalysis;
 using Tools.Geometry;
 
@@ -15,7 +13,7 @@ public sealed class Day18 : Day
         var maze = InitMaze(7, 7, 12, InputExample);
         return maze.ShortestPathV2(Index2D.O, new Index2D(maze.RowLength - 1, maze.ColLength - 1));
     }
-    
+
     [Puzzle(answer: 336)]
     public long Part1()
     {
@@ -23,7 +21,7 @@ public sealed class Day18 : Day
         maze.Print();
         return maze.ShortestPathV2(Index2D.O, new Index2D(maze.RowLength - 1, maze.ColLength - 1));
     }
-    
+
     [Puzzle(answer: "24,30")]
     public string Part2()
     {
@@ -43,7 +41,7 @@ public sealed class Day18 : Day
         }
         return lines[left];
     }
-    
+
     private static Maze InitMaze(int rows, int cols, int take, string[] blockades)
     {
         var maze = new Maze(rows, cols);

@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Tools.Geometry;
 
 namespace AoC._2024;
@@ -8,10 +7,10 @@ public sealed class Day20 : Day
 {
     [Puzzle(answer: 1393)]
     public long Part1() => Cheats(cheatDuration: 2, minIncrease: 100);
-    
+
     [Puzzle(answer: 990096)]
     public long Part2() => Cheats(cheatDuration: 20, minIncrease: 100);
-    
+
     private long Cheats(int cheatDuration, int minIncrease = 100)
     {
         // Initialize
@@ -20,7 +19,7 @@ public sealed class Day20 : Day
         var end = maze.FindIndexes('E').First();
         maze.UpdateAt(start, '.');
         maze.UpdateAt(end, '.');
-        
+
         // Determine path and all distances till the end
         var current = start;
         var distancesTillEnd = new Dictionary<Index2D, int> { { start, 0 } };
@@ -34,7 +33,7 @@ public sealed class Day20 : Day
         }
         var distance = distancesTillEnd[end];
         distancesTillEnd = distancesTillEnd.Select(x => new KeyValuePair<Index2D, int>(x.Key, distance - x.Value)).ToDictionary();
-        
+
         // Loop through the path and look in a manhattan area around it for all possible exit points
         var distances = new Dictionary<int, int>();
         var list = new List<(Index2D Index, int Distance)>();

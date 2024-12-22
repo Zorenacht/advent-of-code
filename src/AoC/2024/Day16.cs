@@ -1,6 +1,3 @@
-using FluentAssertions;
-using ShortestPath;
-using System.Linq;
 using Tools.Geometry;
 
 namespace AoC._2024;
@@ -18,15 +15,15 @@ public sealed class Day16 : Day
         maze.UpdateAt(end, '.');
         return maze.ShortestPath(new IndexDirection(start, Direction.E), end);
     }
-    
+
     private record DijkstraNode(IndexDirection Current, IndexDirection? Prev);
-    
+
     private class DijkstraInfo(int distance, HashSet<IndexDirection> previous)
     {
         public int Distance { get; set; } = distance;
         public HashSet<IndexDirection> Previous { get; set; } = previous;
     }
-    
+
     [Puzzle(answer: 502)]
     public long Part2()
     {
@@ -60,7 +57,7 @@ public sealed class Day16 : Day
             {
                 nodes.Add(currentIndex, new DijkstraInfo(distance, dnode.Prev is { } ? [dnode.Prev] : []));
             }
-            
+
             var straight = new IndexDirection(currentIndex.Index + currentIndex.Direction, currentIndex.Direction);
             var left = new IndexDirection(currentIndex.Index, currentIndex.Direction.Left());
             var right = new IndexDirection(currentIndex.Index, currentIndex.Direction.Right());
@@ -68,7 +65,7 @@ public sealed class Day16 : Day
             pq.Enqueue(new DijkstraNode(left, currentIndex), distance + 1000);
             pq.Enqueue(new DijkstraNode(right, currentIndex), distance + 1000);
         }
-        
+
         var optimal = new HashSet<Index2D>();
         var queue = new Queue<IndexDirection>();
         var eastEnd = new IndexDirection(end, Direction.E);

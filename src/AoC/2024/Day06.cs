@@ -7,13 +7,13 @@ public sealed class Day06 : Day
 {
     [Puzzle(answer: 4559)]
     public int Part1() => Path(Input).GroupBy(x => x.Index).Count();
-    
+
     [Puzzle(answer: 1604)]
     public int Part2() => Loop(Input);
-    
+
     [Puzzle(answer: 6)]
     public int Part2Example() => Loop(InputExample);
-    
+
     private static HashSet<IndexDirectionV2> Path(string[] lines)
     {
         var grid = lines.ToCharGrid();
@@ -24,7 +24,7 @@ public sealed class Day06 : Day
         {
             if (grid.ValueOrDefault(current) == null) break;
             set.Add(new IndexDirectionV2(current, dir));
-            
+
             var next = current + dir;
             while (grid.ValueOrDefault(next) == '#')
             {
@@ -35,7 +35,7 @@ public sealed class Day06 : Day
         }
         return set;
     }
-    
+
     private static int Loop(string[] lines)
     {
         var grid = lines.ToCharGrid();
@@ -46,7 +46,7 @@ public sealed class Day06 : Day
             .Select(x => x.First())
             .Count(pair => HasCycle(pair.First, pair.Second.Index, grid));
     }
-    
+
     private static bool HasCycle(IndexDirectionV2 start, Index2D blockCandidate, CharGrid grid)
     {
         var simulated = new HashSet<IndexDirectionV2>();
@@ -57,13 +57,13 @@ public sealed class Day06 : Day
         while (true)
         {
             if (grid.ValueOrDefault(indexDir.Index) == null) break;
-            
+
             if (simulated.Contains(indexDir))
-            {                
+            {
                 grid.UpdateAt(blockCandidate, '.');
-                return true;        
+                return true;
             }
-            
+
             var next = indexDir with { Index = indexDir.Index + indexDir.Direction };
             if (grid.ValueOrDefault(next.Index) == '#')
                 simulated.Add(indexDir);

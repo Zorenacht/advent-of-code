@@ -9,7 +9,7 @@ public sealed class Day12 : Day
             .FloodFillRegions()
             .KeyedAreas.Values
             .Sum(x => x.Count * x.Border.Count);
-    
+
     [Puzzle(answer: 818286)]
     public int Part2()
     {
