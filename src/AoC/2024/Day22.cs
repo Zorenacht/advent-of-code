@@ -51,9 +51,11 @@ public sealed class Day22 : Day
         current = ((current << 06) ^ current) % 16777216;
         current = ((current >> 05) ^ current) % 16777216;
         current = ((current << 11) ^ current) % 16777216;
-        int diff = (int)((current % 10) - lastDigit);
-        diff = ((diff < 0 ? (0b1_0000 + -diff) : diff)) & 0b11111;
+
+        // The difference is between -9 and 9, we add 9 to get a positive number between 0 and 18 which fits inside 5 bits
+        int diff = (int)((current % 10) - lastDigit + 9);
         bits = ((bits << 5) + diff) & 0b11111_11111_11111_11111;
+
         if ((bits & 0b11111_00000_00000_00000) > 0 && !added[bits])
         {
             bananas[bits] += (int)(current % 10);

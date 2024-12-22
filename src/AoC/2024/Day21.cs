@@ -16,7 +16,7 @@ public sealed class Day21 : Day
     // Determined rules:
     // first by running the algorithm and taking the lower result
     // later through logic, determined that < is far away and should be grouped
-    // <^ bt ^>, because [<^]=[v<<,>^,>] and [^>]=[<,v<,>>^] where the latter contains an ungrouped <
+    // <^ bt ^<, because [<^]=[v<<,>^,>] and [^<]=[<,v<,>>^] where the latter contains an ungrouped <
     // v> bt >v, because [v>]=[<v,>,^  ] and [>v]=[v,<,^>  ] where the latter contains an ungrouped <
     // ^> bt >^, because [^>]=[<,v>,^  ] and [>^]=[v,<^,>  ] the logic doesnt seem to hold here :(,
     //           probably gets overruled due to <^ being more expensive than v> 
