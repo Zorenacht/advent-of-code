@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.LinearSystem)]
 public sealed class Day13 : Day
 {
     [Puzzle(answer: 35255)]

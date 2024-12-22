@@ -3,6 +3,7 @@ using Tools.Geometry;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Grid, PuzzleType.ShortestPath)]
 public sealed class Day20 : Day
 {
     [Puzzle(answer: 1393)]

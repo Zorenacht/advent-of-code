@@ -1,5 +1,6 @@
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Ordering)]
 public sealed class Day09 : Day
 {
     [Puzzle(answer: 6_279_058_075_753)]

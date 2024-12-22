@@ -1,5 +1,6 @@
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Compute, PuzzleType.DP, PuzzleType.Recursion)]
 public sealed class Day11 : Day
 {
     [Puzzle(answer: 194557)]

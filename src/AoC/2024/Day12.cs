@@ -1,5 +1,6 @@
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Grid, PuzzleType.FloodFill)]
 public sealed class Day12 : Day
 {
     [Puzzle(answer: 1370100)]

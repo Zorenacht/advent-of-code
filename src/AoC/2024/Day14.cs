@@ -4,6 +4,7 @@ using static AoC._2021.Day20;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Grid, PuzzleType.FloodFill)]
 public sealed class Day14 : Day
 {
     [Puzzle(answer: 218619120)]

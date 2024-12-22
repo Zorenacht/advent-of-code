@@ -4,6 +4,7 @@ using Tools;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Compute, PuzzleType.DP)]
 public sealed class Day22 : Day
 {
     [Puzzle(answer: 14273043166)]

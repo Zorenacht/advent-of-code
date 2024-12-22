@@ -6,6 +6,7 @@ using Tools.Geometry;
 namespace AoC._2024;
 
 [SuppressMessage("ReSharper", "InlineTemporaryVariable")]
+[PuzzleType(PuzzleType.Grid, PuzzleType.ShortestPath)]
 public sealed class Day18 : Day
 {
     [Puzzle(answer: 22)]

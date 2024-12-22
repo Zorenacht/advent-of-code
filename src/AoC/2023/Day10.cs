@@ -18,16 +18,16 @@ public sealed class Day10 : Day
     
     private class Loop
     {
-        private readonly Grid<char> _board;
+        private readonly Maze _maze;
         private readonly HashSet<Index2D> _cycle;
         private IndexDirection Start { get; set; }
         
         public Loop(string[] board)
         {
-            _board = board.AddBorder('*').ToCharGrid();
-            var start = _board.FindIndexes('S').First();
-            var dir = StartDirection(_board, start);
-            _cycle = CyclePoints(_board, start, dir);
+            _maze = board.AddBorder('*').ToMaze();
+            var start = _maze.FindIndexes('S').First();
+            var dir = StartDirection(_maze, start);
+            _cycle = CyclePoints(_maze, start, dir);
             Start = new IndexDirection(start, dir);
         }
         
@@ -45,29 +45,29 @@ public sealed class Day10 : Day
             {
                 var p = iterator.Index;
                 var dir = iterator.Direction;
-                var lef = Left(p, dir, _board[p.Row][p.Col]);
-                var rig = Right(p, dir, _board[p.Row][p.Col]);
+                var lef = Left(p, dir, _maze[p.Row][p.Col]);
+                var rig = Right(p, dir, _maze[p.Row][p.Col]);
                 foreach (var l in lef)
                 {
-                    if (_board[l.Row][l.Col] != '*' && !_cycle.Contains(l) && !left.Contains(l) && !right.Contains(l))
+                    if (_maze[l.Row][l.Col] != '*' && !_cycle.Contains(l) && !left.Contains(l) && !right.Contains(l))
                     {
                         left.Add(l);
                     }
                 }
                 foreach (var r in rig)
                 {
-                    if (_board[r.Row][r.Col] != '*' && !_cycle.Contains(r) && !left.Contains(r) && !right.Contains(r))
+                    if (_maze[r.Row][r.Col] != '*' && !_cycle.Contains(r) && !left.Contains(r) && !right.Contains(r))
                     {
                         right.Add(r);
                     }
                 }
-                iterator = Mapping(_board[p.Row][p.Col], iterator).First();
+                iterator = Mapping(_maze[p.Row][p.Col], iterator).First();
                 _cycle.Add(iterator.Index);
             } while (iterator.Index != start);
             
-            FloodFill(_board, left, right, _cycle);
+            FloodFill(_maze, left, right, _cycle);
             
-            if (print) PrintColor(_board, [(_cycle, ConsoleColor.Blue), (left, ConsoleColor.Red), (right, ConsoleColor.Green)]);
+            if (print) PrintColor(_maze, [(_cycle, ConsoleColor.Blue), (left, ConsoleColor.Red), (right, ConsoleColor.Green)]);
             
             return Math.Min(left.Count, right.Count);
         }

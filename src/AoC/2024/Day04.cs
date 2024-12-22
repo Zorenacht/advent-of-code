@@ -3,15 +3,16 @@ using Tools.Geometry;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Grid)]
 public sealed class Day04 : Day
 {
     [Puzzle(answer: 2567)]
     public int Part1()
     {
-        var lines2 = Input.ToCharGrid();
-        return lines2.EnumerableWithIndex()
+        var grid = Input.ToCharGrid();
+        return grid.EnumerableWithIndex()
             .Where(ele => ele.Value == 'X')
-            .Sum(ele => CountXMAS(ele.Index, lines2));
+            .Sum(ele => CountXMAS(ele.Index, grid));
 
         int CountXMAS(Index2D index, Grid<char> grid)
         {
@@ -39,10 +40,10 @@ public sealed class Day04 : Day
     public int Part2()
     {
         int result = 0;
-        var lines2 = Input.ToCharGrid();
-        foreach ((var index, char value) in lines2.EnumerableWithIndex())
+        var grid = Input.ToCharGrid();
+        foreach ((var index, char value) in grid.EnumerableWithIndex())
         {
-            if (value == 'A') result += CountXMas(index, lines2) ? 1 : 0;
+            if (value == 'A') result += CountXMas(index, grid) ? 1 : 0;
         }
         return result;
 

@@ -2,10 +2,10 @@ using FluentAssertions;
 using ShortestPath;
 using System.Linq;
 using Tools.Geometry;
-using static AoC._2021.Day20;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Grid, PuzzleType.ShortestPath)]
 public sealed class Day16 : Day
 {
     [Puzzle(answer: 94444)]

@@ -1,5 +1,6 @@
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Compute, PuzzleType.Recursion, PuzzleType.DP)]
 public sealed class Day07 : Day
 {
     [Puzzle(answer: 001_708_857_123_053)]

@@ -2,6 +2,7 @@ using System.Diagnostics;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Compute, PuzzleType.Manual)]
 public sealed class Day17 : Day
 {
     [Puzzle(answer: "7,5,4,3,4,5,3,4,6")]

@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Permutations, PuzzleType.DP, PuzzleType.Tree)]
 public sealed class Day19 : Day
 {
     [Puzzle(answer: 330)]

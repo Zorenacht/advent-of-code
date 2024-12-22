@@ -5,6 +5,7 @@ using Tools.Geometry;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.DP, PuzzleType.Manual)]
 public sealed class Day21 : Day
 {
     [Puzzle(answer: 224326)]
