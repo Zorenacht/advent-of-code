@@ -1,4 +1,6 @@
 using FluentAssertions;
+using System;
+using Tools;
 
 namespace AoC._2024;
 
@@ -11,8 +13,12 @@ public sealed class Day22 : Day
         var lines = Input;
         foreach (var line in lines)
         {
-            var num = line.Ints().First();
-            result += SecretNumber(num, num, 2000, [], [], []);
+            long current = line.Ints().First();
+            for (int i = 0; i < 2000; ++i)
+            {
+                (current, _) = SecretNumber(current, 0, [], []);
+            }
+            result += current;
         }
         return result;
     }
@@ -21,35 +27,39 @@ public sealed class Day22 : Day
     public long Part2()
     {
         var lines = Input;
-        var cache = new Dictionary<string, long>();
+        var cache = new int[0b11111_11111_11111_11111];
         foreach (var line in lines)
         {
-            var num = line.Ints().First();
-            SecretNumber(num, num, 2_000, [], [], cache);
+            long current = line.Ints().First();
+            int bits = 0;
+
+            bool[] added = new bool[0b11111_11111_11111_11111];
+            for (int i = 0; i < 2000; ++i)
+            {
+                (current, bits) = SecretNumber(current, bits, added, cache);
+            }
         }
-        return cache.Max(x => x.Value);
+        return cache.Max(x => x);
     }
 
-    public long SecretNumber(long current, long start, int times,
-        List<long> diffs,
-        HashSet<string> added,
-        Dictionary<string, long> bananas)
+    public (long, int) SecretNumber(long current,
+        int bits,
+        bool[] added,
+        int[] bananas)
     {
-        if (times == 0) return current;
         var lastDigit = current % 10;
-        current = ((current * 0064) ^ current) % 16777216;
-        current = ((current / 0032) ^ current) % 16777216;
-        current = ((current * 2048) ^ current) % 16777216;
-        var diff = (current % 10) - lastDigit;
-        if (diffs.Count == 4) diffs.RemoveAt(0);
-        diffs.Add(diff);
-        var key = string.Join(",", diffs);
-        if (diffs.Count == 4 && added.Add(key))
+        current = ((current << 06) ^ current) % 16777216;
+        current = ((current >> 05) ^ current) % 16777216;
+        current = ((current << 11) ^ current) % 16777216;
+        int diff = (int)((current % 10) - lastDigit);
+        diff = ((diff < 0 ? (0b1_0000 + -diff) : diff)) & 0b11111;
+        bits = ((bits << 5) + diff) & 0b11111_11111_11111_11111;
+        if ((bits & 0b11111_00000_00000_00000) > 0 && !added[bits])
         {
-            if (!bananas.TryAdd(key, current % 10))
-                bananas[key] += (current % 10);
+            bananas[bits] += (int)(current % 10);
+            added[bits] = true;
         };
-        return SecretNumber(current, start, times - 1, diffs, added, bananas);
+        return (current, bits);
     }
 
 };
