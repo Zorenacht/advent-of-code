@@ -5,6 +5,11 @@ namespace Collections;
 [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public static class CollectionExtensions
 {
+    public static string StringJoin<T>(this IEnumerable<T>? values, string sep)
+    {
+        return string.Join(sep, values ?? []);
+    }
+
     public static (int Index, long Value) MaxWithIndex(this IEnumerable<long> enumerable)
     {
         long maxValue = long.MinValue;
