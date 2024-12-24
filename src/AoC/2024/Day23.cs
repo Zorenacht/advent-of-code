@@ -1,8 +1,5 @@
 using Collections;
-using FluentAssertions;
-using MathNet.Numerics.Optimization.LineSearch;
 using System.Data;
-using System.Linq;
 
 namespace AoC._2024;
 
@@ -15,7 +12,7 @@ public sealed class Day23 : Day
             .ThreeCliques('t');
 
     [Puzzle(answer: "cm,de,ez,gv,hg,iy,or,pw,qu,rs,sn,uc,wq")]
-    public string Part2() 
+    public string Part2()
         => LAN
             .Parse(Input)
             .MaximalCliques()

@@ -1,5 +1,4 @@
 using Collections;
-using static AoC._2024.Day24.Computer;
 
 namespace AoC._2024;
 
@@ -28,7 +27,7 @@ public sealed class Day24 : Day
 
         var solutions = new List<string>();
         var solutions2 = valids
-            .Select(valid => new KeyValuePair<string,List<Swap>>(valid
+            .Select(valid => new KeyValuePair<string, List<Swap>>(valid
                 .SelectMany(x => new string[] { x.Left.To.ToString(), x.Right.To.ToString() })
                 .Order().StringJoin(","), valid))
             .GroupBy(x => x.Key)
