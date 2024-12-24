@@ -8,8 +8,8 @@ ElapsedTime(() =>
     for (int i = 0; i < 1; ++i)
     {
         var result = day.Part2();
+        Console.WriteLine($"Answer: {result}");
     }
-    //Console.WriteLine($"Answer: {result}");
 });
 
 
