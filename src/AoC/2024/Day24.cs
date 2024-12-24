@@ -15,7 +15,6 @@ public sealed class Day24 : Day
     [Puzzle(answer: "cgh,frt,pmd,sps,tst,z05,z11,z23")]
     public string Part2()
     {
-
         //int bits = 5; int depth = 2;
         //var computer = new Computer().Init(InputExample, (a, b) => a & b);
 
@@ -44,7 +43,6 @@ public sealed class Day24 : Day
         private Dictionary<string, StateNode> StateNodes = [];
         private Dictionary<string, OperationNode> OperationNodes = [];
         private Func<long, long, long> Operation = null!;
-
         private string[] EntryPoints { get; set; } = [];
 
         public Computer Init(string[] input, Func<long, long, long> func)
@@ -274,11 +272,6 @@ public sealed class Day24 : Day
             return result;
         }
 
-        private void Print(string prefix = "")
-        {
-            Console.WriteLine($"{prefix}|{GetString()}");
-        }
-
         private string GetString()
         {
             var x = Value('x');
@@ -291,10 +284,8 @@ public sealed class Day24 : Day
     public record StateNode(string Symbol)
     {
         public int Value { get; set; } = 0;
-
         public HashSet<OperationNode> Previous { get; init; } = [];
         public List<OperationNode> Next { get; init; } = [];
-
         public override string ToString() => Symbol;
     }
 
@@ -313,9 +304,7 @@ public sealed class Day24 : Day
         public StateNode From2 { get; set; }
         public string Operation { get; init; }
         public StateNode To { get; set; }
-
         public string KeyString { get; }
-
         public override string ToString() => $"{To}";
 
     }
@@ -327,15 +316,12 @@ public sealed class Day24 : Day
 
         public void Do()
         {
-
             LeftTo.Previous.Remove(Left);
             LeftTo.Previous.Add(Right);
             Left.To = RightTo;
-
             RightTo.Previous.Remove(Right);
             RightTo.Previous.Add(Left);
             Right.To = LeftTo;
-
         }
 
         public void Undo()
@@ -343,7 +329,6 @@ public sealed class Day24 : Day
             LeftTo.Previous.Remove(Right);
             LeftTo.Previous.Add(Left);
             Left.To = LeftTo;
-
             RightTo.Previous.Remove(Left);
             RightTo.Previous.Add(Right);
             Right.To = RightTo;
