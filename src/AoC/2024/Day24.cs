@@ -1,14 +1,5 @@
 using Collections;
-using FluentAssertions;
-using MathNet.Numerics;
-using NUnit.Framework.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Channels;
-using Tools;
-using static AoC._2024.Day24;
-using static System.Net.Mime.MediaTypeNames;
+using static AoC._2024.Day24.Computer;
 
 namespace AoC._2024;
 
@@ -17,168 +8,126 @@ public sealed class Day24 : Day
     [Puzzle(answer: 60714423975686)]
     public long Part1()
     {
-        long result = 0;
-        var groups = Input.GroupBy(string.Empty);
-        var states = new Dictionary<string, int>();
-        var links = new List<(string From1, string Type, string From2, string To)>();
-        foreach (var line in groups[0])
-        {
-            var splitted = line.Split(": ");
-            states.Add(splitted[0], int.Parse(splitted[1]));
-        }
-        foreach (var line in groups[1])
-        {
-            var splitted = line.Split(" -> ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            states.TryAdd(splitted[0], 0);
-            states.TryAdd(splitted[2], 0);
-            states.TryAdd(splitted[3], 0);
-            var type = splitted[1];
-            links.Add((splitted[0], splitted[1], splitted[2], splitted[3]));
-        }
-
-
-        for (int i = 0; i < 100; ++i)
-        {
-            foreach (var link in links)
-            {
-                states[link.To] = link.Type switch
-                {
-                    "XOR" => states[link.From1] ^ states[link.From2],
-                    "AND" => states[link.From1] & states[link.From2],
-                    "OR" => states[link.From1] | states[link.From2],
-                    _ => throw new Exception()
-                };
-            }
-        }
-
-        return Long('z', states);
-
-        static long Long(char symbol, Dictionary<string, int> states)
-        {
-            long result = 0;
-            for (int i = 0; i < 64; ++i)
-            {
-                if (states.TryGetValue($"z{i.ToString().PadLeft(2, '0')}", out var bit))
-                    result = result + ((long)bit << i);
-                else break;
-            }
-            return result;
-        }
+        var computer = new Computer().Init(Input, (a, b) => 0);
+        computer.Calculate();
+        return computer.Value('z');
     }
 
-    public record Link(string From1, string Operator, string From2, string To)
-    {
-        public int Calculate(int from1, int from2)
-        {
-            return Operator switch
-            {
-                "XOR" => from1 ^ from2,
-                "AND" => from1 & from2,
-                "OR" => from1 | from2,
-                _ => throw new Exception()
-            };
-
-        }
-    }
-
-    public record Node(string Symbol)
-    {
-        public HashSet<string> Next { get; init; } = [];
-        public HashSet<string> Previous { get; init; } = [];
-    }
-
-    // not cgh,frt,jkm,pmd,rrr,z05,z11,z23
-    // not cgh,frt,jkm,pmd,rrr,z05,z11,z23
-    [Puzzle(answer: null)]
+    [Puzzle(answer: "cgh,frt,pmd,sps,tst,z05,z11,z23")]
     public string Part2()
     {
-        List<List<(int, int)>> valids = [];
 
-        int bits = 5; int depth = 2;
-        var computer = new Computer().Init(InputExample, (a, b) => a & b).Permute(bit: bits, [], valids, depth: depth);
+        //int bits = 5; int depth = 2;
+        //var computer = new Computer().Init(InputExample, (a, b) => a & b);
 
-        //int bits = 44; int depth = 4;
-        //var computer = new Computer().Init(Input, (a, b) => a + b);
+        int bits = 44; int depth = 4;
+        var computer = new Computer().Init(Input, (a, b) => a + b);
 
-        var original = computer.Links.ToList();
+        List<List<Swap>> valids = [];
+        computer.FindValidPermutations(bit: bits, [], valids, depth: depth);
 
-        computer.Permute(bit: bits, [], valids, depth: depth);
-
-        //new Computer().Init(Input).Permute(44, [], valids);
-        //Console.WriteLine($"The swap {valids[0].StringJoin(",")} is: {computer.VerifySwaps(valids[0], 5)}");
         var solutions = new List<string>();
         foreach (var valid in valids)
         {
             var vld = computer.VerifySwaps(valid, bits);
-
-            Console.WriteLine($"The swap {valid.StringJoin(",")} is: {vld}");
-            if (vld) solutions.Add(valid
-                    .SelectMany(x => new string[] { computer.Links[x.Item1].To, computer.Links[x.Item2].To })
-                    .Order().StringJoin(","));
+            var swapString = valid
+                    .SelectMany(x => new string[] { x.Left.To.ToString(), x.Right.To.ToString() })
+                    .Order().StringJoin(",");
+            if (vld) solutions.Add(swapString);
         }
         return solutions.First();
     }
 
     public class Computer()
     {
-        private Dictionary<string, int> States = [];
-        public List<Link> Links = [];
+        private Dictionary<string, StateNode> StateNodes = [];
+        private Dictionary<string, OperationNode> OperationNodes = [];
+        private Func<long, long, long> Operation = null!;
 
-        private Dictionary<string, Node> Previous = [];
-        private List<(Link, Link)> AllPossibleSwaps = [];
-        private List<(int, int)> SwapsApplied = [];
-        private Func<long, long, long> Operation;
+        private string[] EntryPoints { get; set; } = [];
 
-        private int ForwardComputations = 10;
-
-        public Computer Init(string[] input, Func<long, long, long> operation)
+        public Computer Init(string[] input, Func<long, long, long> func)
         {
-            Operation = operation;
+            Operation = func;
             var groups = input.GroupBy(string.Empty);
+            foreach (var line in groups[1])
+            {
+                var splitted = line.Split(" -> ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                var from1 = splitted[0];
+                var from2 = splitted[2];
+                var op = splitted[1];
+                var to = splitted[3];
+
+                var from1Node = new StateNode(from1);
+                var from2Node = new StateNode(from2);
+                var toNode = new StateNode(to);
+                StateNodes.TryAdd(from1, from1Node);
+                StateNodes.TryAdd(from2, from2Node);
+                StateNodes.TryAdd(to, toNode);
+            }
             foreach (var line in groups[0])
             {
-                var splitted = line.Split(": ");
-                States.Add(splitted[0], 0);
-                Previous.Add(splitted[0], new Node(splitted[0]));
-            }
-            for (int i = 0; i < 64; ++i)
-            {
-                States[$"x{i.ToString().PadLeft(2, '0')}"] = 0;
-                States[$"y{i.ToString().PadLeft(2, '0')}"] = 0;
+                var split = line.Split(": ");
+                StateNodes[split[0]].Value = int.Parse(split[1]);
             }
             foreach (var line in groups[1])
             {
                 var splitted = line.Split(" -> ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                States.TryAdd(splitted[0], 0);
-                States.TryAdd(splitted[2], 0);
-                States.TryAdd(splitted[3], 0);
-                Previous.TryAdd(splitted[0], new Node(splitted[0]));
-                Previous.TryAdd(splitted[2], new Node(splitted[2]));
-                Previous.TryAdd(splitted[3], new Node(splitted[3]));
-                Previous[splitted[3]].Previous.Add(splitted[0]);
-                Previous[splitted[3]].Previous.Add(splitted[2]);
-                Previous[splitted[0]].Next.Add(splitted[3]);
-                Previous[splitted[2]].Next.Add(splitted[3]);
-                Links.Add(new(splitted[0], splitted[1], splitted[2], splitted[3]));
+                var from1 = splitted[0];
+                var from2 = splitted[2];
+                var op = splitted[1];
+                var to = splitted[3];
+
+                var from1Node = StateNodes[from1];
+                var from2Node = StateNodes[from2];
+                var toNode = StateNodes[to];
+
+                var operationNode = new OperationNode(from1Node, from2Node, op, toNode);
+                OperationNodes.Add(line, operationNode);
+
+                from1Node.Next.Add(operationNode);
+                from2Node.Next.Add(operationNode);
+                toNode.Previous.Add(operationNode);
             }
+            EntryPoints = StateNodes.Where(x => x.Value.Previous.Count == 0).Select(x => x.Key).ToArray();
+
             return this;
         }
 
-        private bool CalculationIsValid()
+        public bool Calculate()
         {
-            for (int i = 0; i < ForwardComputations; ++i)
+            var visited = new HashSet<string>();
+            var visitedOperation = new Dictionary<string, int>();
+            var queue = new Queue<string>().With(EntryPoints);
+            while (queue.TryDequeue(out var current))
             {
-                foreach (var link in Links)
+                var operations = StateNodes[current].Next;
+                foreach (var node in operations)
                 {
-                    States[link.To] = link.Operator switch
+                    if (!visitedOperation.TryAdd(node.KeyString, 1))
                     {
-                        "XOR" => States[link.From1] ^ States[link.From2],
-                        "AND" => States[link.From1] & States[link.From2],
-                        "OR" => States[link.From1] | States[link.From2],
-                        _ => throw new Exception()
-                    };
+                        if (visitedOperation[node.KeyString] == 1)
+                        {
+                            visitedOperation[node.KeyString]++;
+                            node.To.Value = node.Operation switch
+                            {
+                                "XOR" => node.From1.Value ^ node.From2.Value,
+                                "AND" => node.From1.Value & node.From2.Value,
+                                "OR" => node.From1.Value | node.From2.Value,
+                                _ => throw new Exception()
+                            };
+                            queue.Enqueue(node.To.ToString());
+                        }
+                        else return false;
+                    }
                 }
             }
+            return true;
+        }
+
+        private bool IntegerCalculationIsValid()
+        {
+            if (!Calculate()) return false;
             var x = Value('x');
             var y = Value('y');
             var result = Operation(x, y);
@@ -186,47 +135,45 @@ public sealed class Day24 : Day
             return result == z;
         }
 
-        public bool AllCalculationsValid(int i)
-            => Set(x: 0L << 0, y: 0L << 0) && CalculationIsValid()
-            && Set(x: 1L << i, y: 0L << 0) && CalculationIsValid()
-            && Set(x: 0L << 0, y: 1L << i) && CalculationIsValid()
-            && Set(x: 1L << i, y: 1L << i) && CalculationIsValid();
+        public bool AllBitCalculationsAreValid(int i)
+            => Set(x: 0L << 0, y: 0L << 0) && IntegerCalculationIsValid()
+            && Set(x: 1L << i, y: 0L << 0) && IntegerCalculationIsValid()
+            && Set(x: 0L << 0, y: 1L << i) && IntegerCalculationIsValid()
+            && Set(x: 1L << i, y: 1L << i) && IntegerCalculationIsValid();
 
-        public Computer Permute(
+
+        public Computer FindValidPermutations(
             int bit,
-            List<(int, int)> permutation,
-            List<List<(int, int)>> valids,
+            List<Swap> swaps,
+            List<List<Swap>> valids,
             int depth)
         {
             if (depth == 0)
             {
-                if (AllCalculationsValid(bit)) valids.Add(permutation.ToList());
+                if (AllBitCalculationsAreValid(bit))
+                {
+                    valids.Add(swaps.ToList());
+                }
                 return this;
             }
-            //foreach (var perm in swaps)
-            //{
 
             for (int i = bit; i >= 0; --i)
             {
-                if (AllCalculationsValid(i)) continue;
-                var corrections = CorrectingSwaps(i);
+                if (AllBitCalculationsAreValid(i)) continue;
+                var corrections = ValidSwaps(i);
                 int index = 0;
 
                 foreach (var correction in corrections)
                 {
-                    if(permutation.Count < 2)
-                        Console.WriteLine($"{new string('-', permutation.Count)}Bit {bit}, dtgo {permutation.Count}, {index} out of {corrections.Count - 1} ");
-                    var bak = Links.ToList();
-                    var link1 = Links[correction.Item1];
-                    var link2 = Links[correction.Item2];
-                    Links[correction.Item1] = link1 with { To = link2.To };
-                    Links[correction.Item2] = link2 with { To = link1.To };
+                    if (swaps.Count < 1)
+                        Console.WriteLine($"{new string('-', swaps.Count)}Bit {i}, depth {swaps.Count}, {index} out of {corrections.Count - 1} ");
 
-                    permutation.Add(correction);
-                    Permute(i - 1, permutation, valids, depth - 1);
-                    permutation.RemoveAt(permutation.Count - 1);
+                    correction.Do();
+                    swaps.Add(correction);
+                    FindValidPermutations(i - 1, swaps, valids, depth - 1);
+                    swaps.RemoveAt(swaps.Count - 1);
+                    correction.Undo();
 
-                    Links = bak;
                     index++;
                 }
                 break;
@@ -234,74 +181,65 @@ public sealed class Day24 : Day
             return this;
         }
 
-        public bool VerifySwaps(List<(int, int)> swaps, int bit)
+        public bool VerifySwaps(List<Swap> swaps, int bit)
         {
-            var backup = Links.ToList();
+
             bool isValid = true;
-            foreach (var swap in swaps)
-            {
-                var link1 = Links[swap.Item1];
-                var link2 = Links[swap.Item2];
-                Links[swap.Item1] = link1 with { To = link2.To };
-                Links[swap.Item2] = link2 with { To = link1.To };
-            }
+            for (int i = 0; i < swaps.Count; ++i) swaps[i].Do();
             for (int i = bit; i >= 0; --i)
             {
-                if (!AllCalculationsValid(i)) isValid = false;
+                if (!AllBitCalculationsAreValid(i)) isValid = false;
             }
-            if (!(Set(x: (1L << 45) - 1, y: 1L << 0) && CalculationIsValid())) isValid = false;
+            if (!(Set(x: (1L << 45) - 1, y: 1L << 0) && IntegerCalculationIsValid())) isValid = false;
 
-            Links = backup;
+            for (int i = swaps.Count - 1; i >= 0; --i) swaps[i].Undo();
             return isValid;
         }
 
-        // Find all swaps valid for bit i
-        private List<(int, int)> CorrectingSwaps(int i)
+        private List<Swap> ValidSwaps(int i)
         {
-            var nexts = new HashSet<string>();
-            var previous = new HashSet<string>();
-            var swaps2 = new List<(int, int)>();
-
+            // Get swap candidates from the start forwards
+            //                 and from the end backwards
+            var forward = new HashSet<string>();
             var queue = new Queue<string>().With(Symbol('x', i), Symbol('y', i));
-            while (queue.TryDequeue(out var element))
+            while (queue.TryDequeue(out var current))
             {
-                if (!Previous.ContainsKey(element)) continue;
-                nexts.Add(element);
-                foreach (var nxt in Previous[element].Next)
-                    queue.Enqueue(nxt);
-            }
-            queue = new Queue<string>().With(Symbol('z', i), Symbol('z', i + 1));
-            while (queue.TryDequeue(out var element))
-            {
-                if (!Previous.ContainsKey(element)) continue;
-                previous.Add(element);
-                foreach (var nxt in Previous[element].Previous)
-                    queue.Enqueue(nxt);
-            }
-
-            int calculations = 0;
-            for (int a = 0; a < Links.Count; a++)
-            {
-                for (int b = 0; b < Links.Count; b++)
+                var operations = StateNodes[current].Next;
+                foreach (var node in operations)
                 {
-                    if (!nexts.Contains(Links[a].To) || !previous.Contains(Links[b].To)) continue;
-                    //var bak = Links.ToList();
-                    var link1 = Links[a];
-                    var link2 = Links[b];
-                    Links[a] = link1 with { To = link2.To };
-                    Links[b] = link2 with { To = link1.To };
-
-
-                    if (AllCalculationsValid(i))
-                    {
-                        swaps2.Add((a, b));
-                    }
-                    Links[a] = link1;
-                    Links[b] = link2;
-                    calculations++;
+                    if (forward.Add(node.KeyString))
+                        queue.Enqueue(node.To.ToString());
                 }
             }
-            return swaps2;
+            var backward = new HashSet<string>();
+            queue = new Queue<string>().With(Symbol('z', i), Symbol('z', i + 1));
+            while (queue.TryDequeue(out var current))
+            {
+                if (!StateNodes.TryGetValue(current, out var nde)) continue;
+                var operations = nde.Previous;
+                foreach (var node in operations)
+                {
+                    if (backward.Add(node.KeyString))
+                    {
+                        queue.Enqueue(node.From1.ToString());
+                        queue.Enqueue(node.From2.ToString());
+                    }
+                }
+            }
+
+            var swaps = new List<Swap>();
+            foreach (var fw in forward)
+            {
+                foreach (var bw in backward)
+                {
+                    var swap = new Swap(OperationNodes[fw], OperationNodes[bw]);
+                    swap.Do();
+                    if (AllBitCalculationsAreValid(i))
+                        swaps.Add(swap);
+                    swap.Undo();
+                }
+            }
+            return swaps;
         }
 
         private static string Symbol(char ch, int bit) => $"{ch}{bit.ToString().PadLeft(2, '0')}";
@@ -312,19 +250,23 @@ public sealed class Day24 : Day
             {
                 var numX = (int)((x >> i) & 1);
                 var numY = (int)((y >> i) & 1);
-                States[$"x{i.ToString().PadLeft(2, '0')}"] = numX;
-                States[$"y{i.ToString().PadLeft(2, '0')}"] = numY;
+                var keyX = $"x{i.ToString().PadLeft(2, '0')}";
+                var keyY = $"y{i.ToString().PadLeft(2, '0')}";
+                if (StateNodes.TryGetValue(keyX, out var nodeX)) nodeX.Value = numX;
+                else return true;
+                if (StateNodes.TryGetValue(keyY, out var nodeY)) nodeY.Value = numY;
+                else return true;
             }
             return true;
         }
 
-        private long Value(char symbol)
+        public long Value(char symbol)
         {
             long result = 0;
             for (int i = 0; i < 64; ++i)
             {
-                if (States.TryGetValue($"{symbol}{i.ToString().PadLeft(2, '0')}", out var bit))
-                    result = result + ((long)bit << i);
+                var key = $"{symbol}{i.ToString().PadLeft(2, '0')}";
+                if (StateNodes.TryGetValue(key, out var node)) result = result + ((long)node.Value << i);
                 else break;
             }
             return result;
@@ -342,5 +284,69 @@ public sealed class Day24 : Day
             var z = Value('z');
             return $"x{x} op y{y}=z{z}";
         }
+    }
+
+    public record StateNode(string Symbol)
+    {
+        public int Value { get; set; } = 0;
+
+        public HashSet<OperationNode> Previous { get; init; } = [];
+        public List<OperationNode> Next { get; init; } = [];
+
+        public override string ToString() => Symbol;
+    }
+
+    public class OperationNode
+    {
+        public OperationNode(StateNode from1, StateNode from2, string operation, StateNode to)
+        {
+            From1 = from1;
+            From2 = from2;
+            Operation = operation;
+            To = to;
+            KeyString = $"{From1} {Operation} {From2} -> {To}";
+        }
+
+        public StateNode From1 { get; set; }
+        public StateNode From2 { get; set; }
+        public string Operation { get; init; }
+        public StateNode To { get; set; }
+
+        public string KeyString { get; }
+
+        public override string ToString() => $"{To}";
+
+    }
+
+    public record Swap(OperationNode Left, OperationNode Right)
+    {
+        private StateNode LeftTo = Left.To;
+        private StateNode RightTo = Right.To;
+
+        public void Do()
+        {
+
+            LeftTo.Previous.Remove(Left);
+            LeftTo.Previous.Add(Right);
+            Left.To = RightTo;
+
+            RightTo.Previous.Remove(Right);
+            RightTo.Previous.Add(Left);
+            Right.To = LeftTo;
+
+        }
+
+        public void Undo()
+        {
+            LeftTo.Previous.Remove(Right);
+            LeftTo.Previous.Add(Left);
+            Left.To = LeftTo;
+
+            RightTo.Previous.Remove(Left);
+            RightTo.Previous.Add(Right);
+            Right.To = RightTo;
+        }
+
+        public override string ToString() => $"({Left},{Right})";
     }
 };
