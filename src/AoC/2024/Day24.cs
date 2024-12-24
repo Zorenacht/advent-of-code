@@ -27,13 +27,16 @@ public sealed class Day24 : Day
         computer.FindValidPermutations(bit: bits, [], valids, depth: depth);
 
         var solutions = new List<string>();
-        foreach (var valid in valids)
+        var solutions2 = valids
+            .Select(valid => new KeyValuePair<string,List<Swap>>(valid
+                .SelectMany(x => new string[] { x.Left.To.ToString(), x.Right.To.ToString() })
+                .Order().StringJoin(","), valid))
+            .GroupBy(x => x.Key)
+            .ToDictionary(g => g.Key, g => g.First().Value);
+        foreach (var solution in solutions2)
         {
-            var vld = computer.VerifySwaps(valid, bits);
-            var swapString = valid
-                    .SelectMany(x => new string[] { x.Left.To.ToString(), x.Right.To.ToString() })
-                    .Order().StringJoin(",");
-            if (vld) solutions.Add(swapString);
+            var vld = computer.VerifySwaps(solution.Value, bits);
+            if (vld) solutions.Add(solution.Key);
         }
         return solutions.First();
     }
@@ -157,6 +160,7 @@ public sealed class Day24 : Day
                 return this;
             }
 
+            // Starting with the most significant bits, as this means they won't have any effect on the lower significant ones, may or may not matter
             for (int i = bit; i >= 0; --i)
             {
                 if (AllBitCalculationsAreValid(i)) continue;
