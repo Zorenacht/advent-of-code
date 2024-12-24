@@ -25,19 +25,18 @@ public sealed class Day24 : Day
         List<List<Swap>> valids = [];
         computer.FindValidPermutations(bit: bits, [], valids, depth: depth);
 
-        var solutions = new List<string>();
-        var solutions2 = valids
+        var solutions = valids
             .Select(valid => new KeyValuePair<string, List<Swap>>(valid
                 .SelectMany(x => new string[] { x.Left.To.ToString(), x.Right.To.ToString() })
                 .Order().StringJoin(","), valid))
             .GroupBy(x => x.Key)
             .ToDictionary(g => g.Key, g => g.First().Value);
-        foreach (var solution in solutions2)
+        foreach (var solution in solutions)
         {
             var vld = computer.VerifySwaps(solution.Value, bits);
-            if (vld) solutions.Add(solution.Key);
+            if (vld) return solution.Key;
         }
-        return solutions.First();
+        throw new NotSupportedException();
     }
 
     public class Computer()
