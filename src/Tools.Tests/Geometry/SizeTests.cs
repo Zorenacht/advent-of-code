@@ -17,7 +17,7 @@ public class SizeTests
     [TestCaseGeneric<int>(4)]
     [TestCaseGeneric<long>(8)]
     [TestCaseGeneric<double>(8)]
-    [TestCaseGeneric<Index2D>(8)]
+    [TestCaseGeneric<Index2D>(12)]
     public unsafe int TypeIsOfSize<T>() where T : unmanaged
         => sizeof(T);
 }

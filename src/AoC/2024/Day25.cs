@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Tools.Geometry;
 
 namespace AoC._2024;
@@ -22,8 +21,8 @@ public sealed class Day25 : Day
             grids.Add(grid);
             if (grid.WallRows.TryGetValue(0, out var row))
                 top.Add(Enumerable.Range(0, cols)
-                    .Select(i => grid.WallCols.TryGetValue(i, out var w1) 
-                        ? w1.Count 
+                    .Select(i => grid.WallCols.TryGetValue(i, out var w1)
+                        ? w1.Count
                         : 0)
                     .ToArray());
             if (grid.WallRows.TryGetValue(maze.RowLength - 1, out var col))
