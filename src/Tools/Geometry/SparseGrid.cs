@@ -6,9 +6,9 @@ namespace Tools.Geometry;
 [SuppressMessage("ReSharper", "InvertIf")]
 public class SparseGrid
 {
-    private Dictionary<int, HashSet<int>> WallCols { get; }
+    public Dictionary<int, HashSet<int>> WallCols { get; }
 
-    private Dictionary<int, HashSet<int>> WallRows { get; }
+    public Dictionary<int, HashSet<int>> WallRows { get; }
 
     public SparseGrid(CharGrid grid, char wall)
     {
