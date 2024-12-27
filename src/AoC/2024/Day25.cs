@@ -2,6 +2,7 @@ using Tools.Geometry;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Compute)]
 public sealed class Day25 : Day
 {
     [Puzzle(answer: 2933)]

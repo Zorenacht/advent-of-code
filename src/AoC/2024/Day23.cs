@@ -3,6 +3,7 @@ using System.Data;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Graph, PuzzleType.Recursion)]
 public sealed class Day23 : Day
 {
     [Puzzle(answer: 1173)]

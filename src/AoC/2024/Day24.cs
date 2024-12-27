@@ -2,6 +2,7 @@ using Collections;
 
 namespace AoC._2024;
 
+[PuzzleType(PuzzleType.Graph, PuzzleType.Recursion)]
 public sealed class Day24 : Day
 {
     [Puzzle(answer: 60714423975686)]
@@ -198,11 +199,14 @@ public sealed class Day24 : Day
 
         private List<Swap> ValidSwaps(int i)
         {
+            // Apparently it is enough to only check the first and few few nodes
+            int nodes = 4;
+
             // Get swap candidates from the start forwards
             //                 and from the end backwards
             var forward = new HashSet<string>();
             var queue = new Queue<string>().With(Symbol('x', i), Symbol('y', i));
-            while (queue.TryDequeue(out var current))
+            while (queue.TryDequeue(out var current) && forward.Count() < nodes)
             {
                 var operations = StateNodes[current].Next;
                 foreach (var node in operations)
@@ -213,7 +217,7 @@ public sealed class Day24 : Day
             }
             var backward = new HashSet<string>();
             queue = new Queue<string>().With(Symbol('z', i), Symbol('z', i + 1));
-            while (queue.TryDequeue(out var current))
+            while (queue.TryDequeue(out var current) && backward.Count() < nodes)
             {
                 if (!StateNodes.TryGetValue(current, out var nde)) continue;
                 var operations = nde.Previous;
