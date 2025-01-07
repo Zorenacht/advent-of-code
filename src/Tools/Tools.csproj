@@ -8,11 +8,11 @@
     <IsPublishable>false</IsPublishable>
     <OutputType>library</OutputType>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  
+
   <PropertyGroup Label="Package settings">
     <RepositoryType>git</RepositoryType>
     <PackageId>Renzo.Tools</PackageId>

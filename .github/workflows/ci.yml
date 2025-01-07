@@ -1,0 +1,44 @@
+name: Build & Test
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "9.0.x"
+      - name: Build Tools
+        run: dotnet build src/Tools/Tools.csproj --configuration Release
+      - name: Build Tools.Test
+        run: dotnet build src/Tools.Tests/Tools.Tests.csproj --configuration Release
+      - name: Run unit tests
+        run: dotnet test src/Tools.Tests/Tools.Tests.csproj --no-build --configuration Release
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: ./**/*.nupkg
+          if-no-files-found: ignore
+
+  push:
+    runs-on: ubuntu-latest
+    if: true # github.ref == 'refs/heads/main'
+    needs: build
+    steps:
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "9.0.x"
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      - name: Push NuGet package
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          SOURCE: https://api.nuget.org/v3/index.json
+        run: dotnet nuget push *.nupkg --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
