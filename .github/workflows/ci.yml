@@ -31,7 +31,7 @@ jobs:
   push:
     name: Push and Tag
     runs-on: ubuntu-latest
-    if: true # github.ref == 'refs/heads/main' TODO: disable true
+    if: github.ref == 'refs/heads/main'
     needs: build
     env:
       PackageId: Renzo.Tools # The package version will be extracted from the package filename as [PackageId].[Version].nupkg
@@ -56,12 +56,7 @@ jobs:
           echo "PackagePushed=$?" >> $GITHUB_ENV
       - name: Get version number # Note this requires the package filename to be of the form [PackageId].[Version].nupkg
         working-directory: ./artifacts
-        run: |
-          ls -1
-          ls -1 | (sed -En 's/${{ env.PackageId }}\.([0-9]+\.[0-9]+\.[0-9]+)\.nupkg/\1/p')
-          echo "Version=$(ls -1 | (sed -En 's/${{ env.PackageId }}\.([0-9]+\.[0-9]+\.[0-9]+)\.nupkg/\1/p'))" >> $GITHUB_ENV
-          echo ${{ env.PackagePushed }}
-          echo ${{ env.Version }}
+        run: echo "Version=$(ls -1 | (sed -En 's/${{ env.PackageId }}\.([0-9]+\.[0-9]+\.[0-9]+)\.nupkg/\1/p'))" >> $GITHUB_ENV
       - name: Create release and tag
         env:
           GH_TOKEN: ${{ github.token }}
