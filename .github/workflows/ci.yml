@@ -40,7 +40,8 @@ jobs:
         uses: actions/download-artifact@v4
       - name: Push NuGet package
         shell: bash
+        working-directory: ./artifacts
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           SOURCE: https://api.nuget.org/v3/index.json
-        run: dotnet nuget push *.nupkg --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
+        run: dotnet nuget push "*.nupkg" --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
