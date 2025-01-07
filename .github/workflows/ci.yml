@@ -31,7 +31,7 @@ jobs:
   push:
     name: Push and Tag?
     runs-on: ubuntu-latest
-    if: true # github.ref == 'refs/heads/main'
+    if: true # github.ref == 'refs/heads/main' TODO: disable true
     needs: build
     steps:
       - name: Setup .NET 9.0
