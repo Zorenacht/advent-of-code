@@ -16,16 +16,16 @@ jobs:
             8.0.x
             9.0.x
       - name: Build Tools
-        run: dotnet build src/Tools/Tools.csproj --configuration Release
+        run: dotnet build src/Tools/Tools.csproj -c Release
       - name: Build Tools.Test
-        run: dotnet build src/Tools.Tests/Tools.Tests.csproj --configuration Release
+        run: dotnet build src/Tools.Tests/Tools.Tests.csproj -c Release
       - name: Run unit tests
-        run: dotnet test src/Tools.Tests/Tools.Tests.csproj --no-build --configuration Release
+        run: dotnet test src/Tools.Tests/Tools.Tests.csproj --no-build -c Release
       - name: Publish artifacts
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
-          path: ./src/Tools.Tests/bin/Release/*.nupkg
+          path: ./src/Tools/bin/Release/*.nupkg
           if-no-files-found: ignore
 
   push:
