@@ -1,9 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <IsPublishable>false</IsPublishable>
+    <OutputType>library</OutputType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package settings">
+    <RepositoryType>git</RepositoryType>
+    <PackageId>Renzo.Tools</PackageId>
+    <PackageDescription>Not meant for use, testing nuget push.</PackageDescription>
+    <Authors>Renzo Baasdam</Authors>
+    <Version>0.0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,4 +26,7 @@
     <PackageReference Include="NUnit" Version="4.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DotNetProjectFile.Analyzers" Version="*" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

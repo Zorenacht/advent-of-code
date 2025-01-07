@@ -1,0 +1,64 @@
+name: Build & Test
+
+on: [push]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+      - name: Build Tools
+        run: dotnet build src/Tools/Tools.csproj -c Release
+      - name: Build Tools.Test
+        run: dotnet build src/Tools.Tests/Tools.Tests.csproj -c Release
+      - name: Run unit tests
+        run: dotnet test src/Tools.Tests/Tools.Tests.csproj --no-build -c Release
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: ./src/Tools/bin/Release/*.nupkg
+          if-no-files-found: ignore
+
+  push:
+    name: Push and Tag
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    env:
+      PackageId: Renzo.Tools # The package version will be extracted from the package filename as [PackageId].[Version].nupkg
+      PackagePushed: -1
+      Version: ""
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "9.0.x"
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      - name: Push NuGet package
+        shell: bash +e {0} # prevents console from exit on error
+        working-directory: ./artifacts
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          SOURCE: https://api.nuget.org/v3/index.json
+        run: |
+          dotnet nuget push "*.nupkg" --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
+          echo "PackagePushed=$?" >> $GITHUB_ENV
+      - name: Get version number # Note this requires the package filename to be of the form [PackageId].[Version].nupkg
+        working-directory: ./artifacts
+        run: echo "Version=$(ls -1 | (sed -En 's/${{ env.PackageId }}\.([0-9]+\.[0-9]+\.[0-9]+)\.nupkg/\1/p'))" >> $GITHUB_ENV
+      - name: Create release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        if: env.PackagePushed == 0 && env.Version != ''
+        run: gh release create v${{ env.Version }} --generate-notes
