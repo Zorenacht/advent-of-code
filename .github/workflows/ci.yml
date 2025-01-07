@@ -55,7 +55,9 @@ jobs:
           echo "PackagePushed=$?" >> $GITHUB_ENV
       - name: Get version number # Note this requires the package filename to be of the form [PackageId].[Version].nupkg
         working-directory: ./artifacts
-        run: echo "Version=$(ls -1 | grep -E '.+\.[0-9]+\.[0-9]+\.[0-9]+\.nupkg$'" >> $GITHUB_ENV
+        run: |
+          ls -1
+          echo "Version=$(ls -1 | (grep -E '${{ env.PackageId }}\.[0-9]+\.[0-9]+\.[0-9]+\.nupkg$' || '')" >> $GITHUB_ENV
       - name: Create release
         if: env.PackagePushed == 0 && env.Version != ''
         run: gh release create v${{ env.Version }} --generate-notes
