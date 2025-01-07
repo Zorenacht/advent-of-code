@@ -18,7 +18,7 @@
     <PackageId>Renzo.Tools</PackageId>
     <PackageDescription>Not meant for use, testing nuget push.</PackageDescription>
     <Authors>Renzo Baasdam</Authors>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
