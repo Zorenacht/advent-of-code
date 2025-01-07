@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
-          path: ./**/*.nupkg
+          path: ./src/Tools.Tests/bin/Release/*.nupkg
           if-no-files-found: ignore
 
   push:
