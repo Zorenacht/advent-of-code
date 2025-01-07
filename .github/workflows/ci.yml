@@ -29,7 +29,7 @@ jobs:
           if-no-files-found: ignore
 
   push:
-    name: Push and Tag?
+    name: Push and Tag
     runs-on: ubuntu-latest
     if: true # github.ref == 'refs/heads/main' TODO: disable true
     needs: build
@@ -40,18 +40,13 @@ jobs:
           dotnet-version: "9.0.x"
       - name: Download artifacts
         uses: actions/download-artifact@v4
-      - name: ls
-        shell: bash
-        run: |
-          ls -lrt
-          cd ../
-          ls -lrt
-          cd ../
-          ls -lrt
       - name: Push NuGet package
-        shell: bash
+        shell: bash +e {0} # prevents console from exit on error
         working-directory: ./artifacts
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           SOURCE: https://api.nuget.org/v3/index.json
-        run: dotnet nuget push "*.nupkg" --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
+        run: |
+          dotnet nuget push "*.nupkg" --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
+          successfull=$?
+          echo $successfull
