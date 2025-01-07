@@ -33,6 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     if: true # github.ref == 'refs/heads/main' TODO: disable true
     needs: build
+    env:
+      PackageId: "Renzo.Tools"
+      PackagePushed: -1
+      Version: ""
     steps:
       - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v1
@@ -49,6 +53,9 @@ jobs:
         run: |
           dotnet nuget push "*.nupkg" --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
           echo "PackagePushed=$?" >> $GITHUB_ENV
-      - name: Push NuGet package
-        if: env.PackagePushed == 0
-        run: echo hey
+      - name: Get version number # Note this requires the package filename to be of the form [PackageId].[Version].nupkg
+        working-directory: ./artifacts
+        run: echo "Version=$(ls -1 ${{ env.PackageId }}*.nupkg | grep -E '.+\.[0-9]+\.[0-9]+\.[0-9]+\.nupkg$'" >> $GITHUB_ENV
+      - name: Create release
+        if: env.PackagePushed == 0 && env.Version != ''
+        run: gh release create v${{ env.Version }} --generate-notes
