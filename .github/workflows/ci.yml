@@ -38,6 +38,15 @@ jobs:
           dotnet-version: "9.0.x"
       - name: Download artifacts
         uses: actions/download-artifact@v4
+      - name: ls
+        shell: bash
+        run: ls -lrt
+          cd ./artifacts
+          ls -lrt
+      - name: ls
+        shell: bash
+        working-directory: ./artifacts
+        run: ls -lrt
       - name: Push NuGet package
         shell: bash
         working-directory: ./artifacts
