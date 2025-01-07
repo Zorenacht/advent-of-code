@@ -47,6 +47,8 @@ jobs:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           SOURCE: https://api.nuget.org/v3/index.json
         run: |
-          dotnet nuget push "*.nupkg" --api-key ${{ env.NUGET_API_KEY }} --source ${{ env.SOURCE }}
-          successfull=$?
-          echo $successfull
+          dotnet nuget push "*.nupkg" --api-key $env.NUGET_API_KEY --source $env.SOURCE
+          echo "PackagePushed=$?" >> $GITHUB_PACKAGEPUSHED
+      - name: Push NuGet package
+        if: env.PackagePushed == 0
+        run: echo hey
