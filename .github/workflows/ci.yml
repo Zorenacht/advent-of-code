@@ -44,12 +44,6 @@ jobs:
         shell: bash
         run: |
           ls -lrt
-          cd ./artifacts
-          ls -lrt
-      - name: ls
-        shell: bash
-        working-directory: ./artifacts
-        run: ls -lrt
       - name: Push NuGet package
         shell: bash
         working-directory: ./artifacts
