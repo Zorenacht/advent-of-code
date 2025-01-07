@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -28,6 +29,7 @@ jobs:
           if-no-files-found: ignore
 
   push:
+    name: Push and Tag?
     runs-on: ubuntu-latest
     if: true # github.ref == 'refs/heads/main'
     needs: build
@@ -40,7 +42,8 @@ jobs:
         uses: actions/download-artifact@v4
       - name: ls
         shell: bash
-        run: ls -lrt
+        run: |
+          ls -lrt
           cd ./artifacts
           ls -lrt
       - name: ls
