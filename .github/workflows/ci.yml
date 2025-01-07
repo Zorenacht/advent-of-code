@@ -2,9 +2,6 @@ name: Build & Test
 
 on: [push]
 
-env:
-  PackageId: Renzo.Tools # The package version will be extracted from the package filename as [PackageId].[Version].nupkg
-
 jobs:
   build:
     name: Build and Test
@@ -37,6 +34,7 @@ jobs:
     if: true # github.ref == 'refs/heads/main' TODO: disable true
     needs: build
     env:
+      PackageId: Renzo.Tools # The package version will be extracted from the package filename as [PackageId].[Version].nupkg
       PackagePushed: -1
       Version: ""
     steps:
