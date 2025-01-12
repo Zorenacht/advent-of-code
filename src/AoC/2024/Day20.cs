@@ -33,13 +33,8 @@ public sealed class Day20 : Day
         }
         var distance = distancesTillEnd[end];
         distancesTillEnd = distancesTillEnd.Select(x => new KeyValuePair<Index2D, int>(x.Key, distance - x.Value)).ToDictionary();
-<<<<<<< Updated upstream
 
         // Loop through the path and look in a manhattan area around it for all possible exit points
-=======
-        
-        // Loop through the path and look in a Manhattan area around it for all possible exit points
->>>>>>> Stashed changes
         var distances = new Dictionary<int, int>();
         var list = distancesTillEnd.Select(kv => (kv.Key, distance - kv.Value)).ToList<(Index2D Index, int Distance)>();
         foreach (var indexDistance in list)
