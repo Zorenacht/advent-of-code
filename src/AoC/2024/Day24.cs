@@ -1,4 +1,5 @@
 using Collections;
+using static AoC._2024.Day24;
 
 namespace AoC._2024;
 
@@ -13,14 +14,19 @@ public sealed class Day24 : Day
         return computer.Value('z');
     }
 
-    [Puzzle(answer: "cgh,frt,pmd,sps,tst,z05,z11,z23")]
-    public string Part2()
-    {
-        //int bits = 5; int depth = 2;
-        //var computer = new Computer().Init(InputExample, (a, b) => a & b);
+    [Puzzle(answer: "z00,z01,z02,z05")]
+    public string Part2Example() => FindCorrectingSwaps(bits: 5, depth: 2, InputExample, (a, b) => a & b);
 
-        int bits = 44; int depth = 4;
-        var computer = new Computer().Init(Input, (a, b) => a + b);
+    [Puzzle(answer: "cgh,frt,pmd,sps,tst,z05,z11,z23")]
+    public string Part2() => FindCorrectingSwaps(bits: 44, depth: 4, Input, (a, b) => a + b);
+
+    public string FindCorrectingSwaps(
+        int bits,
+        int depth,
+        string[] input, 
+        Func<long, long, long> func)
+    {
+        var computer = new Computer().Init(input, func);
 
         List<List<Swap>> valids = [];
         computer.FindValidPermutations(bit: bits, [], valids, depth: depth);
@@ -38,6 +44,7 @@ public sealed class Day24 : Day
         }
         throw new NotSupportedException();
     }
+
 
     public class Computer()
     {
@@ -125,23 +132,6 @@ public sealed class Day24 : Day
             return true;
         }
 
-        private bool IntegerCalculationIsValid()
-        {
-            if (!Calculate()) return false;
-            var x = Value('x');
-            var y = Value('y');
-            var result = Operation(x, y);
-            var z = Value('z');
-            return result == z;
-        }
-
-        public bool AllBitCalculationsAreValid(int i)
-            => Set(x: 0L << 0, y: 0L << 0) && IntegerCalculationIsValid()
-            && Set(x: 1L << i, y: 0L << 0) && IntegerCalculationIsValid()
-            && Set(x: 0L << 0, y: 1L << i) && IntegerCalculationIsValid()
-            && Set(x: 1L << i, y: 1L << i) && IntegerCalculationIsValid();
-
-
         public Computer FindValidPermutations(
             int bit,
             List<Swap> swaps,
@@ -184,7 +174,6 @@ public sealed class Day24 : Day
 
         public bool VerifySwaps(List<Swap> swaps, int bit)
         {
-
             bool isValid = true;
             for (int i = 0; i < swaps.Count; ++i) swaps[i].Do();
             for (int i = bit; i >= 0; --i)
@@ -196,6 +185,22 @@ public sealed class Day24 : Day
             for (int i = swaps.Count - 1; i >= 0; --i) swaps[i].Undo();
             return isValid;
         }
+
+        private bool IntegerCalculationIsValid()
+        {
+            if (!Calculate()) return false;
+            var x = Value('x');
+            var y = Value('y');
+            var result = Operation(x, y);
+            var z = Value('z');
+            return result == z;
+        }
+
+        private bool AllBitCalculationsAreValid(int i)
+            => Set(x: 0L << 0, y: 0L << 0) && IntegerCalculationIsValid()
+            && Set(x: 1L << i, y: 0L << 0) && IntegerCalculationIsValid()
+            && Set(x: 0L << 0, y: 1L << i) && IntegerCalculationIsValid()
+            && Set(x: 1L << i, y: 1L << i) && IntegerCalculationIsValid();
 
         private List<Swap> ValidSwaps(int i)
         {
