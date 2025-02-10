@@ -61,3 +61,4 @@ jobs:
         if: env.Version != ''
         run: |
           git tag v${{ env.Version}}
+          git push origin v${{ env.Version}}
