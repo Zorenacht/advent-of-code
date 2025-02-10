@@ -60,5 +60,5 @@ jobs:
       - name: Tag version
         if: env.Version != ''
         run: |
-          git tag v${{ env.Version}}
-          git push origin v${{ env.Version}}
+          git tag v${{ env.Version }}
+          git push origin v${{ env.Version }}
